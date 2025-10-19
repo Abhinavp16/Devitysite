@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - DevityClub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+            }
+        }
+        
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .animate-slideInLeft {
+            animation: slideInLeft 0.6s ease-out forwards;
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .animate-pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4 relative overflow-hidden">
+        <!-- Animated Background Elements -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <!-- Floating particles -->
+            <div class="absolute top-20 left-20 w-4 h-4 bg-blue-400/30 rounded-full animate-float"></div>
+            <div class="absolute top-40 right-32 w-6 h-6 bg-purple-400/20 rounded-full animate-float" style="animation-delay: 1s;"></div>
+            <div class="absolute bottom-32 left-40 w-3 h-3 bg-cyan-400/40 rounded-full animate-float" style="animation-delay: 2s;"></div>
+            <div class="absolute bottom-20 right-20 w-5 h-5 bg-indigo-400/25 rounded-full animate-float" style="animation-delay: 0.5s;"></div>
+            
+            <!-- Gradient orbs -->
+            <div class="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-xl animate-pulse"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-40 h-40 bg-gradient-to-r from-cyan-500/15 to-blue-500/15 rounded-full blur-2xl animate-pulse" style="animation-delay: 1s;"></div>
+        </div>
+
+        <!-- Back to Home Button -->
+        <a href="/" class="absolute top-8 left-8 flex items-center px-4 py-2 text-blue-200 hover:text-white transition-all duration-300 rounded-lg hover:bg-white/10 backdrop-blur-sm group">
+            <svg class="w-5 h-5 mr-2 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Home
+        </a>
+
+        <!-- Login Container -->
+        <div class="relative w-full max-w-md">
+            <!-- Main Login Card -->
+            <div class="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8 animate-fadeInUp">
+                <!-- Header -->
+                <div class="text-center mb-8 animate-slideInLeft">
+                    <div class="relative inline-block">
+                        <h1 class="text-3xl font-bold text-white mb-2">
+                            <span class="bg-gradient-to-r from-blue-200 via-white to-cyan-200 bg-clip-text text-transparent">
+                                Admin Login
+                            </span>
+                        </h1>
+                        <div class="absolute -inset-2 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 blur-lg rounded-lg opacity-50"></div>
+                    </div>
+                    <p class="text-blue-200/80 text-sm">Welcome back! Please sign in to continue.</p>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="space-y-6">
+                    <!-- Email Field -->
+                    <div class="relative group animate-slideInLeft" style="animation-delay: 0.2s;">
+                        <label class="block text-blue-200 text-sm font-medium mb-2 transition-all duration-300 group-hover:text-white">
+                            Email Address
+                        </label>
+                        <div class="relative">
+                            <input
+                                type="email"
+                                name="email"
+                                id="email"
+                                class="w-full px-4 py-3 pl-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-blue-200/60 focus:outline-none focus:border-blue-400 focus:bg-white/15 transition-all duration-300 backdrop-blur-sm"
+                                placeholder="Enter your email"
+                                required
+                            />
+                            <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+                                <svg class="w-5 h-5 text-blue-300/70 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Username Field -->
+                    <div class="relative group animate-slideInLeft" style="animation-delay: 0.4s;">
+                        <label class="block text-blue-200 text-sm font-medium mb-2 transition-all duration-300 group-hover:text-white">
+                            Username
+                        </label>
+                        <div class="relative">
+                            <input
+                                type="text"
+                                name="username"
+                                id="username"
+                                class="w-full px-4 py-3 pl-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-blue-200/60 focus:outline-none focus:border-blue-400 focus:bg-white/15 transition-all duration-300 backdrop-blur-sm"
+                                placeholder="Enter your username"
+                                required
+                            />
+                            <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+                                <svg class="w-5 h-5 text-blue-300/70 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="relative group animate-slideInLeft" style="animation-delay: 0.6s;">
+                        <label class="block text-blue-200 text-sm font-medium mb-2 transition-all duration-300 group-hover:text-white">
+                            Password
+                        </label>
+                        <div class="relative">
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                class="w-full px-4 py-3 pl-12 pr-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-blue-200/60 focus:outline-none focus:border-blue-400 focus:bg-white/15 transition-all duration-300 backdrop-blur-sm"
+                                placeholder="Enter your password"
+                                required
+                            />
+                            <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+                                <svg class="w-5 h-5 text-blue-300/70 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <button
+                                type="button"
+                                id="togglePassword"
+                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-300/70 hover:text-blue-400 transition-all duration-300 hover:scale-110"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Login Button -->
+                    <div class="animate-slideInLeft" style="animation-delay: 0.8s;">
+                        <button
+                            type="submit"
+                            id="loginBtn"
+                            class="relative w-full py-3 px-6 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 hover:from-blue-600 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-2xl group overflow-hidden"
+                        >
+                            <!-- Button shimmer effect -->
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out"></div>
+                            
+                            <!-- Button glow -->
+                            <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500 opacity-0 group-hover:opacity-50 blur-lg transition-opacity duration-500 rounded-xl"></div>
+                            
+                            <div class="relative z-10 flex items-center justify-center">
+                                <svg class="w-5 h-5 mr-2 transition-all duration-300 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                </svg>
+                                <span id="btnText">Sign In</span>
+                            </div>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Footer -->
+                <div class="mt-8 text-center animate-slideInLeft" style="animation-delay: 1s;">
+                    <p class="text-blue-200/60 text-sm">
+                        Secure admin access for DevityClub
+                    </p>
+                    <div class="mt-4 flex justify-center space-x-4">
+                        <div class="w-2 h-2 bg-blue-400/50 rounded-full animate-pulse"></div>
+                        <div class="w-2 h-2 bg-cyan-400/50 rounded-full animate-pulse" style="animation-delay: 0.5s;"></div>
+                        <div class="w-2 h-2 bg-indigo-400/50 rounded-full animate-pulse" style="animation-delay: 1s;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decorative elements -->
+            <div class="absolute -top-4 -left-4 w-8 h-8 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-20 animate-float"></div>
+            <div class="absolute -bottom-4 -right-4 w-6 h-6 bg-gradient-to-r from-purple-400 to-indigo-400 rounded-full opacity-30 animate-float" style="animation-delay: 1.5s;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('password');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+        });
+
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('loginBtn');
+            const btnText = document.getElementById('btnText');
+            
+            // Show loading state
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+            btnText.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Signing In...
+            `;
+            
+            // Simulate login process
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.classList.remove('opacity-70', 'cursor-not-allowed');
+                btnText.textContent = 'Sign In';
+                
+                // Get form data
+                const formData = {
+                    email: document.getElementById('email').value,
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                };
+                
+                console.log('Login attempt:', formData);
+                
+                // Store auth token and user data
+                localStorage.setItem('adminToken', 'authenticated');
+                localStorage.setItem('adminUser', JSON.stringify({
+                    email: formData.email,
+                    username: formData.username
+                }));
+                
+                // Redirect to dashboard
+                window.location.href = '/dashboard';
+            }, 2000);
+        });
+
+        // Add focus effects
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.querySelector('svg').classList.add('text-blue-400', 'scale-110');
+                this.parentElement.querySelector('svg').classList.remove('text-blue-300/70');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.querySelector('svg').classList.remove('text-blue-400', 'scale-110');
+                this.parentElement.querySelector('svg').classList.add('text-blue-300/70');
+            });
+        });
+    </script>
+</body>
+</html>

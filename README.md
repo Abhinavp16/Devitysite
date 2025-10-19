@@ -1,70 +1,166 @@
-# Getting Started with Create React App
+# DevityClub Website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, responsive website for DevityClub - a tech community focused on empowering the next generation of tech innovators.
+
+## Features
+
+- **Responsive Design**: Fully responsive design that works on all devices
+- **Modern UI**: Clean and modern interface built with React and Tailwind CSS
+- **Interactive Components**: Engaging user interface with smooth animations
+- **Contact Form**: Functional contact form for community inquiries
+- **Speaker Showcase**: Dedicated section for guest speakers and industry experts
+- **Event Management**: Display of upcoming and past events
+- **Team Section**: Meet the team behind DevityClub
+
+## Tech Stack
+
+- **Frontend**: React 19.1.1
+- **Styling**: Tailwind CSS 4.1.13
+- **Build Tool**: Create React App
+- **Icons**: Heroicons (via SVG)
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (version 14 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd devitysite
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm start
+```
+
+4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ## Available Scripts
 
-In the project directory, you can run:
+- `npm start` - Runs the app in development mode
+- `npm test` - Launches the test runner
+- `npm run build` - Builds the app for production
+- `npm run eject` - Ejects from Create React App (one-way operation)
 
-### `npm start`
+## Project Structure
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
+devitysite/
+├── public/
+│   ├── index.html
+│   └── ...
+├── src/
+│   ├── components/
+│   │   ├── Header.js
+│   │   ├── Hero.js
+│   │   ├── About.js
+│   │   ├── Events.js
+│   │   ├── Team.js
+│   │   ├── Speakers.js
+│   │   ├── Contact.js
+│   │   └── Footer.js
+│   ├── App.js
+│   ├── App.css
+│   ├── index.js
+│   └── index.css
+├── tailwind.config.js
+├── postcss.config.js
+└── package.json
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Components
 
-### `npm test`
+### Header
+- Navigation menu with smooth scrolling
+- Responsive mobile menu
+- Admin login button
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Hero
+- Eye-catching hero section with call-to-action buttons
+- Animated tech-themed graphics
+- Responsive layout
 
-### `npm run build`
+### About
+- Club mission and vision
+- Feature highlights with icons
+- Statistics showcase
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Events
+- Upcoming and past events display
+- Event registration functionality
+- Event details with date, time, and location
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Team
+- Team member profiles
+- Social media links
+- Skills and expertise display
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Speakers
+- Guest speaker profiles
+- Company affiliations
+- Upcoming talks information
 
-### `npm run eject`
+### Contact
+- Contact form with validation
+- Contact information display
+- Social media links
+- Office hours
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Footer
+- Newsletter subscription
+- Quick links and resources
+- Social media integration
+- Copyright information
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Customization
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Colors
+The website uses a blue-based color scheme. To customize colors, update the Tailwind configuration in `tailwind.config.js`.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Content
+Update the content in each component file to match your club's information:
+- Club name and branding
+- Team member information
+- Event details
+- Contact information
 
-## Learn More
+### Styling
+Additional custom styles can be added to `src/App.css` or by extending Tailwind classes.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Deployment
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+To deploy the website:
 
-### Code Splitting
+1. Build the project:
+```bash
+npm run build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+2. Deploy the `build` folder to your hosting service (Netlify, Vercel, GitHub Pages, etc.)
 
-### Analyzing the Bundle Size
+## Contributing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
-### Making a Progressive Web App
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+This project is open source and available under the [MIT License](LICENSE).
 
-### Advanced Configuration
+## Support
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+For support or questions, please contact the DevityClub team at hello@devityclub.dev

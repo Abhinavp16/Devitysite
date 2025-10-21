@@ -44,26 +44,23 @@ function App() {
 
   try {
     return (
-      <div className="min-h-screen">
-        {/* Header and Hero without animated background */}
-        <div className="relative">
-          <Header />
-          <Hero />
+      <div className="min-h-screen bg-gray-50">
+        {/* Test with just basic content first */}
+        <div className="p-8 text-center">
+          <h1 className="text-4xl font-bold text-blue-600 mb-4">Devity Club</h1>
+          <p className="text-xl text-gray-600 mb-8">Loading components...</p>
         </div>
 
-        {/* Rest of the sections with animated background */}
-        <div className="relative min-h-screen">
-          <AnimatedBackground />
-          <div className="relative z-10">
-            <About />
-            <ClubMemories />
-            <Events />
-            <Team />
-            <Speakers />
-            <Contact />
-            <Footer />
-          </div>
-        </div>
+        {/* Gradually add components */}
+        <Header />
+        <Hero />
+        <About />
+        {/* <ClubMemories />
+        <Events />
+        <Team />
+        <Speakers />
+        <Contact />
+        <Footer /> */}
       </div>
     );
   } catch (error) {

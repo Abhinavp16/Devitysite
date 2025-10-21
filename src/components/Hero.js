@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { HeroAnimatedBackground } from './AnimatedBackground';
-import devityLogoVideo from '../devity_logo.mp4';
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);

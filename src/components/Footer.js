@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 const Footer = () => {
-  const [email, setEmail] = useState('');
 
   
 

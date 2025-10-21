@@ -16,9 +16,11 @@ function App() {
   const [currentPage, setCurrentPage] = useState('home');
 
   useEffect(() => {
+    console.log('App component mounted');
     // Simple routing based on URL pathname
     const handleRouteChange = () => {
       const path = window.location.pathname;
+      console.log('Current path:', path);
       if (path === '/dashboard') {
         setCurrentPage('dashboard');
       } else {
@@ -34,33 +36,45 @@ function App() {
     };
   }, []);
 
+  console.log('Rendering App, currentPage:', currentPage);
+
   if (currentPage === 'dashboard') {
     return <AdminProtectedRoute />;
   }
 
-  return (
-    <div className="min-h-screen">
-      {/* Header and Hero without animated background */}
-      <div className="relative">
-        <Header />
-        <Hero />
-      </div>
+  try {
+    return (
+      <div className="min-h-screen">
+        {/* Header and Hero without animated background */}
+        <div className="relative">
+          <Header />
+          <Hero />
+        </div>
 
-      {/* Rest of the sections with animated background */}
-      <div className="relative min-h-screen">
-        <AnimatedBackground />
-        <div className="relative z-10">
-          <About />
-          <ClubMemories />
-          <Events />
-          <Team />
-          <Speakers />
-          <Contact />
-          <Footer />
+        {/* Rest of the sections with animated background */}
+        <div className="relative min-h-screen">
+          <AnimatedBackground />
+          <div className="relative z-10">
+            <About />
+            <ClubMemories />
+            <Events />
+            <Team />
+            <Speakers />
+            <Contact />
+            <Footer />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error('Error in App render:', error);
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <h1>Error loading application</h1>
+        <p>Please check the console for details.</p>
+      </div>
+    );
+  }
 }
 
 export default App;

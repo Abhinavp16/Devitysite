@@ -9,7 +9,6 @@ const AdminProtectedRoute = () => {
     // Check authentication status
     const checkAuth = () => {
       const token = localStorage.getItem('adminToken');
-      const user = localStorage.getItem('adminUser');
       
       // Check for valid JWT token (should be longer than 20 characters)
       if (token && token.length > 20) {
@@ -35,9 +34,21 @@ const AdminProtectedRoute = () => {
   }
 
   if (!isAuthenticated) {
-    // Import and show the login component
-    const AdminLogin = require('./AdminLogin').default;
-    return <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />;
+    // For static deployment, redirect to home or show message
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Admin Access Required</h2>
+          <p className="text-gray-600 mb-6">This area requires admin authentication.</p>
+          <button 
+            onClick={() => window.location.href = '/'}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
+          >
+            Return to Home
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return <AdminDashboard />;

@@ -9,6 +9,21 @@ node_modules/
 # Production
 /build
 
+# Backend (not needed for static deployment)
+/server
+*.bat
+BACKEND_SETUP.md
+TEST_BACKEND.md
+HOSTINGER_DEPLOYMENT_GUIDE.md
+
+# Documentation files (optional to exclude)
+ADMIN_DASHBOARD_GUIDE.md
+COMPLETE_SETUP_GUIDE.md
+COMPLETE_SYSTEM_SUMMARY.md
+LOGIN_INSTRUCTIONS.md
+QUICK_TEST_GUIDE.md
+SYSTEM_STATUS.md
+
 # Misc
 .DS_Store
 .env.local

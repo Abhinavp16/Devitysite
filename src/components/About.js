@@ -58,7 +58,7 @@ const About = () => {
               growing together as a community.
             </p>
             <p className="text-lg text-gray-700 leading-relaxed">
-              Since our founding in 2020, we've hosted over 30+ events, supported 500+ members,
+              Since our founding in 15 th February 2023, we've hosted over 30+ events, supported 300+ members,
               and launched dozens of innovative projects that have made a real impact.
             </p>
           </div>

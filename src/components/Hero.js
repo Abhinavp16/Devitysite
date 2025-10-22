@@ -63,10 +63,10 @@ const Hero = () => {
               {/* Main circle with video logo */}
               <div className="w-96 h-96 rounded-full flex items-center justify-center shadow-2xl hover-scale overflow-hidden relative p-3 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600">
                 {/* Video container filling most of the circle */}
-                <div className="relative w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-black/20">
+                <div className="relative w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-white">
                   {/* Video Logo */}
                   <video
-                    className="w-full h-full object-cover mix-blend-screen"
+                    className="w-full h-full object-contain"
                     autoPlay
                     loop
                     muted
@@ -80,7 +80,7 @@ const Hero = () => {
                       e.target.nextElementSibling.style.display = 'block';
                     }}
                   >
-                    <source src="/assets/videos/devity_lgo.mp4" type="video/mp4" />
+                    <source src="/assets/videos/devity_logo.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
 

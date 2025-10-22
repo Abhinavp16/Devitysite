@@ -1,19 +1,29 @@
 import { SpeakersAnimatedBackground } from './AnimatedBackground';
 
 // Import speaker images
-import vikashImage from '../img/Vikash Shrivastava.jpeg';
-import rohitImage from '../img/rohit agrawal.jpeg';
-import amolImage from '../img/amol rangari.jpeg';
-import nakulImage from '../img/Nakul; Grover.jpeg';
-import umamaheshwarImage from '../img/umamaheshwar.jpeg';
+import vikashImage from '../img/speakers/Vikash Shrivastava.jpeg';
+import rohitAgarwalImage from '../img/speakers/rohit agrawal.jpeg';
+import amolImage from '../img/speakers/amol rangari.jpeg';
+import nakulImage from '../img/speakers/Nakul; Grover.jpeg';
+import umamaheshwarImage from '../img/speakers/umamaheshwar.jpeg';
+import mahimaImage from '../img/speakers/Mahima Saran.png';
+import meetaImage from '../img/speakers/Meeta Rathore.png';
+import tusharImage from '../img/speakers/Tushar Pandey.png';
+import rohitSinghalImage from '../img/speakers/Rohit Singhal.png';
+import himanshuImage from '../img/speakers/Himanshu Rathore.png';
+import priyanshuImage from '../img/speakers/Priyanshu Patel.png';
+import krutarthImage from '../img/speakers/Krutarth Rindani.png';
+import poorviImage from '../img/speakers/Poorvi Dewangan.png';
+import roshanImage from '../img/speakers/Roshan Bishi.png';
+import meghnaImage from '../img/speakers/Meghna Parwate.png';
 
 const Speakers = () => {
   const speakers = [
     {
-      name: "Mr. Vikash Shrivastava",
-      title: "Senior Engineer Manager ",
-      company: "Dell Technologies",
-      expertise: ["Ex-Google", "Ex-Cisco"],
+      name: "Mr. Vikas Shrivastava",
+      title: "Sr. Engineering Manager",
+      company: "DELL Technologies",
+      expertise: ["Ex-Google", "Ex-Cisco", "Engineering Leadership", "Cloud Architecture"],
       image: vikashImage,
       gradientFrom: "from-red-500",
       gradientTo: "to-pink-600",
@@ -22,34 +32,10 @@ const Speakers = () => {
       textColor: "text-red-700"
     },
     {
-      name: "Mr. Rohit Agarwal ",
-      title: "Senior Data Engineering Lead",
-      company: "Optum ( A United Health Group Company )",
-      expertise: ["Data Engineering", "Analytics", "Microservices"],
-      image: rohitImage,
-      gradientFrom: "from-blue-500",
-      gradientTo: "to-indigo-600",
-      bgGradient: "from-blue-50 via-white to-indigo-50",
-      skillGradient: "from-blue-100 to-indigo-100",
-      textColor: "text-blue-700"
-    },
-    {
-      name: "Mr. Amol Rangari ",
-      title: "Cybersecurity consultant",
-      company: "Cognizant",
-      expertise: ["Cybersecurity", "Ethical Hacking", "Zero Trust"],
-      image: amolImage,
-      gradientFrom: "from-green-500",
-      gradientTo: "to-emerald-600",
-      bgGradient: "from-green-50 via-white to-emerald-50",
-      skillGradient: "from-green-100 to-emerald-100",
-      textColor: "text-green-700"
-    },
-    {
       name: "Mr. Nakul Grover",
-      title: "Sr.DevOps Engineer",
+      title: "Sr. DevOps Engineer",
       company: "Thomson Reuters",
-      expertise: ["Ex-Deloitte", "Docker", "DevOps"],
+      expertise: ["Ex-Deloitte India", "DevOps", "CI/CD", "Cloud Infrastructure"],
       image: nakulImage,
       gradientFrom: "from-purple-500",
       gradientTo: "to-violet-600",
@@ -58,18 +44,161 @@ const Speakers = () => {
       textColor: "text-purple-700"
     },
     {
-      name: "Mr. Umamaheshwar Achari kakinada",
-      title: "Principal Engineer ",
-      company: "Charter Communication,Stamford,Connecticut",
-      expertise: ["Ex-motorola", "Ex-Nokia"],
-      image: umamaheshwarImage,
+      name: "Mrs. Mahima Saran",
+      title: "Sr. Solutions Architect",
+      company: "MongoDB",
+      expertise: ["Ex-AWS", "Ex-Accenture", "Database Architecture", "Cloud Solutions"],
+      image: mahimaImage,
+      gradientFrom: "from-green-500",
+      gradientTo: "to-teal-600",
+      bgGradient: "from-green-50 via-white to-teal-50",
+      skillGradient: "from-green-100 to-teal-100",
+      textColor: "text-green-700"
+    },
+    {
+      name: "Mrs. Meeta Rathore",
+      title: "Sr. Big Data Engineer",
+      company: "Optum, UHG",
+      expertise: ["Ex-IBM", "Ex-HSBC", "Big Data", "Analytics", "Data Engineering"],
+      image: meetaImage,
+      gradientFrom: "from-blue-500",
+      gradientTo: "to-cyan-600",
+      bgGradient: "from-blue-50 via-white to-cyan-50",
+      skillGradient: "from-blue-100 to-cyan-100",
+      textColor: "text-blue-700"
+    },
+    {
+      name: "Mr. Tushar Pandey",
+      title: "Software Development Engineer",
+      company: "Rakuten India",
+      expertise: ["Full Stack Development", "E-commerce", "Scalable Systems"],
+      image: tusharImage,
+      gradientFrom: "from-orange-500",
+      gradientTo: "to-red-600",
+      bgGradient: "from-orange-50 via-white to-red-50",
+      skillGradient: "from-orange-100 to-red-100",
+      textColor: "text-orange-700"
+    },
+    {
+      name: "Mr. Rohit Singhal",
+      title: "Sr. Software Development Engineer",
+      company: "Microsoft",
+      expertise: ["Ex-Amazon", "Ex-Motorola", "Cloud Computing", "Distributed Systems"],
+      image: rohitSinghalImage,
+      gradientFrom: "from-indigo-500",
+      gradientTo: "to-purple-600",
+      bgGradient: "from-indigo-50 via-white to-purple-50",
+      skillGradient: "from-indigo-100 to-purple-100",
+      textColor: "text-indigo-700"
+    },
+    {
+      name: "Mr. Himanshu Rathore",
+      title: "MTS Engineer",
+      company: "Salesforce",
+      expertise: ["Ex-Amazon", "Ex-HashedIN", "CRM Solutions", "Enterprise Software"],
+      image: himanshuImage,
+      gradientFrom: "from-cyan-500",
+      gradientTo: "to-blue-600",
+      bgGradient: "from-cyan-50 via-white to-blue-50",
+      skillGradient: "from-cyan-100 to-blue-100",
+      textColor: "text-cyan-700"
+    },
+    {
+      name: "Mr. Rohit Agarwal",
+      title: "Data Engineer Lead",
+      company: "Optum, UHG",
+      expertise: ["Data Engineering", "Analytics", "Big Data", "Cloud Platforms"],
+      image: rohitAgarwalImage,
+      gradientFrom: "from-emerald-500",
+      gradientTo: "to-green-600",
+      bgGradient: "from-emerald-50 via-white to-green-50",
+      skillGradient: "from-emerald-100 to-green-100",
+      textColor: "text-emerald-700"
+    },
+    {
+      name: "Mr. Amol Rangari",
+      title: "Cybersecurity Consultant",
+      company: "Cognizant",
+      expertise: ["Cybersecurity", "Ethical Hacking", "Security Architecture", "Compliance"],
+      image: amolImage,
+      gradientFrom: "from-red-500",
+      gradientTo: "to-orange-600",
+      bgGradient: "from-red-50 via-white to-orange-50",
+      skillGradient: "from-red-100 to-orange-100",
+      textColor: "text-red-700"
+    },
+    {
+      name: "Mr. Priyanshu Patel",
+      title: "Co-founder & AIE",
+      company: "Brainless AI & Akua",
+      expertise: ["Artificial Intelligence", "Machine Learning", "Startup Leadership", "Innovation"],
+      image: priyanshuImage,
+      gradientFrom: "from-violet-500",
+      gradientTo: "to-purple-600",
+      bgGradient: "from-violet-50 via-white to-purple-50",
+      skillGradient: "from-violet-100 to-purple-100",
+      textColor: "text-violet-700"
+    },
+    {
+      name: "Mr. Krutarth Rindani",
+      title: "Sr. DevOps Engineer",
+      company: "McAfee",
+      expertise: ["Ex-Asite", "Ex-Sterlite", "DevOps", "Security", "Infrastructure"],
+      image: krutarthImage,
+      gradientFrom: "from-teal-500",
+      gradientTo: "to-cyan-600",
+      bgGradient: "from-teal-50 via-white to-cyan-50",
+      skillGradient: "from-teal-100 to-cyan-100",
+      textColor: "text-teal-700"
+    },
+    {
+      name: "Ms. Poorvi Dewangan",
+      title: "MBA Student",
+      company: "NIT Calicut",
+      expertise: ["Business Strategy", "Technology Management", "Innovation", "Leadership"],
+      image: poorviImage,
       gradientFrom: "from-pink-500",
       gradientTo: "to-rose-600",
       bgGradient: "from-pink-50 via-white to-rose-50",
       skillGradient: "from-pink-100 to-rose-100",
       textColor: "text-pink-700"
     },
-
+    {
+      name: "Mr. Roshan Bishi",
+      title: "Digital Engineer Intern & MTech Student",
+      company: "Texas Instruments & IIT Kharagpur",
+      expertise: ["Digital Engineering", "Embedded Systems", "Research", "Innovation"],
+      image: roshanImage,
+      gradientFrom: "from-amber-500",
+      gradientTo: "to-orange-600",
+      bgGradient: "from-amber-50 via-white to-orange-50",
+      skillGradient: "from-amber-100 to-orange-100",
+      textColor: "text-amber-700"
+    },
+    {
+      name: "Ms. Meghna Parwate",
+      title: "Enterprise Product & Agile Coach",
+      company: "Independent Consultant",
+      expertise: ["Product Management", "Agile Methodology", "Enterprise Solutions", "Team Leadership"],
+      image: meghnaImage,
+      gradientFrom: "from-rose-500",
+      gradientTo: "to-pink-600",
+      bgGradient: "from-rose-50 via-white to-pink-50",
+      skillGradient: "from-rose-100 to-pink-100",
+      textColor: "text-rose-700"
+    },
+    {
+      name: "Mr. Umamaheshwar Achari",
+      title: "Principal Engineer",
+      company: "Charter Communication, Connecticut",
+      expertise: ["Ex-Motorola", "Ex-Nokia", "Telecommunications", "Network Engineering"],
+      image: umamaheshwarImage,
+      gradientFrom: "from-slate-500",
+      gradientTo: "to-gray-600",
+      bgGradient: "from-slate-50 via-white to-gray-50",
+      skillGradient: "from-slate-100 to-gray-100",
+      textColor: "text-slate-700"
+    }
   ];
 
   return (

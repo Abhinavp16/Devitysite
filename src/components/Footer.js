@@ -13,7 +13,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400">
-            Made with ❤️ by Devity Team
+            Made with ❤️ by Devity Tech Team
           </p>
           <p className="text-gray-500 text-sm mt-2">
             © 2025 Devity. All rights reserved. | Privacy | Terms | Cookies

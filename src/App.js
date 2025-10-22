@@ -11,6 +11,7 @@ import Speakers from './components/Speakers';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import AdminProtectedRoute from './components/AdminProtectedRoute';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -39,27 +40,29 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Header and Hero without animated background */}
-      <div className="relative">
-        <Header />
-        <Hero />
-      </div>
+    <ThemeProvider>
+      <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+        {/* Header and Hero without animated background */}
+        <div className="relative">
+          <Header />
+          <Hero />
+        </div>
 
-      {/* Rest of the sections with animated background */}
-      <div className="relative min-h-screen">
-        <AnimatedBackground />
-        <div className="relative z-10">
-          <About />
-          <ClubMemories />
-          <Events />
-          <Team />
-          <Speakers />
-          <Contact />
-          <Footer />
+        {/* Rest of the sections with animated background */}
+        <div className="relative min-h-screen">
+          <AnimatedBackground />
+          <div className="relative z-10">
+            <About />
+            <ClubMemories />
+            <Events />
+            <Team />
+            <Speakers />
+            <Contact />
+            <Footer />
+          </div>
         </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 }
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { TeamAnimatedBackground } from './AnimatedBackground';
 
 // Import leadership team images
@@ -46,7 +45,7 @@ const Team = () => {
     { name: "Dr. Shikha Tiwari", role: "Club Mentor, Asst Professor", image: img9, bio: "Academic guidance and research supervision.", skills: ["Research", "Teaching", "Mentoring"], social: { linkedin: "https://www.linkedin.com/in/dr-shikha-tiwari-b383061a0?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" } },
     { name: "Mr. Poorab Patel", role: "Board Member, Ex-President (2022-23)", image: img10, bio: "Former club president with strong leadership experience.", skills: ["Leadership", "Strategy", "Community"], social: { github: "#", linkedin: "https://www.linkedin.com/in/poorabpatel?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" } },
     { name: "Mr. Vaibhav Kumar Sahu", role: "Board Member, Ex-President (2024-25)", image: img11, bio: "Recent club president with innovative vision.", skills: ["Innovation", "Leadership", "Technology"], social: { github: "#", linkedin: "https://www.linkedin.com/in/vaibhavkumarsahu?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" } },
-    { name: "Ms. Manya Sahu", role: "Club Advisor, Ex-Vice President (2022-23)", image: img12, bio: "Former vice president providing strategic guidance.", skills: ["Strategy", "Guidance", "Leadership"], social: { github: "#", linkedin: "https://www.linkedin.com/in/manya-sinha2004?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" } },
+    { name: "Ms. Manya Sinha", role: "Club Advisor, Ex-Vice President (2022-23)", image: img12, bio: "Former vice president providing strategic guidance.", skills: ["Strategy", "Guidance", "Leadership"], social: { github: "#", linkedin: "https://www.linkedin.com/in/manya-sinha2004?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" } },
 
     // Core Team (13-30) - Medium cards
     { name: "Mr. Aarekh Verma", role: "President", image: img13, bio: "Leading the club with vision and strategic direction, fostering innovation and community growth.", skills: ["Leadership", "Strategy", "Community Building"], social: { github: "#", linkedin: "#" } },
@@ -58,7 +57,7 @@ const Team = () => {
     { name: "Ms. Vandana Singh", role: "Devops & Cloud Lead", image: img19, bio: "Managing cloud infrastructure and deployment pipelines for seamless operations.", skills: ["Docker", "Kubernetes", "CI/CD"], social: { github: "#", linkedin: "https://www.linkedin.com/in/vandana-singh1105?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" } },
     { name: "Ms. Nupur Goyal", role: "Open Source Lead", image: img20, bio: "Promoting open source contributions and managing community-driven projects.", skills: ["Open Source", "Git", "Community Management"], social: { github: "#", linkedin: "https://www.linkedin.com/in/nupur-goyal-0283b6321?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" } },
     { name: "Ms. Harsha Hariyani", role: "Management Lead", image: img21, bio: "Coordinating team activities and ensuring smooth execution of club operations.", skills: ["Project Management", "Team Coordination", "Operations"], social: { github: "#", linkedin: "https://www.linkedin.com/in/harsha-hariyani-b8b8b8321?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" } },
-    { name: "Ms. Ritika Jiwani", role: "PR Lead", image: img22, bio: "Managing public relations, social media presence, and external communications.", skills: ["Public Relations", "Social Media", "Marketing"], social: { github: "#", linkedin: "https://www.linkedin.com/in/ritika-jiwnani-955884381" } },
+    { name: "Ms. Ritika Jiwnani", role: "PR Lead", image: img22, bio: "Managing public relations, social media presence, and external communications.", skills: ["Public Relations", "Social Media", "Marketing"], social: { github: "#", linkedin: "https://www.linkedin.com/in/ritika-jiwnani-955884381" } },
     { name: "Mr. Krish Rawlley", role: "PR Lead", image: img23, bio: "Handling media outreach, brand promotion, and community engagement initiatives.", skills: ["Media Relations", "Brand Management", "Content Creation"], social: { github: "#", linkedin: "#" } },
     { name: "Ms. Neha Biswal", role: "UI/UX Coordinator", image: img24, bio: "Designing user interfaces and enhancing user experience across digital platforms.", skills: ["UI/UX Design", "Figma", "User Research"], social: { github: "#", linkedin: "https://www.linkedin.com/in/neha-biswal-b8b8b8321?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" } },
     { name: "Mr. Bhabani Sankar Biswal", role: "Tech Coordinator", image: img25, bio: "Coordinating technical workshops, hackathons, and skill development programs.", skills: ["Technical Training", "Workshop Management", "Mentoring"], social: { github: "#", linkedin: "https://www.linkedin.com/in/bhabani-sankar-biswal?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" } },
@@ -67,7 +66,7 @@ const Team = () => {
   ];
 
   const renderLargeCard = (member, index) => (
-    <div key={index} className="group relative bg-gradient-to-br from-indigo-50 via-white to-cyan-50 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-700 p-8 text-center transform hover:-translate-y-4 border border-indigo-100 backdrop-blur-sm">
+    <div key={index} className="group relative bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-700 p-8 text-center transform hover:-translate-y-4 border border-indigo-100 dark:border-gray-600 backdrop-blur-sm">
       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       <div className="relative z-10">
         <div className="w-32 h-32 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl overflow-hidden ring-4 ring-white/50 group-hover:ring-indigo-200/50 transition-all duration-500 group-hover:scale-110">
@@ -80,12 +79,12 @@ const Team = () => {
           )}
         </div>
         <h3 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">{member.name}</h3>
-        <p className="text-indigo-600 font-bold mb-4 text-lg">{member.role}</p>
-        {member.bio && <p className="text-gray-700 text-base mb-6 leading-relaxed">{member.bio}</p>}
+        <p className="text-indigo-600 dark:text-indigo-400 font-bold mb-4 text-lg transition-colors duration-300">{member.role}</p>
+        {member.bio && <p className="text-gray-700 dark:text-gray-300 text-base mb-6 leading-relaxed transition-colors duration-300">{member.bio}</p>}
         {member.skills && member.skills.length > 0 && (
           <div className="flex flex-wrap justify-center gap-2 mb-8">
             {member.skills.map((skill, skillIndex) => (
-              <span key={skillIndex} className="px-4 py-2 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-full text-sm font-semibold shadow-md hover:shadow-lg transition-shadow duration-300 border border-indigo-200/50">
+              <span key={skillIndex} className="px-4 py-2 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-300 border border-indigo-200/50 dark:border-indigo-500/50">
                 {skill}
               </span>
             ))}
@@ -112,7 +111,7 @@ const Team = () => {
   );
 
   const renderMediumCard = (member, index) => (
-    <div key={index} className="group relative bg-gradient-to-br from-purple-50 via-white to-pink-50 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 p-6 text-center transform hover:-translate-y-3 border border-purple-100 backdrop-blur-sm">
+    <div key={index} className="group relative bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 p-6 text-center transform hover:-translate-y-3 border border-purple-100 dark:border-gray-600 backdrop-blur-sm">
       <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-rose-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       <div className="relative z-10">
         <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl overflow-hidden ring-4 ring-white/50 group-hover:ring-purple-200/50 transition-all duration-500 group-hover:scale-105">
@@ -125,12 +124,12 @@ const Team = () => {
           )}
         </div>
         <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-1">{member.name}</h3>
-        <p className="text-purple-600 font-semibold mb-3">{member.role}</p>
-        {member.bio && <p className="text-gray-700 text-sm mb-4 leading-relaxed">{member.bio}</p>}
+        <p className="text-purple-600 dark:text-purple-400 font-semibold mb-3 transition-colors duration-300">{member.role}</p>
+        {member.bio && <p className="text-gray-700 dark:text-gray-300 text-sm mb-4 leading-relaxed transition-colors duration-300">{member.bio}</p>}
         {member.skills && member.skills.length > 0 && (
           <div className="flex flex-wrap justify-center gap-2 mb-4">
             {member.skills.map((skill, skillIndex) => (
-              <span key={skillIndex} className="px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-full text-xs font-medium shadow-sm hover:shadow-md transition-shadow duration-300 border border-purple-200/50">
+              <span key={skillIndex} className="px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/50 dark:to-pink-900/50 text-purple-700 dark:text-purple-300 rounded-full text-xs font-medium shadow-sm hover:shadow-md transition-all duration-300 border border-purple-200/50 dark:border-purple-500/50">
                 {skill}
               </span>
             ))}
@@ -157,21 +156,21 @@ const Team = () => {
   );
 
   return (
-    <section id="team" className="py-20 bg-gradient-to-br from-slate-50/60 via-blue-50/60 to-indigo-100/60 backdrop-blur-sm relative overflow-hidden">
+    <section id="team" className="py-20 bg-gradient-to-br from-slate-50/60 via-blue-50/60 to-indigo-100/60 dark:from-gray-900/60 dark:via-gray-800/60 dark:to-gray-700/60 backdrop-blur-sm relative overflow-hidden transition-colors duration-300">
       <TeamAnimatedBackground />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
             Meet Our Team
           </h2>
-          <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed transition-colors duration-300">
             Our dedicated team of passionate individuals working together to build an amazing tech community.
           </p>
         </div>
 
         {/* Leadership Team (1-12) - Large Cards */}
         <div className="mb-16">
-          <h3 className="text-2xl font-bold text-gray-800 mb-8 text-center">Leadership Team</h3>
+          <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-8 text-center transition-colors duration-300">Leadership Team</h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {teamMembers.slice(0, 12).map((member, index) => renderLargeCard(member, index))}
           </div>
@@ -179,7 +178,7 @@ const Team = () => {
 
         {/* Core Team (13-30) - Medium Cards */}
         <div>
-          <h3 className="text-2xl font-bold text-gray-800 mb-8 text-center">Core Team</h3>
+          <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-8 text-center transition-colors duration-300">Core Team</h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {teamMembers.slice(12, 27).map((member, index) => renderMediumCard(member, index + 12))}
           </div>

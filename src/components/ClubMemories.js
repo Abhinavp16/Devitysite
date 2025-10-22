@@ -128,7 +128,7 @@ const ClubMemories = () => {
           <h2 className="text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-6">
             Club Memories
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-300 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed transition-colors duration-300">
             Capturing moments of innovation, learning, and friendship that define our journey together.
           </p>
         </div>

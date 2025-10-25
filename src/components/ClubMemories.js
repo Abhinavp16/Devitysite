@@ -44,7 +44,7 @@ const ClubMemories = () => {
   const memorySections = {
     'Code Fusion': {
       title: 'Code Fusion',
-      description: 'Competitive programming and coding challenges',
+      description: 'CodeFusion: The DevOps Synergy, was successfully held on 4th February 2025 at Amity University Chhattisgarh.  The keynote speaker, Mr. Nakul Grover, DevOps Engineer at Thomson Reuters, shared his expertise in DevOps workflows, cloud technologies, and automation tools. ',
       gradient: 'from-red-500 to-pink-600',
       bgGradient: 'from-red-50 via-white to-pink-50',
       images: [
@@ -56,8 +56,8 @@ const ClubMemories = () => {
       ]
     },
     'Envision X': {
-      title: 'Envision X',
-      description: 'Innovation showcase and project presentations',
+      title: 'Envision X 2025',
+      description: ' Envision-X 2025: The Biggest Tech Event at Amity University Chhattisgarh Envision-X 2025, organized under the leadership of Vaibhav Kumar Sahu, was successfully conducted from February 4 to March 25, 2025, at Amity University Chhattisgarh. This 45-day online project-based innovation challenge, hosted by the Devity Club in collaboration with the Amity School of Engineering & Technology (ASET) and Amity Institute of Information Technology (AIIT), provided a unique platform for students to work on real-world projects while receiving mentorship from top industry experts.',
       gradient: 'from-blue-500 to-indigo-600',
       bgGradient: 'from-blue-50 via-white to-indigo-50',
       images: [
@@ -70,7 +70,7 @@ const ClubMemories = () => {
     },
     'Jumpstart Event': {
       title: 'Jumpstart Event',
-      description: 'Guest talks and industry insights',
+      description: ' Jumpstart Your Tech Career: Master Networking Fundamentals and Learn CCNA & CCNP for Job Assurance, organized under the leadership of Vaibhav Kumar Sahu, was successfully held at Amity University Chhattisgarh. This insightful offline event was hosted by the Devity Club in association with Amity Institute of Information Technology (AIIT) and Amity School of Engineering & Technology (ASET), with the goal of empowering students with foundational and advanced networking knowledge aligned with industry certifications',
       gradient: 'from-green-500 to-emerald-600',
       bgGradient: 'from-green-50 via-white to-emerald-50',
       images: [
@@ -82,8 +82,8 @@ const ClubMemories = () => {
       ]
     },
     'Net Secure': {
-      title: 'Net Secure',
-      description: 'Cybersecurity workshops and awareness sessions',
+      title: 'Net Secure 2025',
+      description: ' NetSecure 2025, organized under the leadership of Vaibhav Kumar Sahu, was successfully held on 20th January 2025. This online event, hosted by Devity Club, focused on guiding students into the critical and rapidly evolving field of network security. The event provided deep insights into career opportunities, industry trends, and the essential skills required to excel in cybersecurity.',
       gradient: 'from-purple-500 to-violet-600',
       bgGradient: 'from-purple-50 via-white to-violet-50',
       images: [

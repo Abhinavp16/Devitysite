@@ -87,8 +87,8 @@ const Speakers = () => {
     {
       name: "Mr. Rohit Singhal",
       title: "Sr. Software Development Engineer",
-      company: "Microsoft",
-      expertise: ["Ex-Amazon", "Ex-Motorola", "Cloud Computing", "Distributed Systems"],
+      company: "Auger",
+      expertise: ["Ex-Microsoft","Ex-Amazon", "Ex-Motorola", "Cloud Computing", "Distributed Systems"],
       image: rohitSinghalImage,
       linkedin: "https://www.linkedin.com/in/rohit-singhal-1a82381aa?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
       gradientFrom: "from-indigo-500",

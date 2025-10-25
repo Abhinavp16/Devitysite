@@ -30,7 +30,7 @@ const About = () => {
 
   const stats = [
     { number: "25+", label: "Industry Mentors" },
-    { number: "30+", label: "Events" },
+    { number: "7+", label: "Events" },
     { number: "25+", label: "Team Members" }
   ];
 
@@ -43,8 +43,7 @@ const About = () => {
             About <span className="text-blue-600 dark:text-blue-400">DevityClub</span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto transition-colors duration-300">
-            We are a vibrant community of technology enthusiasts dedicated to learning, building,
-            and shaping the future of tech together.
+             The Devity Club is a dynamic student-led initiative aimed at fostering technical skills and promoting innovation among students. With a focus on real-world applications and cutting-edge technologies, the club provides a platform for students to enhance their competitive programming abilities, engage in impactful projects, and contribute to open-source communities and shaping the future of tech together.
           </p>
         </div>
 
@@ -53,12 +52,10 @@ const About = () => {
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 md:p-12 backdrop-blur-sm border border-white/20 dark:border-gray-600/20 transition-colors duration-300">
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 transition-colors duration-300">Our Mission</h3>
             <p className="text-lg text-gray-700 dark:text-gray-300 mb-6 leading-relaxed transition-colors duration-300">
-              Devity Club empowers students and professionals to explore the endless possibilities
-              of technology. We believe in learning by doing, building through collaboration, and
-              growing together as a community.
+              Devity Club  Empower students with hands-on skills across emerging domains like AI, Cybersecurity, DevOps, Cloud Computing, and Web Technologies.Bridge the gap between academic learning and industry expectations through impactful events, mentorship, and collaborative projects. Foster a culture of continuous learning, creativity, and open-source contribution. Serve as a launchpad for future-ready tech professionals and leaders.
             </p>
             <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed transition-colors duration-300">
-              Since our founding in 15 th February 2023, we've hosted over 30+ events, supported 300+ members,
+              Since our founding in 15th February 2023, we've hosted over 7+ events, supported 200+ members,
               and launched dozens of innovative projects that have made a real impact.
             </p>
           </div>

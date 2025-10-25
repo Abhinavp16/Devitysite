@@ -1,5 +1,5 @@
 import { ClubMemoriesAnimatedBackground } from './AnimatedBackground';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 // Import Code Fusion images
 import codeFusion1 from '../img/club memoriess/Code Fusion/20250204_115212AMByGPSMapCamera.jpg';
@@ -38,6 +38,8 @@ import netCamp5 from '../img/club memoriess/NetCamp/WhatsApp Image 2025-08-05 at
 
 const ClubMemories = () => {
   const [activeSection, setActiveSection] = useState('Code Fusion');
+  const [imagesLoaded, setImagesLoaded] = useState({});
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const memorySections = {
     'Code Fusion': {
@@ -111,6 +113,39 @@ const ClubMemories = () => {
     return memorySections[sectionName]?.gradient || 'from-gray-500 to-gray-600';
   };
 
+  // Preload images for faster switching
+  useEffect(() => {
+    const preloadImages = () => {
+      Object.keys(memorySections).forEach(sectionName => {
+        memorySections[sectionName].images.forEach((image, index) => {
+          const img = new Image();
+          img.onload = () => {
+            setImagesLoaded(prev => ({
+              ...prev,
+              [`${sectionName}-${index}`]: true
+            }));
+          };
+          img.src = image.src;
+        });
+      });
+    };
+
+    preloadImages();
+  }, []);
+
+  // Handle section change with smooth transition
+  const handleSectionChange = useCallback((sectionName) => {
+    if (sectionName === activeSection) return;
+
+    setIsTransitioning(true);
+
+    // Small delay to allow transition effect
+    setTimeout(() => {
+      setActiveSection(sectionName);
+      setIsTransitioning(false);
+    }, 150);
+  }, [activeSection]);
+
   return (
     <section id="memories" className="py-20 bg-gradient-to-br from-slate-900 via-gray-900 to-black relative overflow-hidden">
       <ClubMemoriesAnimatedBackground />
@@ -138,11 +173,12 @@ const ClubMemories = () => {
           {Object.keys(memorySections).map((sectionName) => (
             <button
               key={sectionName}
-              onClick={() => setActiveSection(sectionName)}
-              className={`relative px-6 py-3 rounded-2xl font-semibold transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 group overflow-hidden ${activeSection === sectionName
+              onClick={() => handleSectionChange(sectionName)}
+              disabled={isTransitioning}
+              className={`relative px-6 py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 group overflow-hidden ${activeSection === sectionName
                 ? `bg-gradient-to-r ${getSectionColor(sectionName)} text-white shadow-xl`
                 : 'bg-gray-800/50 text-gray-300 hover:text-white border border-gray-700/50 hover:border-gray-600/50'
-                }`}
+                } ${isTransitioning ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {/* Button shimmer effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
@@ -156,7 +192,7 @@ const ClubMemories = () => {
         </div>
 
         {/* Active Section Content */}
-        <div className="mb-8">
+        <div className={`mb-8 transition-all duration-300 ${isTransitioning ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
           <div className="text-center mb-8">
             <h3 className={`text-3xl font-bold bg-gradient-to-r ${getSectionColor(activeSection)} bg-clip-text text-transparent mb-3`}>
               {memorySections[activeSection].title}
@@ -167,22 +203,38 @@ const ClubMemories = () => {
           </div>
 
           {/* Images Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div key={activeSection} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {memorySections[activeSection].images.map((image, index) => (
               <div
                 key={index}
                 className="group relative bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl overflow-hidden hover:transform hover:scale-105 hover:-translate-y-2 transition-all duration-500 cursor-pointer border border-gray-700/50 hover:border-gray-600/50 shadow-xl hover:shadow-2xl"
                 style={{
-                  animationDelay: `${index * 0.1}s`,
-                  animation: 'fadeInUp 0.6s ease-out forwards'
+                  animationDelay: `${index * 0.05}s`,
+                  animation: 'fadeInUp 0.4s ease-out forwards'
                 }}
               >
                 {/* Image container with overlay effects */}
                 <div className="relative h-64 overflow-hidden rounded-2xl">
+                  {/* Loading placeholder */}
+                  {!imagesLoaded[`${activeSection}-${index}`] && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800 animate-pulse flex items-center justify-center">
+                      <div className="w-8 h-8 border-2 border-white/20 border-t-white/60 rounded-full animate-spin"></div>
+                    </div>
+                  )}
+
                   <img
                     src={image.src}
                     alt={image.title}
-                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
+                    loading="eager"
+                    decoding="async"
+                    className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110 ${imagesLoaded[`${activeSection}-${index}`] ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    onLoad={() => {
+                      setImagesLoaded(prev => ({
+                        ...prev,
+                        [`${activeSection}-${index}`]: true
+                      }));
+                    }}
                   />
 
                   {/* Gradient overlay */}

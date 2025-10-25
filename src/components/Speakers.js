@@ -229,41 +229,46 @@ const Speakers = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
           {speakers.map((speaker, index) => (
-            <div key={index} className={`group relative bg-gradient-to-br ${speaker.bgGradient} rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-700 p-8 text-center transform hover:-translate-y-4 border border-gray-100 dark:border-gray-600 backdrop-blur-sm`}>
+            <div key={index} className={`group relative bg-gradient-to-br ${speaker.bgGradient} rounded-xl sm:rounded-2xl shadow-xl hover:shadow-2xl sm:shadow-2xl sm:hover:shadow-3xl transition-all duration-700 p-3 sm:p-4 md:p-6 lg:p-8 text-center transform hover:-translate-y-2 sm:hover:-translate-y-4 border border-gray-100 dark:border-gray-600 backdrop-blur-sm`}>
               <div className={`absolute inset-0 bg-gradient-to-br ${speaker.gradientFrom}/5 ${speaker.gradientTo}/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
               <div className="relative z-10">
-                <div className={`w-24 h-24 bg-gradient-to-br ${speaker.gradientFrom} ${speaker.gradientTo} rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl overflow-hidden ring-4 ring-white/50 group-hover:ring-gray-200/50 transition-all duration-500 group-hover:scale-110`}>
+                <div className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-br ${speaker.gradientFrom} ${speaker.gradientTo} rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 md:mb-6 shadow-xl sm:shadow-2xl overflow-hidden ring-2 sm:ring-4 ring-white/50 group-hover:ring-gray-200/50 transition-all duration-500 group-hover:scale-110`}>
                   <img src={speaker.image} alt={speaker.name} className="w-full h-full object-cover rounded-full" />
                 </div>
 
-                <div className={`inline-block px-4 py-2 bg-gradient-to-r ${speaker.skillGradient} ${speaker.textColor} rounded-full text-sm font-semibold mb-4 shadow-md`}>
+                <div className={`inline-block px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 bg-gradient-to-r ${speaker.skillGradient} ${speaker.textColor} rounded-full text-xs sm:text-sm font-semibold mb-2 sm:mb-3 md:mb-4 shadow-md`}>
                   {speaker.company}
                 </div>
 
-                <h3 className={`text-2xl font-bold bg-gradient-to-r ${speaker.gradientFrom} ${speaker.gradientTo} bg-clip-text text-transparent mb-2`}>{speaker.name}</h3>
-                <p className="text-gray-700 dark:text-gray-300 font-medium mb-6 transition-colors duration-300">{speaker.title}</p>
+                <h3 className={`text-sm sm:text-lg md:text-xl lg:text-2xl font-bold bg-gradient-to-r ${speaker.gradientFrom} ${speaker.gradientTo} bg-clip-text text-transparent mb-1 sm:mb-2 leading-tight`}>{speaker.name}</h3>
+                <p className="text-xs sm:text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium mb-3 sm:mb-4 md:mb-6 transition-colors duration-300 leading-tight">{speaker.title}</p>
 
-                <div className="flex flex-wrap justify-center gap-2 mb-6">
-                  {speaker.expertise.map((skill, skillIndex) => (
-                    <span key={skillIndex} className={`px-3 py-1 bg-gradient-to-r ${speaker.skillGradient} ${speaker.textColor} rounded-full text-xs font-medium shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-200/50 dark:border-gray-500/50`}>
+                <div className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-3 sm:mb-4 md:mb-6">
+                  {speaker.expertise.slice(0, 3).map((skill, skillIndex) => (
+                    <span key={skillIndex} className={`px-2 py-0.5 sm:px-3 sm:py-1 bg-gradient-to-r ${speaker.skillGradient} ${speaker.textColor} rounded-full text-xs font-medium shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-200/50 dark:border-gray-500/50`}>
                       {skill}
                     </span>
                   ))}
+                  {speaker.expertise.length > 3 && (
+                    <span className={`px-2 py-0.5 sm:px-3 sm:py-1 bg-gradient-to-r ${speaker.skillGradient} ${speaker.textColor} rounded-full text-xs font-medium shadow-sm border border-gray-200/50 dark:border-gray-500/50`}>
+                      +{speaker.expertise.length - 3}
+                    </span>
+                  )}
                 </div>
 
-                <div className="border-t border-gray-200/50 dark:border-gray-500/50 pt-6 transition-colors duration-300">
+                <div className="border-t border-gray-200/50 dark:border-gray-500/50 pt-3 sm:pt-4 md:pt-6 transition-colors duration-300">
                   <div className="flex justify-center">
                     <a
                       href={speaker.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`bg-gradient-to-r ${speaker.gradientFrom} ${speaker.gradientTo} p-3 rounded-full hover:shadow-lg transition-all duration-300 transform hover:scale-110 group`}
+                      className={`bg-gradient-to-r ${speaker.gradientFrom} ${speaker.gradientTo} p-2 sm:p-2.5 md:p-3 rounded-full hover:shadow-lg transition-all duration-300 transform hover:scale-110 group`}
                       aria-label={`Connect with ${speaker.name} on LinkedIn`}
                     >
                       <svg
-                        className="w-6 h-6 text-white group-hover:text-gray-100 transition-colors duration-300"
+                        className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white group-hover:text-gray-100 transition-colors duration-300"
                         fill="currentColor"
                         viewBox="0 0 24 24"
                       >

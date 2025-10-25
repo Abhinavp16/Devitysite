@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { HeroAnimatedBackground } from './AnimatedBackground';
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -9,13 +8,12 @@ const Hero = () => {
   }, []);
 
   return (
-    <section id="home" className="relative min-h-screen bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 overflow-hidden transition-colors duration-300">
-      <HeroAnimatedBackground />
+    <section id="home" className="relative min-h-screen bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-slate-900 dark:to-black overflow-hidden transition-colors duration-300">
       {/* Hero background elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-70 h-70 bg-blue-400 rounded-full mix-blend-multiply opacity-20 animate-float"></div>
-        <div className="absolute top-40 right-10 w-52 h-52 bg-purple-400 rounded-full mix-blend-multiply opacity-20 animate-float-reverse"></div>
-        <div className="absolute -bottom-8 left-20 w-42 h-42 bg-pink-400 rounded-full mix-blend-multiply opacity-20 animate-float-diagonal"></div>
+        <div className="absolute top-20 left-10 w-70 h-70 bg-blue-400/10 dark:bg-blue-500/20 rounded-full animate-float"></div>
+        <div className="absolute top-40 right-10 w-52 h-52 bg-purple-400/10 dark:bg-purple-500/20 rounded-full animate-float-reverse"></div>
+        <div className="absolute -bottom-8 left-20 w-42 h-42 bg-pink-400/10 dark:bg-pink-500/20 rounded-full animate-float-diagonal"></div>
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
@@ -23,7 +21,7 @@ const Hero = () => {
           {/* Hero Content */}
           <div className={`text-center lg:text-left ${isVisible ? 'animate-fadeInLeft' : 'opacity-0'}`}>
             <div className="mb-6">
-              <span className="inline-block px-4 py-2 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full text-sm font-bold mb-4 animate-slideInFromBottom transition-colors duration-300">
+              <span className="inline-block px-4 py-2 bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-white rounded-full text-sm font-bold mb-4 animate-slideInFromBottom transition-colors duration-300">
                 🚀 Welcome to the Future of Tech
               </span>
             </div>
@@ -33,7 +31,7 @@ const Hero = () => {
               <span className="gradient-text animate-pulse-slow">Devity Club</span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-gray-900 dark:text-gray-300 mb-8 leading-relaxed animate-fadeInUp delay-200 font-medium transition-colors duration-300">
+            <p className="text-xl md:text-2xl text-gray-700 dark:text-white mb-8 leading-relaxed animate-fadeInUp delay-200 font-medium transition-colors duration-300">
               Empowering the next generation of tech innovators through community,
               learning, and collaboration. Join us in shaping the future of technology.
             </p>
@@ -43,16 +41,16 @@ const Hero = () => {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-8 mt-12 animate-fadeInUp delay-600">
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-1">25+</div>
-                <div className="text-gray-900 dark:text-gray-300 text-sm font-semibold transition-colors duration-300">Active Team Members</div>
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">25+</div>
+                <div className="text-gray-700 dark:text-gray-300 text-sm font-semibold transition-colors duration-300">Active Team Members</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-1">30+</div>
-                <div className="text-gray-900 dark:text-gray-300 text-sm font-semibold transition-colors duration-300">Events</div>
+                <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-1">30+</div>
+                <div className="text-gray-700 dark:text-gray-300 text-sm font-semibold transition-colors duration-300">Events</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-600 mb-1">10+</div>
-                <div className="text-gray-900 dark:text-gray-300 text-sm font-semibold transition-colors duration-300">Research Paper & Projects</div>
+                <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-1">10+</div>
+                <div className="text-gray-700 dark:text-gray-300 text-sm font-semibold transition-colors duration-300">Research Paper & Projects</div>
               </div>
             </div>
           </div>
@@ -133,10 +131,10 @@ const Hero = () => {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-fadeInUp delay-1000">
-          <div className="flex flex-col items-center text-gray-800 dark:text-gray-300 transition-colors duration-300">
+          <div className="flex flex-col items-center text-gray-700 dark:text-gray-300 transition-colors duration-300">
             <span className="text-sm mb-2 font-semibold">Scroll to explore</span>
             <div className="w-6 h-10 border-2 border-gray-700 dark:border-gray-400 rounded-full flex justify-center transition-colors duration-300">
-              <div className="w-1 h-3 bg-gray-800 dark:bg-gray-400 rounded-full mt-2 animate-bounce transition-colors duration-300"></div>
+              <div className="w-1 h-3 bg-gray-700 dark:bg-gray-400 rounded-full mt-2 animate-bounce transition-colors duration-300"></div>
             </div>
           </div>
         </div>

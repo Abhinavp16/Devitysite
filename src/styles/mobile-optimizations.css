@@ -19,7 +19,7 @@ html, body {
   .hero-mobile {
     min-height: 100vh;
     min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
-    padding-top: env(safe-area-inset-top);
+    padding-top: calc(5rem + env(safe-area-inset-top)); /* 80px for navbar + safe area */
     padding-bottom: env(safe-area-inset-bottom);
   }
 
@@ -38,6 +38,11 @@ html, body {
   .hero-content {
     padding-left: max(1rem, env(safe-area-inset-left));
     padding-right: max(1rem, env(safe-area-inset-right));
+    /* Ensure content is properly positioned after navbar */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100vh - 5rem); /* Full height minus navbar */
   }
 
   /* Mobile-optimized animations */
@@ -88,7 +93,7 @@ html, body {
 @media screen and (max-width: 896px) and (orientation: landscape) {
   .hero-mobile-landscape {
     min-height: 100vh;
-    padding-top: 1rem;
+    padding-top: calc(4rem + env(safe-area-inset-top)); /* 64px for navbar in landscape + safe area */
     padding-bottom: 1rem;
   }
 
@@ -117,6 +122,19 @@ html, body {
 @media screen and (max-width: 640px) {
   input, select, textarea {
     font-size: 16px !important;
+  }
+}
+
+/* Navbar height compensation for all screen sizes */
+.hero-mobile {
+  /* Ensure hero starts after fixed navbar */
+  margin-top: 0;
+}
+
+/* Small mobile devices */
+@media screen and (max-width: 480px) {
+  .hero-mobile {
+    padding-top: calc(4.5rem + env(safe-area-inset-top)); /* 72px for smaller navbar + safe area */
   }
 }
 

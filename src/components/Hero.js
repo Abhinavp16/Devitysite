@@ -10,23 +10,23 @@ const Hero = () => {
   useEffect(() => {
     setIsVisible(true);
 
-   
+
     initMobileOptimizations();
 
-   
+
     const preloadVideo = async () => {
       try {
         const video = document.createElement('video');
         video.src = '/assets/videos/devity_logo.mp4';
         video.preload = 'auto';
-        video.muted = true; 
-        video.playsInline = true; 
+        video.muted = true;
+        video.playsInline = true;
 
-        
+
         const handleLoadedData = () => {
           console.log('Video preload: loaded successfully');
           setVideoLoaded(true);
-         
+
           video.play().catch(e => {
             console.warn('Preload video play failed:', e);
           });
@@ -36,7 +36,7 @@ const Hero = () => {
         const handleCanPlay = () => {
           console.log('Video preload: can play');
           setVideoLoaded(true);
-          
+
           video.play().catch(e => {
             console.warn('Preload video play failed:', e);
           });
@@ -60,10 +60,10 @@ const Hero = () => {
         video.addEventListener('canplaythrough', handleCanPlay);
         video.addEventListener('error', handleError);
 
-        
+
         video.load();
 
-        
+
         setTimeout(() => {
           if (!videoLoaded && !videoError) {
             console.log('Showing fallback after 2 seconds');
@@ -71,7 +71,7 @@ const Hero = () => {
           }
         }, 2000);
 
-        
+
         setTimeout(() => {
           if (!videoLoaded && !videoError) {
             console.warn('Video loading timeout, showing fallback');
@@ -105,7 +105,7 @@ const Hero = () => {
   }, [videoLoaded, videoError]);
 
   return (
-    <section id="home" className="relative min-h-screen hero-mobile bg-white dark:bg-gray-900 overflow-hidden transition-colors duration-300">
+    <section id="home" className="relative min-h-screen hero-mobile hero-mobile-landscape bg-white dark:bg-gray-900 overflow-hidden transition-colors duration-300 pt-20 sm:pt-24 md:pt-28">
       {/* Hero background elements - responsive positioning */}
       <div className="absolute inset-0">
         <div className="absolute top-10 sm:top-20 left-4 sm:left-10 w-32 h-32 sm:w-70 sm:h-70 bg-blue-400/10 dark:bg-blue-500/20 rounded-full animate-float"></div>
@@ -113,7 +113,7 @@ const Hero = () => {
         <div className="absolute -bottom-4 sm:-bottom-8 left-8 sm:left-20 w-24 h-24 sm:w-42 sm:h-42 bg-pink-400/10 dark:bg-pink-500/20 rounded-full animate-float-diagonal"></div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 lg:py-32 hero-content">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-20 hero-content hero-content-landscape">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Hero Content */}
           <div className={`text-center lg:text-left ${isVisible ? 'animate-fadeInLeft' : 'opacity-0'}`}>

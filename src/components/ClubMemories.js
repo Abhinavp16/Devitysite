@@ -1,5 +1,6 @@
 import { ClubMemoriesAnimatedBackground } from './AnimatedBackground';
 import { useState, useEffect, useCallback } from 'react';
+import { preloadImage } from '../utils/imageOptimization';
 
 // Import Code Fusion images
 import codeFusion1 from '../img/club memoriess/Code Fusion/20250204_115212AMByGPSMapCamera.jpg';
@@ -113,38 +114,89 @@ const ClubMemories = () => {
     return memorySections[sectionName]?.gradient || 'from-gray-500 to-gray-600';
   };
 
-  // Preload images for faster switching
+  // Preload images for faster switching with priority loading
   useEffect(() => {
-    const preloadImages = () => {
-      Object.keys(memorySections).forEach(sectionName => {
-        memorySections[sectionName].images.forEach((image, index) => {
-          const img = new Image();
-          img.onload = () => {
-            setImagesLoaded(prev => ({
-              ...prev,
-              [`${sectionName}-${index}`]: true
-            }));
-          };
-          img.src = image.src;
-        });
+    const preloadImages = async () => {
+      // First, preload active section images with high priority
+      const activeImages = memorySections[activeSection].images;
+      
+      // Use Promise.all for faster parallel loading of active section
+      const activePromises = activeImages.map(async (image, index) => {
+        try {
+          await preloadImage(image.src);
+          setImagesLoaded(prev => ({
+            ...prev,
+            [`${activeSection}-${index}`]: true
+          }));
+        } catch (error) {
+          setImagesLoaded(prev => ({
+            ...prev,
+            [`${activeSection}-${index}`]: 'error'
+          }));
+        }
       });
+
+      await Promise.all(activePromises);
+
+      // Then preload other sections with lower priority
+      setTimeout(() => {
+        Object.keys(memorySections).forEach(sectionName => {
+          if (sectionName !== activeSection) {
+            memorySections[sectionName].images.forEach(async (image, index) => {
+              try {
+                await preloadImage(image.src);
+                setImagesLoaded(prev => ({
+                  ...prev,
+                  [`${sectionName}-${index}`]: true
+                }));
+              } catch (error) {
+                setImagesLoaded(prev => ({
+                  ...prev,
+                  [`${sectionName}-${index}`]: 'error'
+                }));
+              }
+            });
+          }
+        });
+      }, 500); // Reduced delay for faster background loading
     };
 
     preloadImages();
-  }, []);
+  }, [activeSection]);
 
-  // Handle section change with smooth transition
+  // Handle section change with smooth transition and preloading
   const handleSectionChange = useCallback((sectionName) => {
     if (sectionName === activeSection) return;
 
     setIsTransitioning(true);
 
-    // Small delay to allow transition effect
+    // Preload new section images immediately with optimized loading
+    const preloadPromises = memorySections[sectionName].images.map(async (image, index) => {
+      if (!imagesLoaded[`${sectionName}-${index}`]) {
+        try {
+          await preloadImage(image.src);
+          setImagesLoaded(prev => ({
+            ...prev,
+            [`${sectionName}-${index}`]: true
+          }));
+        } catch (error) {
+          setImagesLoaded(prev => ({
+            ...prev,
+            [`${sectionName}-${index}`]: 'error'
+          }));
+        }
+      }
+    });
+
+    // Don't wait for all images to load before switching
+    Promise.all(preloadPromises);
+
+    // Smooth transition with reduced delay
     setTimeout(() => {
       setActiveSection(sectionName);
       setIsTransitioning(false);
-    }, 150);
-  }, [activeSection]);
+    }, 100);
+  }, [activeSection, imagesLoaded]);
 
   return (
     <section id="memories" className="py-20 bg-gradient-to-br from-slate-900 via-gray-900 to-black relative overflow-hidden">
@@ -215,19 +267,27 @@ const ClubMemories = () => {
               >
                 {/* Image container with overlay effects */}
                 <div className="relative h-64 overflow-hidden rounded-2xl">
-                  {/* Loading placeholder */}
+                  {/* Enhanced loading placeholder with skeleton */}
                   {!imagesLoaded[`${activeSection}-${index}`] && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800 animate-pulse flex items-center justify-center">
-                      <div className="w-8 h-8 border-2 border-white/20 border-t-white/60 rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
+                      {/* Skeleton loader */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-pulse">
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                      </div>
+                      <div className="relative z-10 flex flex-col items-center">
+                        <div className="w-8 h-8 border-2 border-white/20 border-t-white/60 rounded-full animate-spin mb-2"></div>
+                        <div className="text-white/60 text-xs">Loading...</div>
+                      </div>
                     </div>
                   )}
 
                   <img
                     src={image.src}
                     alt={image.title}
-                    loading="eager"
+                    loading={index < 3 ? "eager" : "lazy"} // Eager load first 3 images
                     decoding="async"
-                    className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110 ${imagesLoaded[`${activeSection}-${index}`] ? 'opacity-100' : 'opacity-0'
+                    fetchPriority={index < 3 ? "high" : "low"}
+                    className={`w-full h-full object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-110 ${imagesLoaded[`${activeSection}-${index}`] ? 'opacity-100' : 'opacity-0'
                       }`}
                     onLoad={() => {
                       setImagesLoaded(prev => ({
@@ -235,7 +295,26 @@ const ClubMemories = () => {
                         [`${activeSection}-${index}`]: true
                       }));
                     }}
+                    onError={() => {
+                      // Handle image load error
+                      setImagesLoaded(prev => ({
+                        ...prev,
+                        [`${activeSection}-${index}`]: 'error'
+                      }));
+                    }}
                   />
+
+                  {/* Error state */}
+                  {imagesLoaded[`${activeSection}-${index}`] === 'error' && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
+                      <div className="text-center text-white/60">
+                        <svg className="w-8 h-8 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+                        </svg>
+                        <div className="text-xs">Image unavailable</div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500"></div>
@@ -280,6 +359,19 @@ const ClubMemories = () => {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+        
+        .animate-shimmer {
+          animation: shimmer 2s infinite;
         }
       `}</style>
     </section>

@@ -1,0 +1,193 @@
+/* Mobile-specific optimizations */
+
+/* Ensure proper viewport handling */
+@viewport {
+  width: device-width;
+  zoom: 1.0;
+}
+
+/* Prevent horizontal scrolling on mobile */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Mobile-first responsive breakpoints */
+@media screen and (max-width: 640px) {
+  /* Hero section mobile optimizations */
+  .hero-mobile {
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Prevent text from being too small on mobile */
+  .hero-title {
+    font-size: clamp(1.875rem, 8vw, 3rem);
+    line-height: 1.1;
+  }
+
+  .hero-subtitle {
+    font-size: clamp(1rem, 4vw, 1.25rem);
+    line-height: 1.4;
+  }
+
+  /* Ensure proper spacing on mobile */
+  .hero-content {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  /* Mobile-optimized animations */
+  .mobile-fade-in {
+    animation: mobileFadeIn 0.6s ease-out forwards;
+  }
+
+  @keyframes mobileFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Optimize touch targets */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Reduce motion for better mobile performance */
+  .mobile-reduced-motion * {
+    animation-duration: 0.3s !important;
+    transition-duration: 0.3s !important;
+  }
+}
+
+/* Tablet optimizations */
+@media screen and (min-width: 641px) and (max-width: 1024px) {
+  .tablet-optimized {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* High DPI mobile displays */
+@media screen and (max-width: 640px) and (-webkit-min-device-pixel-ratio: 2) {
+  .hero-visual {
+    transform: scale(0.95);
+  }
+}
+
+/* Landscape mobile orientation */
+@media screen and (max-width: 896px) and (orientation: landscape) {
+  .hero-mobile-landscape {
+    min-height: 100vh;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .hero-content-landscape {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .ios-safari-fix {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Android Chrome specific fixes */
+@media screen and (max-width: 640px) {
+  .android-chrome-fix {
+    min-height: calc(100vh - env(keyboard-inset-height, 0px));
+  }
+}
+
+/* Prevent zoom on input focus (mobile) */
+@media screen and (max-width: 640px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Mobile-specific utility classes */
+.mobile-only {
+  display: block;
+}
+
+.desktop-only {
+  display: none;
+}
+
+@media screen and (min-width: 641px) {
+  .mobile-only {
+    display: none;
+  }
+  
+  .desktop-only {
+    display: block;
+  }
+}
+
+/* Mobile performance optimizations */
+@media screen and (max-width: 640px) {
+  /* Reduce GPU usage on mobile */
+  .mobile-gpu-optimized {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: auto;
+  }
+
+  /* Optimize images for mobile */
+  .mobile-image-optimized {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  /* Reduce shadow complexity on mobile */
+  .mobile-shadow-optimized {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Container queries for modern browsers */
+@container (max-width: 640px) {
+  .container-mobile {
+    padding: 1rem;
+  }
+}
+
+/* Accessibility improvements for mobile */
+@media screen and (max-width: 640px) {
+  /* Ensure sufficient color contrast */
+  .mobile-high-contrast {
+    color: #000;
+    background-color: #fff;
+  }
+
+  /* Larger touch targets for accessibility */
+  .mobile-accessible-touch {
+    min-height: 48px;
+    min-width: 48px;
+    padding: 12px;
+  }
+}
+
+/* Mobile-specific dark mode optimizations */
+@media screen and (max-width: 640px) and (prefers-color-scheme: dark) {
+  .mobile-dark-optimized {
+    background-color: #0f172a;
+    color: #f8fafc;
+  }
+}

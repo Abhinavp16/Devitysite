@@ -3,6 +3,17 @@ import { EventsAnimatedBackground } from './AnimatedBackground';
 const Events = () => {
   const events = [
     {
+      title: "ENVISION-X 2026: Transform Ideas into Reality",
+      date: "February , 2026",
+      time: " ",
+      location: "Virtual",
+      type: "Innovation Challenge",
+      description: "45-day online project-based innovation challenge.",
+      status: "Upcoming",
+      color: "bg-blue-100 text-blue-600"
+    },
+
+    {
       title: "Legacy Connect 1.0",
       date: "September 12, 2025",
       time: "08:45 PM -10:45 PM",
@@ -13,23 +24,52 @@ const Events = () => {
       color: "bg-blue-100 text-blue-600"
     },
     {
-      title: "Devity Summit 2025",
-      date: "September 01-02, 2025",
-      time: "09:00 AM - 04:30 PM ",
-      location: "Auditorium",
-      type: "Seminar",
-      description: "Learn From Leaders . Build For Industries.",
-      status: "Completed",
-      color: "bg-blue-100 text-blue-600"
-    },
-
-    {
       title: "The Devity Spark",
       date: "September 07, 2025",
       time: "10:30 AM ",
       location: "Auditorium",
       type: "Seminar",
       description: "Ignite Your Campus Journey.",
+      status: "Completed",
+      color: "bg-blue-100 text-blue-600"
+    },
+    {
+      title: "Devity Summit 2025",
+      date: "September 01-02, 2025",
+      time: "09:00 AM - 04:30 PM ",
+      location: "Auditorium",
+      type: "Seminar",
+      description: "Learn From Leaders . Build For Industries.",
+      status: "Ongoing",
+      color: "bg-blue-100 text-blue-600"
+    },
+    {
+      title: "NetCamp",
+      date: "August 04-22, 2025",
+      time: "09:00 AM - 04:30 PM ",
+      location: "Auditorium AUC",
+      type: "Training Program",
+      description: "Netcamp Summer Internship With Industrial Training 2025",
+      status: "Completed",
+      color: "bg-blue-100 text-blue-600"
+    },
+    {
+      title: " Jumpstart Your Tech Career",
+      date: "May 6, 2025",
+      time: "09:00 AM - 04:30 PM ",
+      location: "Auditorium",
+      type: "Seminar",
+      description: "Master Networking Fundamentals and Learn CCNA & CCNP for Job Assurance.",
+      status: "Completed",
+      color: "bg-blue-100 text-blue-600"
+    },
+    {
+      title: "ENVISION-X 2025: Transform Ideas into Reality",
+      date: "February 4 - March 25, 2025",
+      time: " ",
+      location: "Virtual",
+      type: "Innovation Challenge",
+      description: "45-day online project-based innovation challenge.",
       status: "Completed",
       color: "bg-blue-100 text-blue-600"
     },

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import './styles/mobile-optimizations.css';
 import AnimatedBackground from './components/AnimatedBackground';
 import Header from './components/Header';
 import Hero from './components/Hero';

@@ -191,3 +191,57 @@ html, body {
     color: #f8fafc;
   }
 }
+
+/* Enhanced badge visibility on mobile */
+@media screen and (max-width: 640px) {
+  .hero-badge {
+    font-size: 0.875rem !important;
+    padding: 0.75rem 1rem !important;
+    font-weight: 700 !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: badgePulse 3s ease-in-out infinite;
+  }
+
+  /* Badge pulse animation for better visibility */
+  @keyframes badgePulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2);
+    }
+    50% {
+      transform: scale(1.02);
+      box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3);
+    }
+  }
+
+  /* Dark mode badge enhancement */
+  .dark .hero-badge {
+    background-color: rgba(59, 130, 246, 0.4) !important;
+    color: #e0f2fe !important;
+    border-color: rgba(59, 130, 246, 0.5) !important;
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2);
+  }
+
+  /* Light mode badge enhancement */
+  .hero-badge {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+    color: #1e40af !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+  }
+
+  /* Video container mobile optimization */
+  .hero-video-container {
+    width: 16rem !important; /* 256px */
+    height: 16rem !important; /* 256px */
+    margin: 0 auto;
+  }
+
+  /* Ensure video loads properly on mobile */
+  .hero-video {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+  }
+}

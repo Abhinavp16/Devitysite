@@ -5,44 +5,80 @@ const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [showFallback, setShowFallback] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
 
-    // Initialize mobile optimizations
+   
     initMobileOptimizations();
 
-    // Enhanced video preloading with better error handling
+   
     const preloadVideo = async () => {
       try {
         const video = document.createElement('video');
         video.src = '/assets/videos/devity_logo.mp4';
-        video.preload = 'metadata';
-        video.muted = true; // Ensure muted for autoplay
+        video.preload = 'auto';
+        video.muted = true; 
+        video.playsInline = true; 
 
-        // Add multiple event listeners for better loading detection
+        
         const handleLoadedData = () => {
+          console.log('Video preload: loaded successfully');
           setVideoLoaded(true);
-          video.removeEventListener('loadeddata', handleLoadedData);
-          video.removeEventListener('canplaythrough', handleLoadedData);
+         
+          video.play().catch(e => {
+            console.warn('Preload video play failed:', e);
+          });
+          cleanup();
         };
 
-        const handleError = () => {
+        const handleCanPlay = () => {
+          console.log('Video preload: can play');
+          setVideoLoaded(true);
+          
+          video.play().catch(e => {
+            console.warn('Preload video play failed:', e);
+          });
+          cleanup();
+        };
+
+        const handleError = (e) => {
+          console.warn('Video preload error:', e);
           setVideoError(true);
           setVideoLoaded(false);
+          cleanup();
+        };
+
+        const cleanup = () => {
+          video.removeEventListener('loadeddata', handleLoadedData);
+          video.removeEventListener('canplaythrough', handleCanPlay);
           video.removeEventListener('error', handleError);
         };
 
         video.addEventListener('loadeddata', handleLoadedData);
-        video.addEventListener('canplaythrough', handleLoadedData);
+        video.addEventListener('canplaythrough', handleCanPlay);
         video.addEventListener('error', handleError);
 
-        // Timeout fallback
+        
+        video.load();
+
+        
         setTimeout(() => {
           if (!videoLoaded && !videoError) {
-            setVideoError(true);
+            console.log('Showing fallback after 2 seconds');
+            setShowFallback(true);
           }
-        }, 5000);
+        }, 2000);
+
+        
+        setTimeout(() => {
+          if (!videoLoaded && !videoError) {
+            console.warn('Video loading timeout, showing fallback');
+            setVideoError(true);
+            cleanup();
+          }
+        }, 10000);
 
       } catch (error) {
         console.warn('Video preload failed:', error);
@@ -51,10 +87,25 @@ const Hero = () => {
     };
 
     preloadVideo();
+
+    // Debug: Check if video file is accessible
+    fetch('/assets/videos/devity_logo.mp4', { method: 'HEAD' })
+      .then(response => {
+        if (response.ok) {
+          console.log('Video file is accessible');
+        } else {
+          console.warn('Video file not accessible:', response.status);
+          setVideoError(true);
+        }
+      })
+      .catch(error => {
+        console.warn('Video file check failed:', error);
+        setVideoError(true);
+      });
   }, [videoLoaded, videoError]);
 
   return (
-    <section id="home" className="relative min-h-screen hero-mobile bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-slate-900 dark:to-black overflow-hidden transition-colors duration-300">
+    <section id="home" className="relative min-h-screen hero-mobile bg-white dark:bg-gray-900 overflow-hidden transition-colors duration-300">
       {/* Hero background elements - responsive positioning */}
       <div className="absolute inset-0">
         <div className="absolute top-10 sm:top-20 left-4 sm:left-10 w-32 h-32 sm:w-70 sm:h-70 bg-blue-400/10 dark:bg-blue-500/20 rounded-full animate-float"></div>
@@ -67,7 +118,7 @@ const Hero = () => {
           {/* Hero Content */}
           <div className={`text-center lg:text-left ${isVisible ? 'animate-fadeInLeft' : 'opacity-0'}`}>
             <div className="mb-4 sm:mb-6">
-              <span className="inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-white rounded-full text-xs sm:text-sm font-bold mb-3 sm:mb-4 animate-slideInFromBottom transition-colors duration-300">
+              <span className="hero-badge inline-block px-4 py-2 sm:px-4 sm:py-2 bg-blue-100 dark:bg-blue-500/30 text-blue-700 dark:text-blue-100 rounded-full text-sm sm:text-sm font-bold mb-3 sm:mb-4 animate-slideInFromBottom transition-colors duration-300 shadow-lg border border-blue-200 dark:border-blue-400/30">
                 🚀 Welcome to the Future of Tech
               </span>
             </div>
@@ -86,15 +137,15 @@ const Hero = () => {
 
             {/* Stats - Mobile optimized */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8 sm:mt-12 animate-fadeInUp delay-600 px-4 sm:px-0">
-              <div className="text-center bg-white/5 dark:bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-3 lg:p-4 border border-white/10">
+              <div className="text-center bg-white/80 dark:bg-black/80 rounded-xl p-4 sm:p-3 lg:p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                 <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">25+</div>
                 <div className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-semibold transition-colors duration-300">Active Team Members</div>
               </div>
-              <div className="text-center bg-white/5 dark:bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-3 lg:p-4 border border-white/10">
+              <div className="text-center bg-white/80 dark:bg-black/80 rounded-xl p-4 sm:p-3 lg:p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                 <div className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400 mb-1">7+</div>
                 <div className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-semibold transition-colors duration-300">Events</div>
               </div>
-              <div className="text-center bg-white/5 dark:bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-3 lg:p-4 border border-white/10">
+              <div className="text-center bg-white/80 dark:bg-black/80 rounded-xl p-4 sm:p-3 lg:p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                 <div className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400 mb-1">10+</div>
                 <div className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-semibold transition-colors duration-300">Research Paper & Projects</div>
               </div>
@@ -105,11 +156,19 @@ const Hero = () => {
           <div className={`flex justify-center lg:justify-end mt-8 lg:mt-0 ${isVisible ? 'animate-fadeInRight delay-300' : 'opacity-0'}`}>
             <div className="relative">
               {/* Main circle with video logo - responsive sizing */}
-              <div className="w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full flex items-center justify-center shadow-2xl hover-scale overflow-hidden relative p-2 sm:p-3 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600">
+              <div className="hero-video-container w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full flex items-center justify-center shadow-2xl hover-scale overflow-hidden relative p-2 sm:p-3 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600">
                 {/* Video container filling most of the circle */}
-                <div className="relative w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-white">
+                <div
+                  className="relative w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-white cursor-pointer"
+                  onClick={() => {
+                    const video = document.querySelector('.hero-video');
+                    if (video) {
+                      video.play().catch(e => console.warn('Manual play failed:', e));
+                    }
+                  }}
+                >
                   {/* Loading placeholder */}
-                  {!videoLoaded && !videoError && (
+                  {!videoLoaded && !videoError && !showFallback && (
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
                       <div className="text-center">
                         <div className="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
@@ -120,35 +179,63 @@ const Hero = () => {
 
                   {/* Video Logo */}
                   <video
-                    className={`w-full h-full object-contain transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    ref={(video) => {
+                      if (video && videoLoaded && !videoError) {
+                        video.play().catch(e => {
+                          console.warn('Video autoplay failed:', e);
+                          // Try to play again after user interaction
+                          document.addEventListener('click', () => {
+                            video.play().catch(() => { });
+                          }, { once: true });
+                        });
+                      }
+                    }}
+                    className={`hero-video w-full h-full object-contain transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
                     autoPlay
                     loop
                     muted
                     playsInline
-                    preload="metadata"
+                    preload="auto"
                     style={{
-                      filter: 'contrast(1.2) brightness(1.1) saturate(1.3)',
+                      filter: 'contrast(1.1) brightness(1.05) saturate(1.2)',
                     }}
-                    onLoadedData={() => setVideoLoaded(true)}
-                    onError={() => {
+                    onLoadedData={(e) => {
+                      console.log('Video loaded data');
+                      setVideoLoaded(true);
+                      // Force play
+                      e.target.play().catch(err => console.warn('Play failed:', err));
+                    }}
+                    onCanPlay={(e) => {
+                      console.log('Video can play');
+                      setVideoLoaded(true);
+                      // Force play
+                      e.target.play().catch(err => console.warn('Play failed:', err));
+                    }}
+                    onError={(e) => {
+                      console.warn('Video failed to load, showing fallback', e);
                       setVideoError(true);
                       setVideoLoaded(false);
                     }}
+                    onLoadStart={() => console.log('Video load started')}
+                    onLoadedMetadata={() => console.log('Video metadata loaded')}
                   >
                     <source src="/assets/videos/devity_logo.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
 
                   {/* Fallback content if video doesn't load */}
-                  <div className={`text-center text-gray-800 transition-opacity duration-500 ${videoError ? 'opacity-100' : 'opacity-0 pointer-events-none'} ${videoError ? 'block' : 'absolute inset-0 flex items-center justify-center'}`}>
+                  <div className={`text-center text-gray-800 transition-opacity duration-500 ${(videoError || showFallback) && !videoLoaded ? 'opacity-100' : 'opacity-0 pointer-events-none'} ${(videoError || showFallback) && !videoLoaded ? 'block' : 'absolute inset-0 flex items-center justify-center'}`}>
                     <div className="animate-rotateIn delay-500">
-                      <svg className="w-32 h-32 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z" />
-                        <path d="M12 7L8.5 10.5l1.5 1.5L12 10l4-4-1.5-1.5L12 7z" fill="currentColor" opacity="0.9" />
-                      </svg>
+                      {/* Custom Devity Logo SVG */}
+                      <div className="w-32 h-32 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl shadow-lg">
+                        <div className="text-white font-bold text-4xl tracking-wider">
+                          <span className="text-white">DE</span>
+                          <span className="text-cyan-200">V</span>
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="text-2xl font-bold mb-2">Devity Club</h3>
-                    <p className="text-blue-600 text-sm">Tech Innovation</p>
+                    <h3 className="text-2xl font-bold mb-2 text-gray-800">Devity Club</h3>
+                    <p className="text-blue-600 text-sm font-semibold">Tech Innovation Hub</p>
                   </div>
                 </div>
               </div>

@@ -16,7 +16,7 @@ import krutarthImage from '../img/speakers/Krutarth Rindani.png';
 import poorviImage from '../img/speakers/Poorvi Dewangan.png';
 import roshanImage from '../img/speakers/Roshan Bishi.png';
 import meghnaImage from '../img/speakers/Meghna Parwate.png';
-
+import JaiKumarImage from '../img/speakers/Jai Kumar Relwani.jpg';
 const Speakers = () => {
   const speakers = [
     {
@@ -208,11 +208,24 @@ const Speakers = () => {
       expertise: ["Ex-Motorola", "Ex-Nokia", "Telecommunications", "Network Engineering"],
       image: umamaheshwarImage,
       linkedin: "https://linkedin.com/in/umamaheshwar-achari",
-      gradientFrom: "from-slate-500",
-      gradientTo: "to-gray-600",
-      bgGradient: "from-slate-50 via-white to-gray-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600",
-      skillGradient: "from-slate-100 to-gray-100 dark:from-slate-900/50 dark:to-gray-900/50",
-      textColor: "text-slate-700 dark:text-slate-300"
+      gradientFrom: "from-orange-500",
+      gradientTo: "to-red-600",
+      bgGradient: "from-orange-50 via-white to-red-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600",
+      skillGradient: "from-orange-100 to-red-100 dark:from-orange-900/50 dark:to-red-900/50",
+      textColor: "text-orange-700 dark:text-orange-300"
+    },
+    {
+      name: "Mr. Jai Kumar Relwani",
+      title: "Program Manager – AI Ready Schools",
+      company: "igebra.ai",
+      expertise: ["Co-Founder(Talent shaala)", "Academic Specialist(BYJU's)", "Facilitator Mathematics"],
+      image: JaiKumarImage,
+      linkedin: "https://www.linkedin.com/in/jai-kumar-relwani-9118a027/",
+      gradientFrom: "from-purple-500",
+      gradientTo: "to-violet-600",
+      bgGradient: "from-purple-50 via-white to-violet-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600",
+      skillGradient: "from-purple-100 to-violet-100 dark:from-purple-900/50 dark:to-violet-900/50",
+      textColor: "text-purple-700 dark:text-purple-300"
     }
   ];
 

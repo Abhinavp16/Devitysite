@@ -13,7 +13,6 @@ const Hero = () => {
 
     initMobileOptimizations();
 
-
     const preloadVideo = async () => {
       try {
         const video = document.createElement('video');

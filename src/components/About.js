@@ -29,9 +29,9 @@ const About = () => {
   ];
 
   const stats = [
-    { number: "25+", label: "Industry Mentors" },
+    { number: "15+", label: "Industry Mentors" },
     { number: "7+", label: "Events" },
-    { number: "18+", label: "Team Members" }
+    { number: "25+", label: "Team Members" }
   ];
 
   return (

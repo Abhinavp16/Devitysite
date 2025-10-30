@@ -86,7 +86,7 @@ const Speakers = () => {
     },
     {
       name: "Mr. Rohit Singhal",
-      title: "Sr. Software Development Engineer",
+      title: "Software Development Manager",
       company: "Auger",
       expertise: ["Ex-Microsoft","Ex-Amazon", "Ex-Motorola", "Cloud Computing", "Distributed Systems"],
       image: rohitSinghalImage,

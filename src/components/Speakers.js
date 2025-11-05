@@ -237,11 +237,11 @@ const Speakers = () => {
       expertise: [ "GSSoC-24 Program Manager"," AI enthusiast", "AWS Cloud Captain-23", "IGDTUW"],
       image: ArushiGargImage,
       linkedin: "https://www.linkedin.com/in/arushi-garg105?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
-      gradientFrom: "from-orange-500",
-      gradientTo: "to-red-600",
-      bgGradient: "from-orange-50 via-white to-red-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600",
-      skillGradient: "from-orange-100 to-red-100 dark:from-orange-900/50 dark:to-red-900/50",
-      textColor: "text-orange-700 dark:text-orange-300"
+      gradientFrom: "from-rose-500",
+      gradientTo: "to-pink-600",
+      bgGradient: "from-rose-50 via-white to-pink-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600",
+      skillGradient: "from-rose-100 to-pink-100 dark:from-rose-900/50 dark:to-pink-900/50",
+      textColor: "text-rose-700 dark:text-rose-300"
     },
     {
       name: "Mr. Saurabh Mudgal",
@@ -250,11 +250,11 @@ const Speakers = () => {
       expertise: ["Security Engineering","Microsoft Global Hackathon 2025 Grand Prize Winner",  "Author “Managing the Cyber Risk”", "Cloud Security"],
       image: SaurabhMudgalImage,
       linkedin: "https://www.linkedin.com/in/smudgal05?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
-      gradientFrom: "from-orange-500",
-      gradientTo: "to-red-600",
-      bgGradient: "from-orange-50 via-white to-red-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600",
-      skillGradient: "from-orange-100 to-red-100 dark:from-orange-900/50 dark:to-red-900/50",
-      textColor: "text-orange-700 dark:text-orange-300"
+      gradientFrom: "from-violet-500",
+      gradientTo: "to-purple-600",
+      bgGradient: "from-violet-50 via-white to-purple-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600",
+      skillGradient: "from-violet-100 to-purple-100 dark:from-violet-900/50 dark:to-purple-900/50",
+      textColor: "text-violet-700 dark:text-violet-300"
     },
     {
       name: "Mr. Divy Arpit",
@@ -263,11 +263,11 @@ const Speakers = () => {
       expertise: ["Machine Learning", "Alumnus @ N.I.T. Raipur.", "Microsoft Azure", "Android Development"],
       image: DivyArpitImage,
       linkedin: "https://www.linkedin.com/in/divy-arpit?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
-      gradientFrom: "from-orange-500",
-      gradientTo: "to-red-600",
-      bgGradient: "from-orange-50 via-white to-red-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600",
-      skillGradient: "from-orange-100 to-red-100 dark:from-orange-900/50 dark:to-red-900/50",
-      textColor: "text-orange-700 dark:text-orange-300"
+      gradientFrom: "from-pink-500",
+      gradientTo: "to-rose-600",
+      bgGradient: "from-pink-50 via-white to-rose-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600",
+      skillGradient: "from-pink-100 to-rose-100 dark:from-pink-900/50 dark:to-rose-900/50",
+      textColor: "text-pink-700 dark:text-pink-300"
     }
   ];
 

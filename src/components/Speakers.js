@@ -226,6 +226,45 @@ const Speakers = () => {
       bgGradient: "from-purple-50 via-white to-violet-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600",
       skillGradient: "from-purple-100 to-violet-100 dark:from-purple-900/50 dark:to-violet-900/50",
       textColor: "text-purple-700 dark:text-purple-300"
+    },
+    {
+      name: "Ms.Arushi Garg",
+      title: "SDE-1",
+      company: "Adobe",
+      expertise: [ "GSSoC-24 Program Manager"," AI enthusiast", "AWS Cloud Captain-23", "IGDTUW"],
+      image: umamaheshwarImage,
+      linkedin: "https://www.linkedin.com/in/arushi-garg105?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
+      gradientFrom: "from-orange-500",
+      gradientTo: "to-red-600",
+      bgGradient: "from-orange-50 via-white to-red-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600",
+      skillGradient: "from-orange-100 to-red-100 dark:from-orange-900/50 dark:to-red-900/50",
+      textColor: "text-orange-700 dark:text-orange-300"
+    },
+    {
+      name: "Mr. Saurabh Mudgal",
+      title: "Principal Security Group Manager",
+      company: "Microsoft",
+      expertise: ["Security Engineering","Microsoft Global Hackathon 2025 Grand Prize Winner",  "Author “Managing the Cyber Risk”", "Cloud Security"],
+      image: umamaheshwarImage,
+      linkedin: "https://www.linkedin.com/in/smudgal05?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
+      gradientFrom: "from-orange-500",
+      gradientTo: "to-red-600",
+      bgGradient: "from-orange-50 via-white to-red-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600",
+      skillGradient: "from-orange-100 to-red-100 dark:from-orange-900/50 dark:to-red-900/50",
+      textColor: "text-orange-700 dark:text-orange-300"
+    },
+    {
+      name: "Mr. Divy Arpit",
+      title: "Sr. Software Engineer",
+      company: " Optum (UHG)",
+      expertise: ["Machine Learning", "Alumnus @ N.I.T. Raipur.", "Microsoft Azure", "Android Development"],
+      image: umamaheshwarImage,
+      linkedin: "https://www.linkedin.com/in/divy-arpit?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
+      gradientFrom: "from-orange-500",
+      gradientTo: "to-red-600",
+      bgGradient: "from-orange-50 via-white to-red-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600",
+      skillGradient: "from-orange-100 to-red-100 dark:from-orange-900/50 dark:to-red-900/50",
+      textColor: "text-orange-700 dark:text-orange-300"
     }
   ];
 

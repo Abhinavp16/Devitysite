@@ -17,6 +17,9 @@ import poorviImage from '../img/speakers/Poorvi Dewangan.png';
 import roshanImage from '../img/speakers/Roshan Bishi.png';
 import meghnaImage from '../img/speakers/Meghna Parwate.png';
 import JaiKumarImage from '../img/speakers/Jai Kumar Relwani.jpg';
+import ArushiGargImage from '../img/speakers/Arushi Garg.jpeg';
+import SaurabhMudgalImage from '../img/speakers/Saurabh Mudgal.png';
+import DivyArpitImage from '../img/speakers/Divy Arpit.jpeg';
 const Speakers = () => {
   const speakers = [
     {

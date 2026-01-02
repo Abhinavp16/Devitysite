@@ -2,6 +2,13 @@ import { ClubMemoriesAnimatedBackground } from './AnimatedBackground';
 import { useState, useEffect, useCallback } from 'react';
 import { preloadImage } from '../utils/imageOptimization';
 
+//Import Tech Elevator images
+import TechElevate1 from '../img/club memoriess/Tech Elevate/1.JPG';
+import TechElevate2 from '../img/club memoriess/Tech Elevate/2.JPG';
+import TechElevate4 from '../img/club memoriess/Tech Elevate/4.JPG';
+import TechElevate5 from '../img/club memoriess/Tech Elevate/5.jpg';
+import TechElevate6 from '../img/club memoriess/Tech Elevate/6.JPG';
+
 // Import Code Fusion images
 import codeFusion1 from '../img/club memoriess/Code Fusion/20250204_115212AMByGPSMapCamera.jpg';
 import codeFusion2 from '../img/club memoriess/Code Fusion/IMG_20250204_120411.jpg';
@@ -15,6 +22,7 @@ import envisionX2 from '../img/club memoriess/Envision X/20250325_101709AMByGPSM
 import envisionX3 from '../img/club memoriess/Envision X/IMG20250325112216.jpg';
 import envisionX4 from '../img/club memoriess/Envision X/IMG20250325112652.jpg';
 import envisionX5 from '../img/club memoriess/Envision X/IMG20250325113648.jpg';
+import envisionX6 from '../img/club memoriess/Envision X/IMG20250325112003.jpg';
 
 // Import Jumpstart Event images
 import jumpstart1 from '../img/club memoriess/Jumpstart Event/ASET GUEST TALK (1)~2.jpg';
@@ -43,6 +51,21 @@ const ClubMemories = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const memorySections = {
+
+    'Tech Elevate': {
+      title: 'Tech Elevate',
+      description: 'Tech Elevate 2024: DevOps & Cloud Career Pathways, was successfully held on 22nd  November 2024 at Amity University Chhattisgarh.  The keynote speaker, Mr. Vikas Shrivastava, shared his expertise in DevOps workflows, cloud technologies, and Career Pathways . ',
+      gradient: 'from-red-500 to-pink-600',
+      bgGradient: 'from-red-50 via-white to-pink-50',
+      images: [
+        { src: TechElevate1, title: 'Opening Ceremony' },
+        { src: TechElevate2, title: 'Coding Session' },
+        { src: TechElevate4, title: 'Problem Solving' },
+        { src: TechElevate5, title: 'Problem Solving' },
+        { src: TechElevate6, title: 'Award Ceremony' }
+      ]
+    },
+
     'Code Fusion': {
       title: 'Code Fusion',
       description: 'CodeFusion: The DevOps Synergy, was successfully held on 4th February 2025 at Amity University Chhattisgarh.  The keynote speaker, Mr. Nakul Grover, DevOps Engineer at Thomson Reuters, shared his expertise in DevOps workflows, cloud technologies, and automation tools. ',
@@ -64,9 +87,11 @@ const ClubMemories = () => {
       images: [
         { src: envisionX1, title: 'Project Setup' },
         { src: envisionX2, title: 'Innovation Display' },
+        { src: envisionX6, title: 'President speech' },
         { src: envisionX3, title: 'Team Presentations' },
         { src: envisionX4, title: 'Audience Engagement' },
         { src: envisionX5, title: 'Networking Session' }
+      
       ]
     },
     'Jumpstart Event': {

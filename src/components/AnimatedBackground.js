@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 // Hero Section Animated Background (Enhanced)
 export const HeroAnimatedBackground = () => {
@@ -27,7 +27,7 @@ export const HeroAnimatedBackground = () => {
 export const AboutAnimatedBackground = () => {
   const [particles, setParticles] = useState([]);
 
-  const aboutIcons = [
+  const aboutIcons = useMemo(() => [
     { content: '🎓', color: 'text-blue-400' },
     { content: '👥', color: 'text-green-400' },
     { content: '🏆', color: 'text-purple-400' },
@@ -40,7 +40,7 @@ export const AboutAnimatedBackground = () => {
     { content: '⚡', color: 'text-yellow-400' },
     { content: '🌐', color: 'text-cyan-400' },
     { content: '🔥', color: 'text-orange-400' },
-  ];
+  ], []);
 
   useEffect(() => {
     const newParticles = [];
@@ -58,7 +58,7 @@ export const AboutAnimatedBackground = () => {
       });
     }
     setParticles(newParticles);
-  }, []);
+  }, [aboutIcons]);
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -90,7 +90,7 @@ export const AboutAnimatedBackground = () => {
 export const TeamAnimatedBackground = () => {
   const [particles, setParticles] = useState([]);
 
-  const teamIcons = [
+  const teamIcons = useMemo(() => [
     { content: '👨‍💻', color: 'text-indigo-400' },
     { content: '👩‍💻', color: 'text-purple-400' },
     { content: '🤝', color: 'text-blue-400' },
@@ -103,7 +103,7 @@ export const TeamAnimatedBackground = () => {
     { content: '⚛️', color: 'text-blue-400' },
     { content: '🚀', color: 'text-red-400' },
     { content: '💻', color: 'text-gray-400' },
-  ];
+  ], []);
 
   useEffect(() => {
     const newParticles = [];
@@ -122,7 +122,7 @@ export const TeamAnimatedBackground = () => {
       });
     }
     setParticles(newParticles);
-  }, []);
+  }, [teamIcons]);
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -174,7 +174,7 @@ export default AnimatedBackground;
 export const ClubMemoriesAnimatedBackground = () => {
   const [particles, setParticles] = useState([]);
 
-  const memoryIcons = [
+  const memoryIcons = useMemo(() => [
     { content: '📸', color: 'text-pink-400' },
     { content: '🎉', color: 'text-yellow-400' },
     { content: '🏆', color: 'text-amber-400' },
@@ -191,7 +191,7 @@ export const ClubMemoriesAnimatedBackground = () => {
     { content: '⚡', color: 'text-yellow-400' },
     { content: '🌐', color: 'text-cyan-400' },
     { content: '🔥', color: 'text-orange-400' },
-  ];
+  ], []);
 
   useEffect(() => {
     const newParticles = [];
@@ -210,7 +210,7 @@ export const ClubMemoriesAnimatedBackground = () => {
       });
     }
     setParticles(newParticles);
-  }, []);
+  }, [memoryIcons]);
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -256,7 +256,7 @@ export const ClubMemoriesAnimatedBackground = () => {
 export const EventsAnimatedBackground = () => {
   const [particles, setParticles] = useState([]);
 
-  const eventIcons = [
+  const eventIcons = useMemo(() => [
     { content: '🎪', color: 'text-pink-400' },
     { content: '🎭', color: 'text-purple-400' },
     { content: '🎨', color: 'text-blue-400' },
@@ -277,7 +277,7 @@ export const EventsAnimatedBackground = () => {
     { content: '🔥', color: 'text-orange-400' },
     { content: '💡', color: 'text-yellow-300' },
     { content: '✨', color: 'text-blue-300' },
-  ];
+  ], []);
 
   useEffect(() => {
     const newParticles = [];
@@ -296,7 +296,7 @@ export const EventsAnimatedBackground = () => {
       });
     }
     setParticles(newParticles);
-  }, []);
+  }, [eventIcons]);
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -345,9 +345,6 @@ export const SpeakersAnimatedBackground = () => {
   const speakerIcons = [
     { content: '🎤', color: 'text-blue-400' },
     { content: '🎙️', color: 'text-purple-400' },
-    { content: '👨‍🏫', color: 'text-green-400' },
-    { content: '👩‍🏫', color: 'text-pink-400' },
-    { content: '🎯', color: 'text-red-400' },
     { content: '💡', color: 'text-yellow-400' },
     { content: '🧠', color: 'text-indigo-400' },
     { content: '📢', color: 'text-orange-400' },
@@ -356,7 +353,6 @@ export const SpeakersAnimatedBackground = () => {
     { content: '🎓', color: 'text-emerald-400' },
     { content: '🏆', color: 'text-amber-400' },
     { content: '⚛️', color: 'text-blue-400' },
-    { content: '🚀', color: 'text-red-400' },
     { content: '💻', color: 'text-gray-400' },
     { content: '⚡', color: 'text-yellow-400' },
     { content: '🌐', color: 'text-cyan-400' },
@@ -365,15 +361,15 @@ export const SpeakersAnimatedBackground = () => {
 
   useEffect(() => {
     const newParticles = [];
-    for (let i = 0; i < 35; i++) {
+    for (let i = 0; i < 30; i++) {
       const icon = speakerIcons[Math.floor(Math.random() * speakerIcons.length)];
       newParticles.push({
         id: i,
         icon: icon,
         x: Math.random() * 100,
         y: Math.random() * 100,
-        size: Math.random() * 24 + 18,
-        duration: Math.random() * 14 + 10,
+        size: Math.random() * 20 + 16,
+        duration: Math.random() * 12 + 8,
         delay: Math.random() * 7,
         opacity: Math.random() * 0.4 + 0.2,
         animationType: Math.floor(Math.random() * 4),
@@ -501,6 +497,92 @@ export const ContactAnimatedBackground = () => {
       <div className="absolute bottom-24 right-16 w-32 h-32 bg-green-100/25 rounded-lg animate-float-reverse"></div>
       <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-purple-100/25 rounded-full animate-pulse"></div>
       <div className="absolute bottom-1/3 right-1/4 w-20 h-20 bg-orange-100/25 rounded-lg animate-float-diagonal"></div>
+    </div>
+  );
+};
+
+// Speaker Review Section Animated Background
+export const SpeakerReviewAnimatedBackground = () => {
+  const [particles, setParticles] = useState([]);
+
+  const speakerReviewIcons = [
+    { content: '🎤', color: 'text-blue-400' },
+    { content: '🗣️', color: 'text-purple-400' },
+    { content: '💬', color: 'text-green-400' },
+    { content: '⭐', color: 'text-yellow-400' },
+    { content: '👏', color: 'text-pink-400' },
+    { content: '🎯', color: 'text-red-400' },
+    { content: '💡', color: 'text-orange-400' },
+    { content: '🌟', color: 'text-cyan-400' },
+    { content: '✨', color: 'text-indigo-400' },
+    { content: '🎙️', color: 'text-purple-300' },
+    { content: '📢', color: 'text-orange-300' },
+    { content: '👨‍🏫', color: 'text-blue-300' },
+    { content: '👩‍🏫', color: 'text-pink-300' },
+    { content: '🏆', color: 'text-amber-400' },
+    { content: '🎓', color: 'text-emerald-400' },
+    { content: '💭', color: 'text-gray-400' },
+    { content: '🔥', color: 'text-red-300' },
+    { content: '⚡', color: 'text-yellow-300' },
+    { content: '🚀', color: 'text-blue-500' },
+    { content: '💻', color: 'text-gray-300' },
+  ];
+
+  useEffect(() => {
+    const newParticles = [];
+    for (let i = 0; i < 30; i++) {
+      const icon = speakerReviewIcons[Math.floor(Math.random() * speakerReviewIcons.length)];
+      newParticles.push({
+        id: i,
+        icon: icon,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 22 + 16,
+        duration: Math.random() * 16 + 12,
+        delay: Math.random() * 8,
+        opacity: Math.random() * 0.3 + 0.15,
+        animationType: Math.floor(Math.random() * 4),
+      });
+    }
+    setParticles(newParticles);
+  }, []);
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map((particle) => {
+        const getAnimationClass = () => {
+          switch (particle.animationType) {
+            case 0: return 'animate-float';
+            case 1: return 'animate-float-reverse';
+            case 2: return 'animate-float-diagonal';
+            case 3: return 'animate-float-circular';
+            default: return 'animate-float';
+          }
+        };
+
+        return (
+          <div
+            key={particle.id}
+            className={`absolute ${getAnimationClass()}`}
+            style={{
+              left: `${particle.x}%`,
+              top: `${particle.y}%`,
+              opacity: particle.opacity,
+              animationDuration: `${particle.duration}s`,
+              animationDelay: `${particle.delay}s`,
+              fontSize: `${particle.size}px`,
+            }}
+          >
+            <span className={particle.icon.color}>{particle.icon.content}</span>
+          </div>
+        );
+      })}
+
+      {/* Speaker review themed geometric shapes */}
+      <div className="absolute top-20 left-16 w-32 h-32 bg-gradient-to-br from-blue-200/15 to-purple-200/15 rounded-full animate-float"></div>
+      <div className="absolute bottom-32 right-20 w-28 h-28 bg-gradient-to-br from-yellow-200/15 to-orange-200/15 rounded-lg animate-float-reverse"></div>
+      <div className="absolute top-1/2 right-1/4 w-24 h-24 bg-gradient-to-br from-green-200/15 to-emerald-200/15 rounded-full animate-pulse"></div>
+      <div className="absolute bottom-1/4 left-1/3 w-20 h-20 bg-gradient-to-br from-pink-200/15 to-rose-200/15 rounded-lg animate-float-diagonal"></div>
     </div>
   );
 };

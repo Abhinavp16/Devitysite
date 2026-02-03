@@ -35,21 +35,21 @@ const About = () => {
   ];
 
   return (
-    <section id="about" className="py-20 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm relative overflow-hidden transition-colors duration-300">
+    <section id="about" className="py-12 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm relative overflow-hidden transition-colors duration-300">
       <AboutAnimatedBackground />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
             About <span className="text-blue-600 dark:text-blue-400">DevityClub</span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto transition-colors duration-300">
-             The Devity Club is a dynamic student-led initiative aimed at fostering technical skills and promoting innovation among students. With a focus on real-world applications and cutting-edge technologies, the club provides a platform for students to enhance their competitive programming abilities, engage in impactful projects, and contribute to open-source communities and shaping the future of tech together.
+            The Devity Club is a dynamic student-led initiative aimed at fostering technical skills and promoting innovation among students. With a focus on real-world applications and cutting-edge technologies, the club provides a platform for students to enhance their competitive programming abilities, engage in impactful projects, and contribute to open-source communities and shaping the future of tech together.
           </p>
         </div>
 
         {/* Mission Section */}
-        <div className="mb-16">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 md:p-12 backdrop-blur-sm border border-white/20 dark:border-gray-600/20 transition-colors duration-300">
+        <div className="mb-10">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 md:p-8 backdrop-blur-sm border border-white/20 dark:border-gray-600/20 transition-colors duration-300">
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 transition-colors duration-300">Our Mission</h3>
             <p className="text-lg text-gray-700 dark:text-gray-300 mb-6 leading-relaxed transition-colors duration-300">
               Devity Club  Empower students with hands-on skills across emerging domains like AI, Cybersecurity, DevOps, Cloud Computing, and Web Technologies.Bridge the gap between academic learning and industry expectations through impactful events, mentorship, and collaborative projects. Foster a culture of continuous learning, creativity, and open-source contribution. Serve as a launchpad for future-ready tech professionals and leaders.
@@ -62,7 +62,7 @@ const About = () => {
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
           {features.map((feature, index) => (
             <div key={index} className="text-center group">
               <div className={`w-20 h-20 ${feature.color} rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 transform group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
@@ -75,7 +75,7 @@ const About = () => {
         </div>
 
         {/* Stats Section */}
-        <div className="bg-gray-50/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-white/20 dark:border-gray-600/20 transition-colors duration-300">
+        <div className="bg-gray-50/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-white/20 dark:border-gray-600/20 transition-colors duration-300">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             {stats.map((stat, index) => (
               <div key={index} className="group">

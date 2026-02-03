@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import './styles/mobile-optimizations.css';
+import './styles/loading-skeleton.css';
 import AnimatedBackground from './components/AnimatedBackground';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import About from './components/About';
 import ClubMemories from './components/ClubMemories';
+import SpeakerReview from './components/SpeakerReview';
 import Events from './components/Events';
 import Team from './components/Team';
 import Speakers from './components/Speakers';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import AdminProtectedRoute from './components/AdminProtectedRoute';
+import LoadingSkeleton from './components/LoadingSkeleton';
+import useLoadingSequence from './hooks/useLoadingSequence';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const { isLoading, progress, currentStep } = useLoadingSequence(200);
 
   useEffect(() => {
     // Simple routing based on URL pathname
@@ -36,6 +41,11 @@ function App() {
     };
   }, []);
 
+  // Show loading skeleton during initial load
+  if (isLoading) {
+    return <LoadingSkeleton progress={progress} currentStep={currentStep} />;
+  }
+
   if (currentPage === 'dashboard') {
     return <AdminProtectedRoute />;
   }
@@ -55,6 +65,7 @@ function App() {
           <div className="relative z-10">
             <About />
             <ClubMemories />
+            <SpeakerReview />
             <Events />
             <Team />
             <Speakers />

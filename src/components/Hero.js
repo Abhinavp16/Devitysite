@@ -112,12 +112,15 @@ const Hero = () => {
         <div className="absolute -bottom-4 sm:-bottom-8 left-8 sm:left-20 w-24 h-24 sm:w-42 sm:h-42 bg-pink-400/10 dark:bg-pink-500/20 rounded-full animate-float-diagonal"></div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-20 hero-content hero-content-landscape">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-12 hero-content hero-content-landscape">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Hero Content */}
           <div className={`text-center lg:text-left ${isVisible ? 'animate-fadeInLeft' : 'opacity-0'}`}>
             <div className="mb-4 sm:mb-6">
-              <span className="hero-badge inline-block px-4 py-2 sm:px-4 sm:py-2 bg-blue-100 dark:bg-blue-500/30 text-blue-700 dark:text-blue-100 rounded-full text-sm sm:text-sm font-bold mb-3 sm:mb-4 animate-slideInFromBottom transition-colors duration-300 shadow-lg border border-blue-200 dark:border-blue-400/30">
+              <span
+                onDoubleClick={() => window.location.href = '/login.html'}
+                className="hero-badge inline-block px-4 py-2 sm:px-4 sm:py-2 bg-blue-100 dark:bg-blue-500/30 text-blue-700 dark:text-blue-100 rounded-full text-sm sm:text-sm font-bold mb-3 sm:mb-4 animate-slideInFromBottom transition-colors duration-300 shadow-lg border border-blue-200 dark:border-blue-400/30 cursor-pointer select-none"
+              >
                 🚀 Welcome to the Future of Tech
               </span>
             </div>

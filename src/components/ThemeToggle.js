@@ -6,7 +6,7 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="relative p-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 transition-all duration-500 transform hover:scale-110 hover:-translate-y-0.5 group overflow-hidden shadow-lg hover:shadow-2xl"
+      className="relative p-2 sm:p-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 transition-all duration-500 transform hover:scale-110 hover:-translate-y-0.5 group overflow-hidden shadow-lg hover:shadow-2xl"
       aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
     >
       {/* Animated background */}
@@ -19,10 +19,10 @@ const ThemeToggle = () => {
       <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 opacity-0 group-hover:opacity-30 blur-md transition-opacity duration-500 rounded-xl"></div>
       
       {/* Icon container */}
-      <div className="relative z-10 w-6 h-6 flex items-center justify-center">
+      <div className="relative z-10 w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">
         {/* Sun Icon (Light Mode) */}
         <svg
-          className={`absolute w-6 h-6 text-yellow-300 transition-all duration-500 transform ${
+          className={`absolute w-5 h-5 sm:w-6 sm:h-6 text-yellow-300 transition-all duration-500 transform ${
             isDarkMode 
               ? 'rotate-180 scale-0 opacity-0' 
               : 'rotate-0 scale-100 opacity-100'
@@ -35,7 +35,7 @@ const ThemeToggle = () => {
         
         {/* Moon Icon (Dark Mode) */}
         <svg
-          className={`absolute w-6 h-6 text-blue-300 transition-all duration-500 transform ${
+          className={`absolute w-5 h-5 sm:w-6 sm:h-6 text-blue-300 transition-all duration-500 transform ${
             isDarkMode 
               ? 'rotate-0 scale-100 opacity-100' 
               : 'rotate-180 scale-0 opacity-0'

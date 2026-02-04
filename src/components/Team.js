@@ -22,7 +22,7 @@ import img16 from '../img/16.png';
 import img17 from '../img/17.png';
 import img18 from '../img/18.png';
 import img19 from '../img/19.png';
-import img20 from '../img/20.png';
+
 import img21 from '../img/21.png';
 import img22 from '../img/22.png';
 import img23 from '../img/23.jpg';
@@ -55,7 +55,6 @@ const Team = () => {
     { name: "Ms. Kiran Vishwakarma", role: "Big Data Lead", image: img17, bio: "Leading big data initiatives and analytics projects, driving data-driven insights.", skills: ["Big Data", "Analytics", "Data Science"], social: { github: "#", linkedin: "http://www.linkedin.com/in/kirannvish" } },
     { name: "Mr. Kunal Sahu", role: "AI/ML Lead", image: img18, bio: "Spearheading artificial intelligence and machine learning projects and research.", skills: ["Machine Learning", "AI Research", "Python"], social: { github: "https://github.com/vky342", linkedin: "#" } },
     { name: "Ms. Vandana Singh", role: "Devops & Cloud Lead", image: img19, bio: "Managing cloud infrastructure and deployment pipelines for seamless operations.", skills: ["Docker", "Kubernetes", "CI/CD"], social: { github: "https://github.com/vandanasingh11", linkedin: "https://www.linkedin.com/in/vandana-singh1105?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" } },
-    { name: "Ms. Nupur Goyal", role: "Open Source Lead", image: img20, bio: "Promoting open source contributions and managing community-driven projects.", skills: ["Open Source", "Git", "Community Management"], social: { github: "https://github.com/Nupur-goyal22", linkedin: "https://www.linkedin.com/in/nupur-goyal-0283b6321?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" } },
     { name: "Ms. Harsha Hariyani", role: "Management Lead", image: img21, bio: "Coordinating team activities and ensuring smooth execution of club operations.", skills: ["Project Management", "Team Coordination", "Operations"], social: { github: "#", linkedin: "https://www.linkedin.com/in/harsha-hariyani-b8b8b8321?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" } },
     { name: "Ms. Ritika Jiwnani", role: "PR Lead", image: img22, bio: "Managing public relations, social media presence, and external communications.", skills: ["Public Relations", "Social Media", "Marketing"], social: { github: "https://github.com/ritikajiwnani21-gif", linkedin: "https://www.linkedin.com/in/ritika-jiwnani-955884381" } },
     { name: "Mr. Krish Rawlley", role: "PR Lead", image: img23, bio: "Handling media outreach, brand promotion, and community engagement initiatives.", skills: ["Media Relations", "Brand Management", "Content Creation"], social: { github: "https://github.com/rawlleykrish-commits", linkedin: "#" } },

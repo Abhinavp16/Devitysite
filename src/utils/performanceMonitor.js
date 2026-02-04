@@ -7,6 +7,27 @@ export const measureLoadTime = (startTime, label = 'Resource') => {
   return loadTime;
 };
 
+export const trackLoadingSequence = (startTime, stepName) => {
+  const currentTime = performance.now();
+  const stepTime = currentTime - startTime;
+  console.log(`Loading step "${stepName}" completed in ${stepTime.toFixed(2)}ms`);
+  return stepTime;
+};
+
+export const measureTotalLoadingTime = () => {
+  const startTime = performance.now();
+  
+  return {
+    start: startTime,
+    end: () => {
+      const endTime = performance.now();
+      const totalTime = endTime - startTime;
+      console.log(`Total loading sequence completed in ${totalTime.toFixed(2)}ms`);
+      return totalTime;
+    }
+  };
+};
+
 export const createPerformanceObserver = (callback) => {
   if ('PerformanceObserver' in window) {
     const observer = new PerformanceObserver((list) => {

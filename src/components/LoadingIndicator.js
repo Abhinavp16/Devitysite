@@ -23,28 +23,10 @@ const LoadingIndicator = ({
   };
 
   return (
-    <div className={`flex flex-col items-center justify-center space-y-3 ${className}`}>
-      {/* Spinner */}
+    <div className={`flex flex-col items-center justify-center space-y-2 ${className}`}>
+      {/* Optimized Spinner */}
       <div className="relative">
         <div className={`${sizeClasses[size]} border-gray-300 border-t-blue-500 rounded-full animate-spin`}></div>
-        
-        {/* Progress ring overlay */}
-        {showProgress && progress > 0 && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <svg className={`${sizeClasses[size]} transform -rotate-90`} viewBox="0 0 24 24">
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeDasharray={`${(progress / 100) * 62.83} 62.83`}
-                className="text-blue-500 transition-all duration-300"
-              />
-            </svg>
-          </div>
-        )}
       </div>
 
       {/* Loading message */}
@@ -61,11 +43,11 @@ const LoadingIndicator = ({
         )}
       </div>
 
-      {/* Progress bar */}
+      {/* Simplified Progress bar */}
       {showProgress && (
-        <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+        <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-1 overflow-hidden">
           <div 
-            className="bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full transition-all duration-300 ease-out"
+            className="bg-blue-500 h-full rounded-full transition-all duration-200 ease-out"
             style={{ width: `${progress}%` }}
           ></div>
         </div>

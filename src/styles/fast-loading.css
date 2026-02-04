@@ -1,0 +1,91 @@
+/* Optimized loading animations for better performance */
+
+/* Fast pulse animation */
+@keyframes fast-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Efficient spin animation */
+@keyframes efficient-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Optimized fade-in */
+@keyframes fast-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Performance-optimized classes */
+.fast-pulse {
+  animation: fast-pulse 1s ease-in-out infinite;
+}
+
+.efficient-spin {
+  animation: efficient-spin 1s linear infinite;
+}
+
+.fast-fade-in {
+  animation: fast-fade-in 0.3s ease-out forwards;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .fast-pulse,
+  .efficient-spin,
+  .fast-fade-in {
+    animation: none;
+  }
+}
+
+/* GPU acceleration for smooth animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Optimized skeleton loading */
+.skeleton-optimized {
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.1) 25%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    rgba(255, 255, 255, 0.1) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Dark mode skeleton */
+.dark .skeleton-optimized {
+  background: linear-gradient(90deg, 
+    rgba(75, 85, 99, 0.1) 25%, 
+    rgba(75, 85, 99, 0.2) 50%, 
+    rgba(75, 85, 99, 0.1) 75%
+  );
+  background-size: 200% 100%;
+}

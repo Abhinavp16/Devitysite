@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { measureTotalLoadingTime, trackLoadingSequence } from '../utils/performanceMonitor';
 
 const useLoadingSequence = (initialDelay = 100) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -6,14 +7,14 @@ const useLoadingSequence = (initialDelay = 100) => {
   const [currentStep, setCurrentStep] = useState('');
 
   useEffect(() => {
+    const loadingTimer = measureTotalLoadingTime();
+    let stepStartTime = performance.now();
+    
     const loadingSteps = [
-      { step: 'Initializing DevityClub...', progress: 15, delay: 300 },
-      { step: 'Loading components...', progress: 35, delay: 500 },
-      { step: 'Fetching club data...', progress: 55, delay: 400 },
-      { step: 'Preparing events...', progress: 70, delay: 300 },
-      { step: 'Loading team info...', progress: 85, delay: 250 },
-      { step: 'Finalizing interface...', progress: 95, delay: 200 },
-      { step: 'Ready to explore!', progress: 100, delay: 150 }
+      { step: 'Initializing DevityClub...', progress: 25, delay: 150 },
+      { step: 'Loading components...', progress: 50, delay: 200 },
+      { step: 'Fetching data...', progress: 75, delay: 150 },
+      { step: 'Ready to explore!', progress: 100, delay: 100 }
     ];
 
     let stepIndex = 0;
@@ -21,6 +22,13 @@ const useLoadingSequence = (initialDelay = 100) => {
     const executeLoadingStep = () => {
       if (stepIndex < loadingSteps.length) {
         const { step, progress: stepProgress, delay } = loadingSteps[stepIndex];
+        
+        // Track previous step completion time
+        if (stepIndex > 0) {
+          trackLoadingSequence(stepStartTime, loadingSteps[stepIndex - 1].step);
+        }
+        
+        stepStartTime = performance.now();
         setCurrentStep(step);
         setProgress(stepProgress);
         
@@ -29,16 +37,18 @@ const useLoadingSequence = (initialDelay = 100) => {
           if (stepIndex < loadingSteps.length) {
             executeLoadingStep();
           } else {
-            // Add a final delay before completing
+            // Track final step and total time
+            trackLoadingSequence(stepStartTime, step);
             setTimeout(() => {
+              loadingTimer.end();
               setIsLoading(false);
-            }, 400);
+            }, 150);
           }
         }, delay);
       }
     };
 
-    // Start loading sequence after initial delay
+    // Start loading sequence after minimal initial delay
     const startTimeout = setTimeout(() => {
       executeLoadingStep();
     }, initialDelay);

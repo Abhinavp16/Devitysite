@@ -26,7 +26,7 @@ const reviews = [
     highlight: "Outstanding Tech Culture"
   },
   {
-    name: "Mr. Anmol Rangari",
+    name: "Mr. Amol Rangari",
     role: "Cognizant",
     image: "https://i.pravatar.cc/150?img=47",
     review:

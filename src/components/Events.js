@@ -4,9 +4,9 @@ import '../styles/Events.css';
 const Events = () => {
   const events = [
     {
-      title: "ENVISION-X 2026: Transform Ideas into Reality",
-      date: "9 February 2026 to ",
-      time: "....",
+      title: "ENVISION-X 2.0: Transform Ideas into Reality",
+      date: "February 9 - April 11, 2026 ",
+      time: "10:00 AM",
       location: "Auditorium (AUC) & Virtual Platform",
       type: "Innovation Challenge",
       description: "🚀 The biggest tech innovation challenge is back! Join us for a 45-day online project-based innovation challenge where ideas transform into reality. Build, innovate, and compete with the best minds in tech.",
@@ -37,10 +37,10 @@ const Events = () => {
     },
     {
       title: "Devity Summit 2025",
-      date: "September 01-02, 2025",
+      date: "September 01-02, 2025 & Mentorship End  April 11, 2026",
       time: "09:00 AM - 04:30 PM ",
       location: "Auditorium",
-      type: "Seminar",
+      type: "Seminar , Mentorship",
       description: "Learn From Leaders . Build For Industries.",
       status: "Ongoing",
       color: "bg-blue-100 text-blue-600"

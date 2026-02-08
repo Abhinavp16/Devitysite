@@ -17,12 +17,14 @@ import Footer from './components/Footer';
 import AdminProtectedRoute from './components/AdminProtectedRoute';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import FastLoadingSkeleton from './components/FastLoadingSkeleton';
+import LaunchingVideo from './components/LaunchingVideo';
 import useLoadingSequence from './hooks/useLoadingSequence';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [useFastLoading, setUseFastLoading] = useState(false); // Toggle for fast loading
+  const [showLaunching, setShowLaunching] = useState(true);
   const { isLoading, progress, currentStep } = useLoadingSequence(50);
 
   useEffect(() => {
@@ -43,6 +45,11 @@ function App() {
       window.removeEventListener('popstate', handleRouteChange);
     };
   }, []);
+
+  // Show launching video first
+  if (showLaunching) {
+    return <LaunchingVideo onComplete={() => setShowLaunching(false)} />;
+  }
 
   // Show loading skeleton during initial load
   if (isLoading) {

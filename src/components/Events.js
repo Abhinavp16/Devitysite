@@ -12,7 +12,7 @@ const Events = () => {
       description: "🚀 The biggest tech innovation challenge is back! Join us for a 45-day online project-based innovation challenge where ideas transform into reality. Build, innovate, and compete with the best minds in tech.",
       status: "Register Now",
       color: "bg-gradient-to-r from-blue-500 to-purple-600 text-white",
-      registrationLink: "#"
+      registrationLink: "https://envision-x-20.vercel.app/"
     },
 
     {

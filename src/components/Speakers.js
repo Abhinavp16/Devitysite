@@ -284,7 +284,7 @@ const Speakers = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
           {speakers.map((speaker, index) => (
             <div key={index} className={`group relative bg-gradient-to-br ${speaker.bgGradient} rounded-xl sm:rounded-2xl shadow-xl hover:shadow-2xl sm:shadow-2xl sm:hover:shadow-3xl transition-all duration-700 p-3 sm:p-4 md:p-6 lg:p-8 text-center transform hover:-translate-y-2 sm:hover:-translate-y-4 border border-gray-100 dark:border-gray-600 backdrop-blur-sm`}>
               <div className={`absolute inset-0 bg-gradient-to-br ${speaker.gradientFrom}/5 ${speaker.gradientTo}/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>

@@ -45,6 +45,14 @@ import netCamp3 from '../img/club memoriess/NetCamp/WhatsApp Image 2025-08-04 at
 import netCamp4 from '../img/club memoriess/NetCamp/WhatsApp Image 2025-08-04 at 17.46.48_52086ce2.jpg';
 import netCamp5 from '../img/club memoriess/NetCamp/WhatsApp Image 2025-08-05 at 10.03.16_0659c366.jpg';
 
+// Import NetCamp images
+import DS1 from '../img/club memoriess/DevitySummit25/DS1.jpg';
+import DS2 from '../img/club memoriess/DevitySummit25/DS2.jpeg';
+import DS3 from '../img/club memoriess/DevitySummit25/DS3.jpeg';
+import DS4 from '../img/club memoriess/DevitySummit25/DS4.jpeg';
+import DS6 from '../img/club memoriess/DevitySummit25/DS6.jpeg';
+
+
 const ClubMemories = () => {
   const [activeSection, setActiveSection] = useState('Code Fusion');
   const [imagesLoaded, setImagesLoaded] = useState({});
@@ -131,6 +139,19 @@ const ClubMemories = () => {
         { src: netCamp3, title: 'Practical Sessions' },
         { src: netCamp4, title: 'Team Projects' },
         { src: netCamp5, title: 'Final Presentations' }
+      ]
+    },
+    'Devity Summit 2025': {
+      title: 'Devity Summit 2025',
+      description: 'Learn From Leaders, Build For Industries',
+      gradient: 'from-orange-500 to-amber-600',
+      bgGradient: 'from-orange-50 via-white to-amber-50',
+      images: [
+        { src: DS1, title: 'Devity Summit' },
+        { src: DS2, title: 'Hands On Training' },
+        { src: DS3, title: 'Ai/Ml engineering' },
+        { src: DS4, title: 'Hack It' },
+        { src: DS6, title: 'Team' }
       ]
     }
   };

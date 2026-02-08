@@ -10,27 +10,27 @@ const reviews = [
     highlight: "Strong Leadership"
   },
   {
-    name: "Prof. S. K. Mishra",
-    role: "Academic Speaker – Data Science",
+    name: "Mrs. Meeta Rathore ",
+    role: "Sr. Big Data Engineer, Optum (UHG)",
     image: "https://i.pravatar.cc/150?img=12",
     review:
-      "Impressed by the professionalism of the club. The environment encourages creativity and collaboration.",
+      "Mentoring Devity Club’s data science cohort was a rewarding experience—students rapidly progressed from exploratory analysis to production-ready pipelines, demonstrating strong ownership and curiosity. Their final models showed measurable improvements in accuracy and robustness, and their documentation and MLOps hygiene exceeded expectations for early-career talent. Devity Club provides a structured, industry-aligned environment that truly accelerates learning and readiness for real-world projects.",
     highlight: "Highly Professional"
   },
   {
-    name: "Dr. Ankit Sharma",
-    role: "Guest Speaker – AI & Robotics",
+    name: "Mr. Rohit Agarwal",
+    role: "Senior Data Engineering Lead |  OPTUM ",
     image: "https://i.pravatar.cc/150?img=32",
     review:
-      "The club has an excellent technical culture. Students are highly motivated and the sessions are very interactive.",
+      "Attending the 2-day speaker session at Amity University Raipur was an incredible experience. The event was well-organized, with an enthusiastic team and inspiring participants. I truly enjoyed delivering my session on Data Engineering and engaging with such bright minds. The discussions were insightful, and the energy throughout the event was remarkable. Kudos to the organizers for creating a platform that fosters learning and collaboration.",
     highlight: "Outstanding Tech Culture"
   },
   {
-    name: "Ms. Riya Verma",
-    role: "Industry Mentor – Full Stack Development",
+    name: "Mr. Anmol Rangari",
+    role: "Cognizant",
     image: "https://i.pravatar.cc/150?img=47",
     review:
-      "Well-organized events and strong leadership. The team shows great enthusiasm towards learning and innovation.",
+      "It was a wonderful experience being part of DEVITY Summit 2025 at Amity University. The event was exceptionally well-organized, and the efforts of the Devity Club were clearly reflected in the smooth execution and warm hospitality. Delivering a session on Cybersecurity and interacting with such enthusiastic students was truly rewarding. The curiosity, engagement, and thoughtful questions from participants highlighted a strong passion for learning and future-ready skills. I appreciate the excellent coordination throughout the event and look forward to contributing to more such initiatives in the future.“Hackers are not criminals; they are curious minds mastering social engineering to expose weaknesses before criminals do.",
     highlight: "Strong Leadership"
   }
 ];
@@ -90,9 +90,9 @@ export default function SpeakerReview() {
               {reviews.map((item, index) => (
                 <div
                   key={index}
-                  className="group relative w-[280px] md:w-[320px] flex-shrink-0
+                  className="group relative w-[320px] md:w-[380px] flex-shrink-0
                     transition-all duration-700 hover:-translate-y-3 hover:scale-[1.02]
-                    min-h-[300px] perspective-1000"
+                    min-h-[420px] perspective-1000"
                   style={{
                     transform: `rotate(${index % 2 === 0 ? '-0.5deg' : '0.5deg'})`,
                     transformOrigin: 'center center'
@@ -148,8 +148,10 @@ export default function SpeakerReview() {
                           <div className="absolute -bottom-2 -right-1 text-4xl text-blue-400/30 font-serif leading-none rotate-180">"</div>
                           
                           <blockquote className="relative z-10 text-gray-100 text-sm leading-relaxed font-medium
-                            px-3 py-1 min-h-[80px] flex items-center">
-                            <span className="italic line-clamp-4">{item.review}</span>
+                            px-3 py-1 min-h-[160px] flex items-start">
+                            <span className="italic line-clamp-none overflow-y-auto max-h-[200px] pr-2 scrollbar-thin scrollbar-thumb-blue-500/50 scrollbar-track-transparent">
+                              {item.review}
+                            </span>
                           </blockquote>
                         </div>
                       </div>
@@ -331,6 +333,19 @@ export default function SpeakerReview() {
           -webkit-line-clamp: 4;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+        .line-clamp-none {
+          display: block;
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+          width: 4px;
+        }
+        .scrollbar-thumb-blue-500\/50::-webkit-scrollbar-thumb {
+          background-color: rgba(59, 130, 246, 0.5);
+          border-radius: 2px;
+        }
+        .scrollbar-track-transparent::-webkit-scrollbar-track {
+          background-color: transparent;
         }
       `}</style>
     </section>

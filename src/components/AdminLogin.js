@@ -49,17 +49,7 @@ const AdminLogin = ({ onLoginSuccess }) => {
     } catch (error) {
       console.error('Login error:', error);
 
-      // Fallback to simple validation if API is not available
-      if (formData.email && formData.username && formData.password) {
-        localStorage.setItem('adminToken', 'authenticated');
-        localStorage.setItem('adminUser', JSON.stringify({
-          email: formData.email,
-          username: formData.username
-        }));
-        window.location.href = '/dashboard';
-      } else {
-        alert('Please fill in all fields');
-      }
+      alert('Login failed: ' + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -72,70 +62,6 @@ const AdminLogin = ({ onLoginSuccess }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Floating Devity Logos - Outside background container for higher z-index */}
-      {/* Test logo - highly visible */}
-      <div className="fixed top-20 left-20 animate-float-slow z-50 pointer-events-none">
-        <div className="devity-logo text-6xl font-black text-red-500 transform rotate-12 animate-pulse-glow">
-          DEVITY
-        </div>
-      </div>
-
-      <div className="fixed top-32 right-32 animate-float-reverse z-40 pointer-events-none">
-        <div className="devity-logo text-4xl font-black text-blue-300 transform -rotate-6 animate-pulse-glow delay-200">
-          DEVITY
-        </div>
-      </div>
-
-      <div className="fixed bottom-40 left-40 animate-float-diagonal z-40 pointer-events-none">
-        <div className="devity-logo text-3xl font-black text-purple-300 transform rotate-45 animate-pulse-glow delay-400">
-          DEVITY
-        </div>
-      </div>
-
-      <div className="fixed bottom-32 right-24 animate-float-bounce z-40 pointer-events-none">
-        <div className="devity-logo text-3xl font-black text-indigo-300 transform -rotate-12 animate-pulse-glow delay-600">
-          DEVITY
-        </div>
-      </div>
-
-      <div className="fixed top-1/2 left-12 animate-float-vertical z-40 pointer-events-none">
-        <div className="devity-logo text-2xl font-black text-blue-400 transform rotate-90 animate-pulse-glow delay-800">
-          DEVITY
-        </div>
-      </div>
-
-      <div className="fixed top-1/3 right-16 animate-float-horizontal z-40 pointer-events-none">
-        <div className="devity-logo text-2xl font-black text-cyan-400 transform -rotate-45 animate-pulse-glow delay-1000">
-          DEVITY
-        </div>
-      </div>
-
-      {/* Additional floating logos for more dynamic effect */}
-      <div className="fixed top-3/4 left-1/4 animate-float-rotate z-40 pointer-events-none">
-        <div className="devity-logo text-xl font-black text-emerald-300 animate-pulse-glow delay-1200">
-          DEVITY
-        </div>
-      </div>
-
-      <div className="fixed top-1/6 left-3/4 animate-pulse-scale z-40 pointer-events-none">
-        <div className="devity-logo text-2xl font-black text-rose-300 animate-rotate-reverse delay-1400">
-          DEVITY
-        </div>
-      </div>
-
-      {/* Corner floating logos */}
-      <div className="fixed top-16 right-1/3 animate-float-diagonal z-40 pointer-events-none">
-        <div className="devity-logo text-lg font-black text-yellow-300 animate-rotate-30 delay-1600">
-          DEVITY
-        </div>
-      </div>
-
-      <div className="fixed bottom-16 left-1/3 animate-float-vertical z-40 pointer-events-none">
-        <div className="devity-logo text-xl font-black text-pink-300 animate-pulse-scale delay-1800">
-          DEVITY
-        </div>
-      </div>
-
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
 

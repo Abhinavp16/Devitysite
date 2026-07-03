@@ -14,6 +14,7 @@ import Team from './components/Team';
 import Speakers from './components/Speakers';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import AdminLogin from './components/AdminLogin';
 import AdminProtectedRoute from './components/AdminProtectedRoute';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import FastLoadingSkeleton from './components/FastLoadingSkeleton';
@@ -31,6 +32,8 @@ function App() {
       const path = window.location.pathname;
       if (path === '/dashboard') {
         setCurrentPage('dashboard');
+      } else if (path === '/login') {
+        setCurrentPage('login');
       } else {
         setCurrentPage('home');
       }
@@ -53,6 +56,10 @@ function App() {
 
   if (currentPage === 'dashboard') {
     return <AdminProtectedRoute />;
+  }
+
+  if (currentPage === 'login') {
+    return <AdminLogin />;
   }
 
   return (

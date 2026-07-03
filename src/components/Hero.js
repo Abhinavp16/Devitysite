@@ -118,7 +118,7 @@ const Hero = () => {
           <div className={`text-center lg:text-left ${isVisible ? 'animate-fadeInLeft' : 'opacity-0'}`}>
             <div className="mb-4 sm:mb-6">
               <span
-                onDoubleClick={() => window.location.href = '/login.html'}
+                onDoubleClick={() => window.location.href = '/login'}
                 className="hero-badge inline-block px-4 py-2 sm:px-4 sm:py-2 bg-blue-100 dark:bg-blue-500/30 text-blue-700 dark:text-blue-100 rounded-full text-sm sm:text-sm font-bold mb-3 sm:mb-4 animate-slideInFromBottom transition-colors duration-300 shadow-lg border border-blue-200 dark:border-blue-400/30 cursor-pointer select-none"
               >
                 🚀 Welcome to the Future of Tech

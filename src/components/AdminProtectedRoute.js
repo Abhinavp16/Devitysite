@@ -1,22 +1,31 @@
 import { useEffect, useState } from 'react';
 import AdminDashboard from './AdminDashboard';
+import apiService from '../services/apiService';
 
 const AdminProtectedRoute = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check authentication status
-    const checkAuth = () => {
+    const checkAuth = async () => {
       const token = localStorage.getItem('adminToken');
-      
-      // Check for valid JWT token (should be longer than 20 characters)
-      if (token && token.length > 20) {
-        setIsAuthenticated(true);
-      } else {
+
+      if (!token) {
         setIsAuthenticated(false);
+        setIsLoading(false);
+        return;
       }
-      setIsLoading(false);
+
+      try {
+        await apiService.verifyToken();
+        setIsAuthenticated(true);
+      } catch (error) {
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminUser');
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     checkAuth();
@@ -41,10 +50,10 @@ const AdminProtectedRoute = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Admin Access Required</h2>
           <p className="text-gray-600 mb-6">This area requires admin authentication.</p>
           <button 
-            onClick={() => window.location.href = '/'}
+            onClick={() => window.location.href = '/login'}
             className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
           >
-            Return to Home
+            Go to Login
           </button>
         </div>
       </div>

@@ -1,6 +1,81 @@
 import { useState, useEffect } from 'react';
 import apiService from '../services/apiService';
 
+const ImageUploadField = ({ label, value, onChange }) => {
+  const [uploading, setUploading] = useState(false);
+
+  const convertImageToWebpDataUrl = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const image = new Image();
+
+        image.onload = () => {
+          const maxSize = 900;
+          const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(image.width * scale);
+          canvas.height = Math.round(image.height * scale);
+
+          const context = canvas.getContext('2d');
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+          const dataUrl = canvas.toDataURL('image/webp', 0.75);
+          resolve(dataUrl);
+        };
+
+        image.onerror = () => reject(new Error('Unable to process image'));
+        image.src = reader.result;
+      };
+
+      reader.onerror = () => reject(new Error('Unable to read image'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const dataUrl = await convertImageToWebpDataUrl(file);
+      onChange(dataUrl);
+    } catch (error) {
+      alert('Image processing failed: ' + error.message);
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+      <div className="space-y-3">
+        {value && (
+          <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+            <img src={value} alt="Preview" className="w-full h-full object-cover" />
+          </div>
+        )}
+        <input
+          type="url"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="https://example.com/image.jpg"
+        />
+        <label className="inline-flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer border border-gray-300 text-sm font-medium">
+          {uploading ? 'Compressing...' : 'Upload Image'}
+          <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} className="hidden" />
+        </label>
+        <p className="text-xs text-gray-500">Images are converted to compressed WebP and saved directly in MongoDB.</p>
+      </div>
+    </div>
+  );
+};
+
 // Overview Tab Component
 export const OverviewTab = ({ dashboardData, refreshData, setActiveTab }) => {
   const [apiStats, setApiStats] = useState(null);
@@ -252,16 +327,11 @@ export const MemoriesTab = ({ dashboardData, setDashboardData }) => {
                   required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
-                <input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
+              <ImageUploadField
+                label="Image"
+                value={formData.image_url}
+                onChange={(imageUrl) => setFormData({...formData, image_url: imageUrl})}
+              />
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Event Date</label>
                 <input
@@ -862,16 +932,11 @@ export const TeamTab = ({ dashboardData, setDashboardData }) => {
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Profile Image URL</label>
-                <input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="https://example.com/profile.jpg"
-                />
-              </div>
+              <ImageUploadField
+                label="Profile Image"
+                value={formData.image_url}
+                onChange={(imageUrl) => setFormData({...formData, image_url: imageUrl})}
+              />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
@@ -1206,16 +1271,11 @@ export const SpeakersTab = ({ dashboardData, setDashboardData }) => {
                   rows="3"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Profile Image URL</label>
-                <input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  placeholder="https://example.com/profile.jpg"
-                />
-              </div>
+              <ImageUploadField
+                label="Profile Image"
+                value={formData.image_url}
+                onChange={(imageUrl) => setFormData({...formData, image_url: imageUrl})}
+              />
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Speaking Topics (comma-separated)</label>
                 <input

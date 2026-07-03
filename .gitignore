@@ -9,8 +9,7 @@ node_modules/
 # Production
 /build
 
-# Backend (not needed for static deployment)
-/server
+# Backend is required for admin/API/database features
 *.bat
 BACKEND_SETUP.md
 TEST_BACKEND.md

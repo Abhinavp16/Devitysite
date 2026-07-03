@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
+const connectMongoDB = require('./config/mongodb');
 
 const authRoutes = require('./routes/auth');
 const memoriesRoutes = require('./routes/memories');
@@ -11,6 +12,7 @@ const eventsRoutes = require('./routes/events');
 const teamRoutes = require('./routes/team');
 const speakersRoutes = require('./routes/speakers');
 const dashboardRoutes = require('./routes/dashboard');
+const publicRoutes = require('./routes/public');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -41,8 +43,8 @@ app.use(cors({
 }));
 
 // Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
 // Static files for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -54,6 +56,7 @@ app.use('/api/events', eventsRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/speakers', speakersRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/public', publicRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -96,26 +99,32 @@ app.use('*', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-    console.log(`🚀 DevityClub Backend Server running on port ${PORT}`);
-    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
-    console.log(`📁 Database: ${process.env.DB_PATH}`);
-    
-    if (process.env.NODE_ENV !== 'production') {
-        console.log('\n📋 Available Endpoints:');
-        console.log('   GET  /api/health - Health check');
-        console.log('   POST /api/auth/login - Admin login');
-        console.log('   GET  /api/dashboard/stats - Dashboard statistics');
-        console.log('   GET  /api/memories - Get all memories');
-        console.log('   POST /api/memories - Create memory');
-        console.log('   GET  /api/events - Get all events');
-        console.log('   POST /api/events - Create event');
-        console.log('   GET  /api/team - Get all team members');
-        console.log('   POST /api/team - Create team member');
-        console.log('   GET  /api/speakers - Get all speakers');
-        console.log('   POST /api/speakers - Create speaker');
-    }
-});
+connectMongoDB()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`🚀 DevityClub Backend Server running on port ${PORT}`);
+            console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+            console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
+
+            if (process.env.NODE_ENV !== 'production') {
+                console.log('\n📋 Available Endpoints:');
+                console.log('   GET  /api/health - Health check');
+                console.log('   POST /api/auth/login - Admin login');
+                console.log('   GET  /api/dashboard/stats - Dashboard statistics');
+                console.log('   GET  /api/memories - Get all memories');
+                console.log('   POST /api/memories - Create memory');
+                console.log('   GET  /api/events - Get all events');
+                console.log('   POST /api/events - Create event');
+                console.log('   GET  /api/team - Get all team members');
+                console.log('   POST /api/team - Create team member');
+                console.log('   GET  /api/speakers - Get all speakers');
+                console.log('   POST /api/speakers - Create speaker');
+            }
+        });
+    })
+    .catch((error) => {
+        console.error('Failed to connect to MongoDB:', error);
+        process.exit(1);
+    });
 
 module.exports = app;

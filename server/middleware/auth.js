@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const db = require('../config/database');
+const { AdminUser, ActivityLog } = require('../models');
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -11,35 +11,31 @@ const authenticateToken = (req, res, next) => {
         });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
         if (err) {
             return res.status(403).json({ 
                 error: 'Invalid or expired token' 
             });
         }
 
-        // Verify user still exists and is active
-        db.get(
-            'SELECT id, email, username, is_active FROM admin_users WHERE id = ? AND is_active = 1',
-            [user.id],
-            (err, dbUser) => {
-                if (err) {
-                    console.error('Database error during auth:', err);
-                    return res.status(500).json({ 
-                        error: 'Authentication error' 
-                    });
-                }
+        try {
+            // Verify user still exists and is active
+            const dbUser = await AdminUser.findOne({ _id: user.id, is_active: true });
 
-                if (!dbUser) {
-                    return res.status(403).json({ 
-                        error: 'User not found or inactive' 
-                    });
-                }
-
-                req.user = dbUser;
-                next();
+            if (!dbUser) {
+                return res.status(403).json({
+                    error: 'User not found or inactive'
+                });
             }
-        );
+
+            req.user = dbUser;
+            next();
+        } catch (error) {
+            console.error('Database error during auth:', error);
+            return res.status(500).json({
+                error: 'Authentication error'
+            });
+        }
     });
 };
 
@@ -61,17 +57,18 @@ const logActivity = (action, tableName, recordId = null, oldValues = null, newVa
                     user_agent: req.get('User-Agent')
                 };
 
-                db.run(
-                    `INSERT INTO activity_logs (user_id, action, table_name, record_id, old_values, new_values, ip_address, user_agent) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                    [logData.user_id, logData.action, logData.table_name, logData.record_id, 
-                     logData.old_values, logData.new_values, logData.ip_address, logData.user_agent],
-                    (err) => {
-                        if (err) {
-                            console.error('Error logging activity:', err);
-                        }
-                    }
-                );
+                ActivityLog.create({
+                    user_id: logData.user_id,
+                    action: logData.action,
+                    table_name: logData.table_name,
+                    record_id: logData.record_id,
+                    old_values: logData.old_values,
+                    new_values: logData.new_values,
+                    ip_address: logData.ip_address,
+                    user_agent: logData.user_agent
+                }).catch((error) => {
+                    console.error('Error logging activity:', error);
+                });
             }
             originalSend.call(this, data);
         };

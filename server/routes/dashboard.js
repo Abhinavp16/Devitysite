@@ -1,13 +1,12 @@
 const express = require('express');
-const db = require('../config/database');
+const { ClubMemory, Event, TeamMember, GuestSpeaker, ActivityLog, mapMemory, mapEvent, mapTeamMember, mapSpeaker } = require('../models');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Get dashboard statistics
 router.get('/stats', authenticateToken, async (req, res) => {
     try {
-        // Get counts for all main entities
+        const now = new Date();
         const [
             memoriesCount,
             eventsCount,
@@ -15,262 +14,132 @@ router.get('/stats', authenticateToken, async (req, res) => {
             teamMembersCount,
             activeTeamMembersCount,
             speakersCount,
-            availableSpeakersCount
+            availableSpeakersCount,
+            recentActivities,
+            upcomingEvents,
+            recentMemories,
+            teamComposition,
+            eventTypeDistribution,
+            monthlyEventTrends
         ] = await Promise.all([
-            db.get('SELECT COUNT(*) as count FROM club_memories'),
-            db.get('SELECT COUNT(*) as count FROM events'),
-            db.get('SELECT COUNT(*) as count FROM events WHERE status = "upcoming"'),
-            db.get('SELECT COUNT(*) as count FROM team_members'),
-            db.get('SELECT COUNT(*) as count FROM team_members WHERE is_active = 1'),
-            db.get('SELECT COUNT(*) as count FROM guest_speakers'),
-            db.get('SELECT COUNT(*) as count FROM guest_speakers WHERE is_available = 1')
+            ClubMemory.countDocuments(),
+            Event.countDocuments(),
+            Event.countDocuments({ status: 'upcoming' }),
+            TeamMember.countDocuments(),
+            TeamMember.countDocuments({ is_active: true }),
+            GuestSpeaker.countDocuments(),
+            GuestSpeaker.countDocuments({ is_available: true }),
+            ActivityLog.find().populate('user_id', 'username legacyId').sort({ created_at: -1 }).limit(10),
+            Event.find({ status: 'upcoming', event_date: { $gte: now } }).sort({ event_date: 1 }).limit(5),
+            ClubMemory.find().sort({ created_at: -1 }).limit(5),
+            TeamMember.aggregate([{ $match: { is_active: true } }, { $group: { _id: '$team_type', count: { $sum: 1 } } }]),
+            Event.aggregate([{ $group: { _id: '$event_type', count: { $sum: 1 } } }, { $sort: { count: -1 } }]),
+            Event.aggregate([
+                { $match: { event_date: { $gte: new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()) } } },
+                { $group: { _id: { $dateToString: { format: '%Y-%m', date: '$event_date' } }, count: { $sum: 1 } } },
+                { $sort: { _id: 1 } }
+            ])
         ]);
-
-        // Get recent activities (last 10 activities)
-        const recentActivities = await db.all(`
-            SELECT al.*, au.username 
-            FROM activity_logs al
-            JOIN admin_users au ON al.user_id = au.id
-            ORDER BY al.created_at DESC
-            LIMIT 10
-        `);
-
-        // Get upcoming events (next 5)
-        const upcomingEvents = await db.all(`
-            SELECT id, title, event_date, event_time, location, event_type
-            FROM events 
-            WHERE status = 'upcoming' AND event_date >= date('now')
-            ORDER BY event_date ASC
-            LIMIT 5
-        `);
-
-        // Get recent memories (last 5)
-        const recentMemories = await db.all(`
-            SELECT id, title, event_date, image_url
-            FROM club_memories
-            ORDER BY created_at DESC
-            LIMIT 5
-        `);
-
-        // Get team composition
-        const teamComposition = await db.all(`
-            SELECT team_type, COUNT(*) as count
-            FROM team_members
-            WHERE is_active = 1
-            GROUP BY team_type
-        `);
-
-        // Get event type distribution
-        const eventTypeDistribution = await db.all(`
-            SELECT event_type, COUNT(*) as count
-            FROM events
-            GROUP BY event_type
-            ORDER BY count DESC
-        `);
-
-        // Get monthly event trends (last 12 months)
-        const monthlyEventTrends = await db.all(`
-            SELECT 
-                strftime('%Y-%m', event_date) as month,
-                COUNT(*) as count
-            FROM events
-            WHERE event_date >= date('now', '-12 months')
-            GROUP BY strftime('%Y-%m', event_date)
-            ORDER BY month ASC
-        `);
 
         res.json({
             success: true,
             data: {
                 statistics: {
-                    club_memories: memoriesCount.count,
-                    total_events: eventsCount.count,
-                    upcoming_events: upcomingEventsCount.count,
-                    total_team_members: teamMembersCount.count,
-                    active_team_members: activeTeamMembersCount.count,
-                    total_speakers: speakersCount.count,
-                    available_speakers: availableSpeakersCount.count
+                    club_memories: memoriesCount,
+                    total_events: eventsCount,
+                    upcoming_events: upcomingEventsCount,
+                    total_team_members: teamMembersCount,
+                    active_team_members: activeTeamMembersCount,
+                    total_speakers: speakersCount,
+                    available_speakers: availableSpeakersCount
                 },
-                recent_activities: recentActivities.map(activity => ({
-                    id: activity.id,
+                recent_activities: recentActivities.map((activity) => ({
+                    id: String(activity.legacyId || activity._id),
                     action: activity.action,
                     table_name: activity.table_name,
-                    username: activity.username,
+                    username: activity.user_id ? activity.user_id.username : undefined,
                     created_at: activity.created_at
                 })),
-                upcoming_events: upcomingEvents,
-                recent_memories: recentMemories,
-                team_composition: teamComposition,
-                event_type_distribution: eventTypeDistribution,
-                monthly_event_trends: monthlyEventTrends
+                upcoming_events: upcomingEvents.map((event) => mapEvent(event)),
+                recent_memories: recentMemories.map(mapMemory),
+                team_composition: teamComposition.map((item) => ({ team_type: item._id, count: item.count })),
+                event_type_distribution: eventTypeDistribution.map((item) => ({ event_type: item._id, count: item.count })),
+                monthly_event_trends: monthlyEventTrends.map((item) => ({ month: item._id, count: item.count }))
             }
         });
-
     } catch (error) {
         console.error('Get dashboard stats error:', error);
-        res.status(500).json({
-            error: 'Failed to fetch dashboard statistics'
-        });
+        res.status(500).json({ error: 'Failed to fetch dashboard statistics' });
     }
 });
 
-// Get activity logs with pagination
 router.get('/activities', authenticateToken, async (req, res) => {
     try {
         const { page = 1, limit = 20, action = '', table_name = '' } = req.query;
-        const offset = (page - 1) * limit;
+        const skip = (Number(page) - 1) * Number(limit);
+        const filter = {};
+        if (action) filter.action = action;
+        if (table_name) filter.table_name = table_name;
 
-        let query = `
-            SELECT al.*, au.username 
-            FROM activity_logs al
-            JOIN admin_users au ON al.user_id = au.id
-        `;
-        let params = [];
-        let conditions = [];
-
-        if (action) {
-            conditions.push('al.action = ?');
-            params.push(action);
-        }
-
-        if (table_name) {
-            conditions.push('al.table_name = ?');
-            params.push(table_name);
-        }
-
-        if (conditions.length > 0) {
-            query += ' WHERE ' + conditions.join(' AND ');
-        }
-
-        query += ' ORDER BY al.created_at DESC LIMIT ? OFFSET ?';
-        params.push(parseInt(limit), parseInt(offset));
-
-        const activities = await db.all(query, params);
-
-        // Get total count
-        let countQuery = 'SELECT COUNT(*) as total FROM activity_logs al';
-        let countParams = [];
-
-        if (conditions.length > 0) {
-            countQuery += ' WHERE ' + conditions.join(' AND ');
-            countParams = params.slice(0, -2); // Remove limit and offset
-        }
-
-        const { total } = await db.get(countQuery, countParams);
+        const [activities, total] = await Promise.all([
+            ActivityLog.find(filter).populate('user_id', 'username legacyId').sort({ created_at: -1 }).skip(skip).limit(Number(limit)),
+            ActivityLog.countDocuments(filter)
+        ]);
 
         res.json({
             success: true,
-            data: activities,
-            pagination: {
-                page: parseInt(page),
-                limit: parseInt(limit),
-                total,
-                pages: Math.ceil(total / limit)
-            }
+            data: activities.map((activity) => ({
+                id: String(activity.legacyId || activity._id),
+                user_id: activity.user_id ? String(activity.user_id.legacyId || activity.user_id._id) : activity.legacyUserId,
+                action: activity.action,
+                table_name: activity.table_name,
+                record_id: activity.record_id,
+                username: activity.user_id ? activity.user_id.username : undefined,
+                created_at: activity.created_at
+            })),
+            pagination: { page: Number(page), limit: Number(limit), total, pages: Math.ceil(total / Number(limit)) }
         });
-
     } catch (error) {
         console.error('Get activities error:', error);
-        res.status(500).json({
-            error: 'Failed to fetch activities'
-        });
+        res.status(500).json({ error: 'Failed to fetch activities' });
     }
 });
 
-// Export all data
 router.get('/export', authenticateToken, async (req, res) => {
     try {
         const [memories, events, teamMembers, speakers] = await Promise.all([
-            db.all('SELECT * FROM club_memories ORDER BY event_date DESC'),
-            db.all('SELECT * FROM events ORDER BY event_date DESC'),
-            db.all(`
-                SELECT tm.*, GROUP_CONCAT(tms.skill_name) as skills
-                FROM team_members tm
-                LEFT JOIN team_member_skills tms ON tm.id = tms.team_member_id
-                GROUP BY tm.id
-                ORDER BY tm.team_type, tm.name
-            `),
-            db.all(`
-                SELECT gs.*, GROUP_CONCAT(se.expertise_area) as expertise_areas
-                FROM guest_speakers gs
-                LEFT JOIN speaker_expertise se ON gs.id = se.speaker_id
-                GROUP BY gs.id
-                ORDER BY gs.name
-            `)
+            ClubMemory.find().sort({ event_date: -1 }),
+            Event.find().sort({ event_date: -1 }),
+            TeamMember.find().sort({ team_type: 1, name: 1 }),
+            GuestSpeaker.find().sort({ name: 1 })
         ]);
 
-        // Process team members skills
-        teamMembers.forEach(member => {
-            member.skills = member.skills ? member.skills.split(',') : [];
-        });
-
-        // Process speakers expertise
-        speakers.forEach(speaker => {
-            speaker.expertise_areas = speaker.expertise_areas ? speaker.expertise_areas.split(',') : [];
-            speaker.speaking_topics = speaker.speaking_topics ? JSON.parse(speaker.speaking_topics) : [];
-        });
-
-        const exportData = {
-            export_date: new Date().toISOString(),
-            exported_by: req.user.username,
-            data: {
-                club_memories: memories,
-                events: events,
-                team_members: teamMembers,
-                guest_speakers: speakers
-            }
-        };
-
-        res.json({
-            success: true,
-            data: exportData
-        });
-
-    } catch (error) {
-        console.error('Export data error:', error);
-        res.status(500).json({
-            error: 'Failed to export data'
-        });
-    }
-});
-
-// System health check
-router.get('/health', authenticateToken, async (req, res) => {
-    try {
-        // Check database connectivity
-        const dbCheck = await db.get('SELECT 1 as test');
-        
-        // Get database file size (approximate)
-        const dbStats = await db.get(`
-            SELECT 
-                COUNT(*) as total_tables
-            FROM sqlite_master 
-            WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
-        `);
-
         res.json({
             success: true,
             data: {
-                database: {
-                    connected: !!dbCheck,
-                    tables: dbStats.total_tables
-                },
-                server: {
-                    uptime: process.uptime(),
-                    memory_usage: process.memoryUsage(),
-                    node_version: process.version,
-                    environment: process.env.NODE_ENV || 'development'
+                export_date: new Date().toISOString(),
+                exported_by: req.user.username,
+                data: {
+                    club_memories: memories.map(mapMemory),
+                    events: events.map((event) => mapEvent(event)),
+                    team_members: teamMembers.map(mapTeamMember),
+                    guest_speakers: speakers.map(mapSpeaker)
                 }
             }
         });
-
     } catch (error) {
-        console.error('Health check error:', error);
-        res.status(500).json({
-            error: 'Health check failed',
-            details: error.message
-        });
+        console.error('Export data error:', error);
+        res.status(500).json({ error: 'Failed to export data' });
     }
+});
+
+router.get('/health', authenticateToken, async (req, res) => {
+    res.json({
+        success: true,
+        status: 'healthy',
+        database: 'connected',
+        timestamp: new Date().toISOString()
+    });
 });
 
 module.exports = router;

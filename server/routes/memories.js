@@ -1,273 +1,123 @@
 const express = require('express');
 const Joi = require('joi');
-const db = require('../config/database');
+const { ClubMemory, legacyOrObjectIdQuery, mapMemory } = require('../models');
 const { authenticateToken, logActivity } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Validation schemas
 const memorySchema = Joi.object({
     title: Joi.string().min(1).max(255).required(),
     description: Joi.string().min(1).max(1000).required(),
-    image_url: Joi.string().uri().allow('').optional(),
+    image_url: Joi.string().max(15000000).allow('', null).optional(),
     event_date: Joi.date().iso().required()
 });
 
 const updateMemorySchema = Joi.object({
     title: Joi.string().min(1).max(255).optional(),
     description: Joi.string().min(1).max(1000).optional(),
-    image_url: Joi.string().uri().allow('').optional(),
+    image_url: Joi.string().max(15000000).allow('', null).optional(),
     event_date: Joi.date().iso().optional()
 });
 
-// Get all memories
 router.get('/', authenticateToken, async (req, res) => {
     try {
         const { page = 1, limit = 10, search = '' } = req.query;
-        const offset = (page - 1) * limit;
+        const skip = (Number(page) - 1) * Number(limit);
+        const filter = search ? {
+            $or: [
+                { title: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } }
+            ]
+        } : {};
 
-        let query = `
-            SELECT m.*, u.username as created_by_username 
-            FROM club_memories m 
-            LEFT JOIN admin_users u ON m.created_by = u.id
-        `;
-        let params = [];
-
-        if (search) {
-            query += ` WHERE m.title LIKE ? OR m.description LIKE ?`;
-            params.push(`%${search}%`, `%${search}%`);
-        }
-
-        query += ` ORDER BY m.event_date DESC, m.created_at DESC LIMIT ? OFFSET ?`;
-        params.push(parseInt(limit), parseInt(offset));
-
-        const memories = await db.all(query, params);
-
-        // Get total count
-        let countQuery = 'SELECT COUNT(*) as total FROM club_memories';
-        let countParams = [];
-
-        if (search) {
-            countQuery += ' WHERE title LIKE ? OR description LIKE ?';
-            countParams.push(`%${search}%`, `%${search}%`);
-        }
-
-        const { total } = await db.get(countQuery, countParams);
+        const [memories, total] = await Promise.all([
+            ClubMemory.find(filter).populate('created_by', 'username legacyId').sort({ event_date: -1, created_at: -1 }).skip(skip).limit(Number(limit)),
+            ClubMemory.countDocuments(filter)
+        ]);
 
         res.json({
             success: true,
-            data: memories,
-            pagination: {
-                page: parseInt(page),
-                limit: parseInt(limit),
-                total,
-                pages: Math.ceil(total / limit)
-            }
+            data: memories.map(mapMemory),
+            pagination: { page: Number(page), limit: Number(limit), total, pages: Math.ceil(total / Number(limit)) }
         });
-
     } catch (error) {
         console.error('Get memories error:', error);
-        res.status(500).json({
-            error: 'Failed to fetch memories'
-        });
+        res.status(500).json({ error: 'Failed to fetch memories' });
     }
 });
 
-// Get single memory
 router.get('/:id', authenticateToken, async (req, res) => {
     try {
-        const { id } = req.params;
-
-        const memory = await db.get(`
-            SELECT m.*, u.username as created_by_username 
-            FROM club_memories m 
-            LEFT JOIN admin_users u ON m.created_by = u.id 
-            WHERE m.id = ?
-        `, [id]);
-
-        if (!memory) {
-            return res.status(404).json({
-                error: 'Memory not found'
-            });
-        }
-
-        res.json({
-            success: true,
-            data: memory
-        });
-
+        const memory = await ClubMemory.findOne(legacyOrObjectIdQuery(req.params.id)).populate('created_by', 'username legacyId');
+        if (!memory) return res.status(404).json({ error: 'Memory not found' });
+        res.json({ success: true, data: mapMemory(memory) });
     } catch (error) {
         console.error('Get memory error:', error);
-        res.status(500).json({
-            error: 'Failed to fetch memory'
-        });
+        res.status(500).json({ error: 'Failed to fetch memory' });
     }
 });
 
-// Create new memory
 router.post('/', authenticateToken, logActivity('CREATE', 'club_memories'), async (req, res) => {
     try {
-        // Validate input
         const { error, value } = memorySchema.validate(req.body);
-        if (error) {
-            return res.status(400).json({
-                error: 'Invalid input',
-                details: error.details[0].message
-            });
-        }
+        if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
 
-        const { title, description, image_url, event_date } = value;
-
-        const result = await db.run(`
-            INSERT INTO club_memories (title, description, image_url, event_date, created_by) 
-            VALUES (?, ?, ?, ?, ?)
-        `, [title, description, image_url || null, event_date, req.user.id]);
-
-        // Get the created memory
-        const memory = await db.get(`
-            SELECT m.*, u.username as created_by_username 
-            FROM club_memories m 
-            LEFT JOIN admin_users u ON m.created_by = u.id 
-            WHERE m.id = ?
-        `, [result.id]);
-
-        res.status(201).json({
-            success: true,
-            message: 'Memory created successfully',
-            data: memory
+        const memory = await ClubMemory.create({
+            ...value,
+            image_url: value.image_url || null,
+            created_by: req.user._id,
+            legacyCreatedBy: req.user.legacyId
         });
+        await memory.populate('created_by', 'username legacyId');
 
+        res.status(201).json({ success: true, message: 'Memory created successfully', data: mapMemory(memory) });
     } catch (error) {
         console.error('Create memory error:', error);
-        res.status(500).json({
-            error: 'Failed to create memory'
-        });
+        res.status(500).json({ error: 'Failed to create memory' });
     }
 });
 
-// Update memory
 router.put('/:id', authenticateToken, logActivity('UPDATE', 'club_memories'), async (req, res) => {
     try {
-        const { id } = req.params;
-
-        // Check if memory exists
-        const existingMemory = await db.get('SELECT * FROM club_memories WHERE id = ?', [id]);
-        if (!existingMemory) {
-            return res.status(404).json({
-                error: 'Memory not found'
-            });
-        }
-
-        // Validate input
         const { error, value } = updateMemorySchema.validate(req.body);
-        if (error) {
-            return res.status(400).json({
-                error: 'Invalid input',
-                details: error.details[0].message
-            });
-        }
+        if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
+        if (Object.keys(value).length === 0) return res.status(400).json({ error: 'No valid fields to update' });
 
-        // Build update query dynamically
-        const updates = [];
-        const params = [];
+        const memory = await ClubMemory.findOneAndUpdate(
+            legacyOrObjectIdQuery(req.params.id),
+            { $set: value },
+            { returnDocument: 'after' }
+        ).populate('created_by', 'username legacyId');
+        if (!memory) return res.status(404).json({ error: 'Memory not found' });
 
-        Object.keys(value).forEach(key => {
-            if (value[key] !== undefined) {
-                updates.push(`${key} = ?`);
-                params.push(value[key]);
-            }
-        });
-
-        if (updates.length === 0) {
-            return res.status(400).json({
-                error: 'No valid fields to update'
-            });
-        }
-
-        updates.push('updated_at = CURRENT_TIMESTAMP');
-        params.push(id);
-
-        await db.run(`
-            UPDATE club_memories 
-            SET ${updates.join(', ')} 
-            WHERE id = ?
-        `, params);
-
-        // Get updated memory
-        const memory = await db.get(`
-            SELECT m.*, u.username as created_by_username 
-            FROM club_memories m 
-            LEFT JOIN admin_users u ON m.created_by = u.id 
-            WHERE m.id = ?
-        `, [id]);
-
-        res.json({
-            success: true,
-            message: 'Memory updated successfully',
-            data: memory
-        });
-
+        res.json({ success: true, message: 'Memory updated successfully', data: mapMemory(memory) });
     } catch (error) {
         console.error('Update memory error:', error);
-        res.status(500).json({
-            error: 'Failed to update memory'
-        });
+        res.status(500).json({ error: 'Failed to update memory' });
     }
 });
 
-// Delete memory
 router.delete('/:id', authenticateToken, logActivity('DELETE', 'club_memories'), async (req, res) => {
     try {
-        const { id } = req.params;
-
-        // Check if memory exists
-        const existingMemory = await db.get('SELECT * FROM club_memories WHERE id = ?', [id]);
-        if (!existingMemory) {
-            return res.status(404).json({
-                error: 'Memory not found'
-            });
-        }
-
-        await db.run('DELETE FROM club_memories WHERE id = ?', [id]);
-
-        res.json({
-            success: true,
-            message: 'Memory deleted successfully'
-        });
-
+        const memory = await ClubMemory.findOneAndDelete(legacyOrObjectIdQuery(req.params.id));
+        if (!memory) return res.status(404).json({ error: 'Memory not found' });
+        res.json({ success: true, message: 'Memory deleted successfully' });
     } catch (error) {
         console.error('Delete memory error:', error);
-        res.status(500).json({
-            error: 'Failed to delete memory'
-        });
+        res.status(500).json({ error: 'Failed to delete memory' });
     }
 });
 
-// Bulk delete memories
 router.delete('/', authenticateToken, logActivity('DELETE', 'club_memories'), async (req, res) => {
     try {
         const { ids } = req.body;
-
-        if (!Array.isArray(ids) || ids.length === 0) {
-            return res.status(400).json({
-                error: 'Invalid or empty IDs array'
-            });
-        }
-
-        const placeholders = ids.map(() => '?').join(',');
-        const result = await db.run(`DELETE FROM club_memories WHERE id IN (${placeholders})`, ids);
-
-        res.json({
-            success: true,
-            message: `${result.changes} memories deleted successfully`,
-            deleted_count: result.changes
-        });
-
+        if (!Array.isArray(ids) || ids.length === 0) return res.status(400).json({ error: 'Invalid or empty IDs array' });
+        const queries = ids.map(legacyOrObjectIdQuery);
+        const result = await ClubMemory.deleteMany({ $or: queries });
+        res.json({ success: true, message: `${result.deletedCount} memories deleted successfully`, deletedCount: result.deletedCount });
     } catch (error) {
         console.error('Bulk delete memories error:', error);
-        res.status(500).json({
-            error: 'Failed to delete memories'
-        });
+        res.status(500).json({ error: 'Failed to delete memories' });
     }
 });
 

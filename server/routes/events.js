@@ -1,11 +1,10 @@
 const express = require('express');
 const Joi = require('joi');
-const db = require('../config/database');
+const { Event, GuestSpeaker, legacyOrObjectIdQuery, publicId, mapEvent, mapSpeaker } = require('../models');
 const { authenticateToken, logActivity } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Validation schemas
 const eventSchema = Joi.object({
     title: Joi.string().min(1).max(255).required(),
     description: Joi.string().min(1).max(2000).required(),
@@ -15,7 +14,7 @@ const eventSchema = Joi.object({
     event_type: Joi.string().valid('Workshop', 'Bootcamp', 'Seminar', 'Competition', 'Hackathon').required(),
     status: Joi.string().valid('upcoming', 'completed', 'cancelled').default('upcoming'),
     max_participants: Joi.number().integer().min(1).optional(),
-    registration_link: Joi.string().uri().optional()
+    registration_link: Joi.string().uri().allow('').optional()
 });
 
 const updateEventSchema = Joi.object({
@@ -30,373 +29,154 @@ const updateEventSchema = Joi.object({
     registration_link: Joi.string().uri().allow('').optional()
 });
 
-// Get all events
+const getEventSpeakerDocs = async (event) => {
+    const assignments = event.speakers || [];
+    const objectIds = assignments.filter((item) => item.speaker).map((item) => item.speaker);
+    const legacyIds = assignments.filter((item) => item.legacySpeakerId).map((item) => item.legacySpeakerId);
+    const speakers = await GuestSpeaker.find({ $or: [{ _id: { $in: objectIds } }, { legacyId: { $in: legacyIds } }] });
+
+    return assignments.map((assignment) => {
+        const speaker = speakers.find((item) => String(item._id) === String(assignment.speaker) || item.legacyId === assignment.legacySpeakerId);
+        return speaker ? { ...mapSpeaker(speaker), speaker_role: assignment.role } : null;
+    }).filter(Boolean);
+};
+
 router.get('/', authenticateToken, async (req, res) => {
     try {
-        const { 
-            page = 1, 
-            limit = 10, 
-            search = '', 
-            status = '', 
-            event_type = '',
-            start_date = '',
-            end_date = ''
-        } = req.query;
-        
-        const offset = (page - 1) * limit;
+        const { page = 1, limit = 10, search = '', status = '', event_type = '', start_date = '', end_date = '' } = req.query;
+        const skip = (Number(page) - 1) * Number(limit);
+        const filter = {};
 
-        let query = `
-            SELECT e.*, u.username as created_by_username,
-                   COUNT(es.speaker_id) as speaker_count
-            FROM events e 
-            LEFT JOIN admin_users u ON e.created_by = u.id
-            LEFT JOIN event_speakers es ON e.id = es.event_id
-        `;
-        let params = [];
-        let conditions = [];
-
-        // Add search conditions
         if (search) {
-            conditions.push('(e.title LIKE ? OR e.description LIKE ? OR e.location LIKE ?)');
-            params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+            filter.$or = [
+                { title: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } },
+                { location: { $regex: search, $options: 'i' } }
+            ];
+        }
+        if (status) filter.status = status;
+        if (event_type) filter.event_type = event_type;
+        if (start_date || end_date) {
+            filter.event_date = {};
+            if (start_date) filter.event_date.$gte = new Date(start_date);
+            if (end_date) filter.event_date.$lte = new Date(end_date);
         }
 
-        if (status) {
-            conditions.push('e.status = ?');
-            params.push(status);
-        }
-
-        if (event_type) {
-            conditions.push('e.event_type = ?');
-            params.push(event_type);
-        }
-
-        if (start_date) {
-            conditions.push('e.event_date >= ?');
-            params.push(start_date);
-        }
-
-        if (end_date) {
-            conditions.push('e.event_date <= ?');
-            params.push(end_date);
-        }
-
-        if (conditions.length > 0) {
-            query += ' WHERE ' + conditions.join(' AND ');
-        }
-
-        query += ` GROUP BY e.id ORDER BY e.event_date ASC, e.created_at DESC LIMIT ? OFFSET ?`;
-        params.push(parseInt(limit), parseInt(offset));
-
-        const events = await db.all(query, params);
-
-        // Get total count
-        let countQuery = 'SELECT COUNT(*) as total FROM events e';
-        let countParams = [];
-
-        if (conditions.length > 0) {
-            countQuery += ' WHERE ' + conditions.join(' AND ');
-            countParams = params.slice(0, -2); // Remove limit and offset
-        }
-
-        const { total } = await db.get(countQuery, countParams);
-
-        res.json({
-            success: true,
-            data: events,
-            pagination: {
-                page: parseInt(page),
-                limit: parseInt(limit),
-                total,
-                pages: Math.ceil(total / limit)
-            }
-        });
-
-    } catch (error) {
-        console.error('Get events error:', error);
-        res.status(500).json({
-            error: 'Failed to fetch events'
-        });
-    }
-});
-
-// Get single event with speakers
-router.get('/:id', authenticateToken, async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const event = await db.get(`
-            SELECT e.*, u.username as created_by_username 
-            FROM events e 
-            LEFT JOIN admin_users u ON e.created_by = u.id 
-            WHERE e.id = ?
-        `, [id]);
-
-        if (!event) {
-            return res.status(404).json({
-                error: 'Event not found'
-            });
-        }
-
-        // Get event speakers
-        const speakers = await db.all(`
-            SELECT gs.*, es.role as speaker_role
-            FROM event_speakers es
-            JOIN guest_speakers gs ON es.speaker_id = gs.id
-            WHERE es.event_id = ?
-            ORDER BY es.role, gs.name
-        `, [id]);
-
-        event.speakers = speakers;
-
-        res.json({
-            success: true,
-            data: event
-        });
-
-    } catch (error) {
-        console.error('Get event error:', error);
-        res.status(500).json({
-            error: 'Failed to fetch event'
-        });
-    }
-});
-
-// Create new event
-router.post('/', authenticateToken, logActivity('CREATE', 'events'), async (req, res) => {
-    try {
-        // Validate input
-        const { error, value } = eventSchema.validate(req.body);
-        if (error) {
-            return res.status(400).json({
-                error: 'Invalid input',
-                details: error.details[0].message
-            });
-        }
-
-        const { 
-            title, description, event_date, event_time, location, 
-            event_type, status, max_participants, registration_link 
-        } = value;
-
-        const result = await db.run(`
-            INSERT INTO events (
-                title, description, event_date, event_time, location, 
-                event_type, status, max_participants, registration_link, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [
-            title, description, event_date, event_time, location, 
-            event_type, status || 'upcoming', max_participants || null, 
-            registration_link || null, req.user.id
+        const [events, total] = await Promise.all([
+            Event.find(filter).populate('created_by', 'username legacyId').sort({ event_date: 1, created_at: -1 }).skip(skip).limit(Number(limit)),
+            Event.countDocuments(filter)
         ]);
 
-        // Get the created event
-        const event = await db.get(`
-            SELECT e.*, u.username as created_by_username 
-            FROM events e 
-            LEFT JOIN admin_users u ON e.created_by = u.id 
-            WHERE e.id = ?
-        `, [result.id]);
-
-        res.status(201).json({
+        res.json({
             success: true,
-            message: 'Event created successfully',
-            data: event
+            data: events.map((event) => mapEvent(event)),
+            pagination: { page: Number(page), limit: Number(limit), total, pages: Math.ceil(total / Number(limit)) }
         });
+    } catch (error) {
+        console.error('Get events error:', error);
+        res.status(500).json({ error: 'Failed to fetch events' });
+    }
+});
 
+router.get('/:id', authenticateToken, async (req, res) => {
+    try {
+        const event = await Event.findOne(legacyOrObjectIdQuery(req.params.id)).populate('created_by', 'username legacyId');
+        if (!event) return res.status(404).json({ error: 'Event not found' });
+        const speakers = await getEventSpeakerDocs(event);
+        res.json({ success: true, data: mapEvent(event, speakers) });
+    } catch (error) {
+        console.error('Get event error:', error);
+        res.status(500).json({ error: 'Failed to fetch event' });
+    }
+});
+
+router.post('/', authenticateToken, logActivity('CREATE', 'events'), async (req, res) => {
+    try {
+        const { error, value } = eventSchema.validate(req.body);
+        if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
+
+        const event = await Event.create({
+            ...value,
+            max_participants: value.max_participants || null,
+            registration_link: value.registration_link || null,
+            created_by: req.user._id,
+            legacyCreatedBy: req.user.legacyId
+        });
+        await event.populate('created_by', 'username legacyId');
+
+        res.status(201).json({ success: true, message: 'Event created successfully', data: mapEvent(event) });
     } catch (error) {
         console.error('Create event error:', error);
-        res.status(500).json({
-            error: 'Failed to create event'
-        });
+        res.status(500).json({ error: 'Failed to create event' });
     }
 });
 
-// Update event
 router.put('/:id', authenticateToken, logActivity('UPDATE', 'events'), async (req, res) => {
     try {
-        const { id } = req.params;
-
-        // Check if event exists
-        const existingEvent = await db.get('SELECT * FROM events WHERE id = ?', [id]);
-        if (!existingEvent) {
-            return res.status(404).json({
-                error: 'Event not found'
-            });
-        }
-
-        // Validate input
         const { error, value } = updateEventSchema.validate(req.body);
-        if (error) {
-            return res.status(400).json({
-                error: 'Invalid input',
-                details: error.details[0].message
-            });
-        }
+        if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
+        if (Object.keys(value).length === 0) return res.status(400).json({ error: 'No valid fields to update' });
 
-        // Build update query dynamically
-        const updates = [];
-        const params = [];
+        const event = await Event.findOneAndUpdate(legacyOrObjectIdQuery(req.params.id), { $set: value }, { returnDocument: 'after' })
+            .populate('created_by', 'username legacyId');
+        if (!event) return res.status(404).json({ error: 'Event not found' });
 
-        Object.keys(value).forEach(key => {
-            if (value[key] !== undefined) {
-                updates.push(`${key} = ?`);
-                params.push(value[key]);
-            }
-        });
-
-        if (updates.length === 0) {
-            return res.status(400).json({
-                error: 'No valid fields to update'
-            });
-        }
-
-        updates.push('updated_at = CURRENT_TIMESTAMP');
-        params.push(id);
-
-        await db.run(`
-            UPDATE events 
-            SET ${updates.join(', ')} 
-            WHERE id = ?
-        `, params);
-
-        // Get updated event
-        const event = await db.get(`
-            SELECT e.*, u.username as created_by_username 
-            FROM events e 
-            LEFT JOIN admin_users u ON e.created_by = u.id 
-            WHERE e.id = ?
-        `, [id]);
-
-        res.json({
-            success: true,
-            message: 'Event updated successfully',
-            data: event
-        });
-
+        res.json({ success: true, message: 'Event updated successfully', data: mapEvent(event) });
     } catch (error) {
         console.error('Update event error:', error);
-        res.status(500).json({
-            error: 'Failed to update event'
-        });
+        res.status(500).json({ error: 'Failed to update event' });
     }
 });
 
-// Delete event
 router.delete('/:id', authenticateToken, logActivity('DELETE', 'events'), async (req, res) => {
     try {
-        const { id } = req.params;
-
-        // Check if event exists
-        const existingEvent = await db.get('SELECT * FROM events WHERE id = ?', [id]);
-        if (!existingEvent) {
-            return res.status(404).json({
-                error: 'Event not found'
-            });
-        }
-
-        // Delete event (cascade will handle event_speakers)
-        await db.run('DELETE FROM events WHERE id = ?', [id]);
-
-        res.json({
-            success: true,
-            message: 'Event deleted successfully'
-        });
-
+        const event = await Event.findOneAndDelete(legacyOrObjectIdQuery(req.params.id));
+        if (!event) return res.status(404).json({ error: 'Event not found' });
+        res.json({ success: true, message: 'Event deleted successfully' });
     } catch (error) {
         console.error('Delete event error:', error);
-        res.status(500).json({
-            error: 'Failed to delete event'
-        });
+        res.status(500).json({ error: 'Failed to delete event' });
     }
 });
 
-// Add speaker to event
 router.post('/:id/speakers', authenticateToken, logActivity('CREATE', 'event_speakers'), async (req, res) => {
     try {
         const { id } = req.params;
         const { speaker_id, role = 'speaker' } = req.body;
+        if (!speaker_id) return res.status(400).json({ error: 'Speaker ID is required' });
 
-        // Validate inputs
-        if (!speaker_id) {
-            return res.status(400).json({
-                error: 'Speaker ID is required'
-            });
-        }
+        const event = await Event.findOne(legacyOrObjectIdQuery(id));
+        if (!event) return res.status(404).json({ error: 'Event not found' });
 
-        // Check if event exists
-        const event = await db.get('SELECT id FROM events WHERE id = ?', [id]);
-        if (!event) {
-            return res.status(404).json({
-                error: 'Event not found'
-            });
-        }
+        const speaker = await GuestSpeaker.findOne(legacyOrObjectIdQuery(speaker_id));
+        if (!speaker) return res.status(404).json({ error: 'Speaker not found' });
 
-        // Check if speaker exists
-        const speaker = await db.get('SELECT id FROM guest_speakers WHERE id = ?', [speaker_id]);
-        if (!speaker) {
-            return res.status(404).json({
-                error: 'Speaker not found'
-            });
-        }
+        const exists = (event.speakers || []).some((item) => String(item.speaker) === String(speaker._id) || item.legacySpeakerId === speaker.legacyId);
+        if (exists) return res.status(409).json({ error: 'Speaker is already assigned to this event' });
 
-        // Check if speaker is already assigned to this event
-        const existing = await db.get(
-            'SELECT id FROM event_speakers WHERE event_id = ? AND speaker_id = ?',
-            [id, speaker_id]
-        );
-
-        if (existing) {
-            return res.status(409).json({
-                error: 'Speaker is already assigned to this event'
-            });
-        }
-
-        // Add speaker to event
-        await db.run(
-            'INSERT INTO event_speakers (event_id, speaker_id, role) VALUES (?, ?, ?)',
-            [id, speaker_id, role]
-        );
-
-        res.status(201).json({
-            success: true,
-            message: 'Speaker added to event successfully'
-        });
-
+        event.speakers.push({ speaker: speaker._id, legacySpeakerId: speaker.legacyId, role });
+        await event.save();
+        res.status(201).json({ success: true, message: 'Speaker added to event successfully' });
     } catch (error) {
         console.error('Add speaker to event error:', error);
-        res.status(500).json({
-            error: 'Failed to add speaker to event'
-        });
+        res.status(500).json({ error: 'Failed to add speaker to event' });
     }
 });
 
-// Remove speaker from event
 router.delete('/:id/speakers/:speaker_id', authenticateToken, logActivity('DELETE', 'event_speakers'), async (req, res) => {
     try {
-        const { id, speaker_id } = req.params;
+        const event = await Event.findOne(legacyOrObjectIdQuery(req.params.id));
+        if (!event) return res.status(404).json({ error: 'Event not found' });
 
-        const result = await db.run(
-            'DELETE FROM event_speakers WHERE event_id = ? AND speaker_id = ?',
-            [id, speaker_id]
-        );
+        const before = event.speakers.length;
+        event.speakers = event.speakers.filter((item) => String(item.speaker) !== String(req.params.speaker_id) && String(item.legacySpeakerId) !== String(req.params.speaker_id));
+        if (event.speakers.length === before) return res.status(404).json({ error: 'Speaker assignment not found' });
 
-        if (result.changes === 0) {
-            return res.status(404).json({
-                error: 'Speaker assignment not found'
-            });
-        }
-
-        res.json({
-            success: true,
-            message: 'Speaker removed from event successfully'
-        });
-
+        await event.save();
+        res.json({ success: true, message: 'Speaker removed from event successfully' });
     } catch (error) {
         console.error('Remove speaker from event error:', error);
-        res.status(500).json({
-            error: 'Failed to remove speaker from event'
-        });
+        res.status(500).json({ error: 'Failed to remove speaker from event' });
     }
 });
 

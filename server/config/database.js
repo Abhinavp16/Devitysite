@@ -15,12 +15,16 @@ const db = new sqlite3.Database(dbPath, (err) => {
 // Enable foreign keys
 db.run('PRAGMA foreign_keys = ON');
 
+const sqliteGet = db.get.bind(db);
+const sqliteAll = db.all.bind(db);
+const sqliteRun = db.run.bind(db);
+
 // Database helper functions
 const dbHelpers = {
     // Get single record
     get: (query, params = []) => {
         return new Promise((resolve, reject) => {
-            db.get(query, params, (err, row) => {
+            sqliteGet(query, params, (err, row) => {
                 if (err) reject(err);
                 else resolve(row);
             });
@@ -30,7 +34,7 @@ const dbHelpers = {
     // Get multiple records
     all: (query, params = []) => {
         return new Promise((resolve, reject) => {
-            db.all(query, params, (err, rows) => {
+            sqliteAll(query, params, (err, rows) => {
                 if (err) reject(err);
                 else resolve(rows);
             });
@@ -40,7 +44,7 @@ const dbHelpers = {
     // Run query (INSERT, UPDATE, DELETE)
     run: (query, params = []) => {
         return new Promise((resolve, reject) => {
-            db.run(query, params, function(err) {
+            sqliteRun(query, params, function(err) {
                 if (err) reject(err);
                 else resolve({ 
                     id: this.lastID, 
@@ -53,7 +57,7 @@ const dbHelpers = {
     // Begin transaction
     beginTransaction: () => {
         return new Promise((resolve, reject) => {
-            db.run('BEGIN TRANSACTION', (err) => {
+            sqliteRun('BEGIN TRANSACTION', (err) => {
                 if (err) reject(err);
                 else resolve();
             });
@@ -63,7 +67,7 @@ const dbHelpers = {
     // Commit transaction
     commit: () => {
         return new Promise((resolve, reject) => {
-            db.run('COMMIT', (err) => {
+            sqliteRun('COMMIT', (err) => {
                 if (err) reject(err);
                 else resolve();
             });
@@ -73,7 +77,7 @@ const dbHelpers = {
     // Rollback transaction
     rollback: () => {
         return new Promise((resolve, reject) => {
-            db.run('ROLLBACK', (err) => {
+            sqliteRun('ROLLBACK', (err) => {
                 if (err) reject(err);
                 else resolve();
             });

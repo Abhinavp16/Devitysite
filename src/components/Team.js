@@ -19,6 +19,25 @@ const LinkedInIcon = ({ className = 'w-5 h-5' }) => (
   </svg>
 );
 
+const XIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4l16 16M20 4L4 20" />
+  </svg>
+);
+
+const ArrowUpRightIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M9 7h8v8" />
+  </svg>
+);
+
+const GlobeIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" />
+    <path strokeLinecap="round" d="M3.6 9h16.8M3.6 15h16.8M12 3c2.2 2.4 3.3 5.4 3.3 9S14.2 18.6 12 21M12 3C9.8 5.4 8.7 8.4 8.7 12s1.1 6.6 3.3 9" />
+  </svg>
+);
+
 const Team = () => {
   const [teamMembers, setTeamMembers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -64,6 +83,56 @@ const Team = () => {
     const titleClass = isLeadership
       ? 'from-indigo-600 to-purple-600'
       : 'from-purple-600 to-pink-600';
+
+    if (!isLeadership) {
+      const primaryLink = member.linkedin_url || member.github_url || member.twitter_url || '#';
+
+      return (
+        <div key={member.id || index} className="relative overflow-hidden rounded-md border border-white/40 bg-white shadow-[inset_1px_1px_0_rgba(255,255,255,0.75),inset_-1px_-1px_0_rgba(15,23,42,0.18),0_10px_24px_rgba(15,23,42,0.18)]">
+          <div className="relative aspect-[4/5] min-h-[360px] bg-gradient-to-br from-slate-100 via-gray-100 to-slate-200 overflow-hidden">
+            {member.image_url ? (
+              <img src={member.image_url} alt={member.name} className="w-full h-full object-cover object-center" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-slate-200 via-indigo-100 to-purple-100 flex items-center justify-center">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white flex items-center justify-center text-5xl font-bold shadow-xl ring-4 ring-white/70">
+                  {getDisplayInitial(member.name)}
+                </div>
+              </div>
+            )}
+
+            <div className="absolute inset-x-4 bottom-4 rounded-lg border border-white/50 bg-gray-700/45 px-4 py-3 text-white shadow-[inset_1px_1px_0_rgba(255,255,255,0.45),inset_-1px_-1px_0_rgba(15,23,42,0.25),0_10px_28px_rgba(15,23,42,0.22)] backdrop-blur-md">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <h3 className="text-base font-bold leading-tight truncate">{member.name}</h3>
+                  <p className="mt-1.5 text-xs font-bold leading-tight text-white/95 truncate">{member.role}</p>
+                </div>
+                <a href={primaryLink} target="_blank" rel="noopener noreferrer" className="shrink-0 text-white" aria-label={`${member.name} profile`}>
+                  <ArrowUpRightIcon className="w-4 h-4" />
+                </a>
+              </div>
+
+              <div className="mt-3 flex items-center gap-3 text-white/95">
+                {member.twitter_url && (
+                  <a href={member.twitter_url} target="_blank" rel="noopener noreferrer" aria-label={`${member.name} X`}>
+                    <XIcon className="w-4 h-4" />
+                  </a>
+                )}
+                {member.linkedin_url && (
+                  <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" aria-label={`${member.name} LinkedIn`}>
+                    <LinkedInIcon className="w-4 h-4" />
+                  </a>
+                )}
+                {member.github_url && (
+                  <a href={member.github_url} target="_blank" rel="noopener noreferrer" aria-label={`${member.name} GitHub`}>
+                    <GlobeIcon className="w-4 h-4" />
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div key={member.id || index} className="group relative bg-gradient-to-br from-white via-indigo-50 to-cyan-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600 rounded-xl sm:rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 p-4 md:p-6 text-center transform hover:-translate-y-2 border border-indigo-100 dark:border-gray-600 backdrop-blur-sm">
@@ -123,7 +192,7 @@ const Team = () => {
         {core.length > 0 && (
           <div>
             <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-8 text-center transition-colors duration-300">Core Team</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
               {core.map((member, index) => renderCard(member, index))}
             </div>
           </div>

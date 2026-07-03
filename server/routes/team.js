@@ -11,21 +11,30 @@ const teamMemberSchema = Joi.object({
     bio: Joi.string().max(1000).allow('').optional(),
     image_url: Joi.string().max(15000000).allow('', null).optional(),
     team_type: Joi.string().valid('leadership', 'core').default('core'),
-    email: Joi.string().email().allow('').optional(),
+    email: Joi.string().email().allow('', null).optional(),
     phone: Joi.string().max(20).allow('').optional(),
-    github_url: Joi.string().uri().allow('').optional(),
-    linkedin_url: Joi.string().uri().allow('').optional(),
-    twitter_url: Joi.string().uri().allow('').optional(),
-    join_date: Joi.date().iso().optional(),
+    github_url: Joi.string().max(500).allow('', null).optional(),
+    linkedin_url: Joi.string().max(500).allow('', null).optional(),
+    twitter_url: Joi.string().max(500).allow('', null).optional(),
+    join_date: Joi.date().iso().allow('', null).optional(),
+    is_active: Joi.boolean().optional(),
     skills: Joi.array().items(Joi.string().min(1).max(100)).optional()
 });
 
 const updateTeamMemberSchema = teamMemberSchema.fork(['name', 'role'], (schema) => schema.optional()).append({
-    is_active: Joi.boolean().optional(),
-    join_date: Joi.date().iso().allow(null).optional()
+    join_date: Joi.date().iso().allow('', null).optional()
 });
 
 const normalizeSkills = (skills = []) => skills.map((skill) => typeof skill === 'string' ? { skill_name: skill } : skill);
+
+const normalizeTeamPayload = (payload) => {
+    const normalized = { ...payload };
+    if (normalized.join_date === '') normalized.join_date = null;
+    ['email', 'phone', 'github_url', 'linkedin_url', 'twitter_url', 'image_url', 'bio'].forEach((field) => {
+        if (normalized[field] === '') normalized[field] = null;
+    });
+    return normalized;
+};
 
 router.get('/', authenticateToken, async (req, res) => {
     try {
@@ -74,7 +83,7 @@ router.post('/', authenticateToken, logActivity('CREATE', 'team_members'), async
     try {
         const { error, value } = teamMemberSchema.validate(req.body);
         if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
-        const { skills, ...memberData } = value;
+        const { skills, ...memberData } = normalizeTeamPayload(value);
 
         const member = await TeamMember.create({
             ...memberData,
@@ -95,9 +104,10 @@ router.put('/:id', authenticateToken, logActivity('UPDATE', 'team_members'), asy
     try {
         const { error, value } = updateTeamMemberSchema.validate(req.body);
         if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
-        if (value.skills !== undefined) value.skills = normalizeSkills(value.skills);
+        const normalizedValue = normalizeTeamPayload(value);
+        if (normalizedValue.skills !== undefined) normalizedValue.skills = normalizeSkills(normalizedValue.skills);
 
-        const member = await TeamMember.findOneAndUpdate(legacyOrObjectIdQuery(req.params.id), { $set: value }, { returnDocument: 'after' })
+        const member = await TeamMember.findOneAndUpdate(legacyOrObjectIdQuery(req.params.id), { $set: normalizedValue }, { returnDocument: 'after' })
             .populate('created_by', 'username legacyId');
         if (!member) return res.status(404).json({ error: 'Team member not found' });
 

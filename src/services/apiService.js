@@ -56,7 +56,7 @@ class ApiService {
                     this.setToken(null);
                     throw new Error(data.error || 'Authentication failed');
                 }
-                throw new Error(data.error || `HTTP error! status: ${response.status}`);
+                throw new Error(data.details || data.error || `HTTP error! status: ${response.status}`);
             }
 
             return data;

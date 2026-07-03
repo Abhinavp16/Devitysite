@@ -11,11 +11,11 @@ const speakerSchema = Joi.object({
     company: Joi.string().min(1).max(255).required(),
     bio: Joi.string().max(2000).allow('').optional(),
     image_url: Joi.string().max(15000000).allow('', null).optional(),
-    email: Joi.string().email().allow('').optional(),
+    email: Joi.string().email().allow('', null).optional(),
     phone: Joi.string().max(20).allow('').optional(),
-    linkedin_url: Joi.string().uri().allow('').optional(),
-    twitter_url: Joi.string().uri().allow('').optional(),
-    website_url: Joi.string().uri().allow('').optional(),
+    linkedin_url: Joi.string().max(500).allow('', null).optional(),
+    twitter_url: Joi.string().max(500).allow('', null).optional(),
+    website_url: Joi.string().max(500).allow('', null).optional(),
     speaking_topics: Joi.array().items(Joi.string().min(1).max(200)).optional(),
     expertise: Joi.array().items(Joi.object({
         area: Joi.string().min(1).max(100).required(),
@@ -26,6 +26,14 @@ const speakerSchema = Joi.object({
 const updateSpeakerSchema = speakerSchema.fork(['name', 'title', 'company'], (schema) => schema.optional()).append({
     is_available: Joi.boolean().optional()
 });
+
+const normalizeSpeakerPayload = (payload) => {
+    const normalized = { ...payload };
+    ['bio', 'image_url', 'email', 'phone', 'linkedin_url', 'twitter_url', 'website_url'].forEach((field) => {
+        if (normalized[field] === '') normalized[field] = null;
+    });
+    return normalized;
+};
 
 router.get('/', authenticateToken, async (req, res) => {
     try {
@@ -96,7 +104,7 @@ router.post('/', authenticateToken, logActivity('CREATE', 'guest_speakers'), asy
         if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
 
         const speaker = await GuestSpeaker.create({
-            ...value,
+            ...normalizeSpeakerPayload(value),
             created_by: req.user._id,
             legacyCreatedBy: req.user.legacyId
         });
@@ -114,7 +122,7 @@ router.put('/:id', authenticateToken, logActivity('UPDATE', 'guest_speakers'), a
         const { error, value } = updateSpeakerSchema.validate(req.body);
         if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
 
-        const speaker = await GuestSpeaker.findOneAndUpdate(legacyOrObjectIdQuery(req.params.id), { $set: value }, { returnDocument: 'after' })
+        const speaker = await GuestSpeaker.findOneAndUpdate(legacyOrObjectIdQuery(req.params.id), { $set: normalizeSpeakerPayload(value) }, { returnDocument: 'after' })
             .populate('created_by', 'username legacyId');
         if (!speaker) return res.status(404).json({ error: 'Speaker not found' });
 

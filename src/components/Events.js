@@ -11,6 +11,18 @@ const eventColor = (status) => {
   return 'bg-blue-100 text-blue-600';
 };
 
+const SectionNotice = ({ tone = 'neutral', children }) => {
+  const toneClass = tone === 'error'
+    ? 'border-red-200/70 bg-red-50/80 text-red-700 dark:border-red-400/30 dark:bg-red-950/30 dark:text-red-200'
+    : 'border-blue-200/70 bg-white/70 text-gray-700 dark:border-white/10 dark:bg-gray-900/50 dark:text-gray-200';
+
+  return (
+    <div className={`mx-auto max-w-2xl rounded-2xl border px-5 py-4 text-center shadow-lg backdrop-blur-xl ${toneClass}`}>
+      {children}
+    </div>
+  );
+};
+
 const Events = () => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,14 +61,14 @@ const Events = () => {
         <div className="flex items-start justify-between mb-4 relative z-10">
           <div className={`${small ? 'event-type-badge-small' : 'event-type-badge'} ${eventColor(event.status)}`}>{event.event_type}</div>
           <div className={`event-status-badge ${isUpcoming ? 'event-status-upcoming' : isOngoing ? 'event-status-ongoing' : 'event-status-completed'}`}>
-            <span>{isUpcoming ? '🚀 Upcoming' : isOngoing ? '⚡ Ongoing' : isCancelled ? '⚠️ Cancelled' : '✅ Completed'}</span>
+            <span>{isUpcoming ? 'Upcoming' : isOngoing ? 'Ongoing' : isCancelled ? 'Cancelled' : 'Completed'}</span>
           </div>
         </div>
         <h3 className={small ? 'event-title event-title-small' : `event-title ${isUpcoming ? 'event-title-upcoming' : 'event-title-regular'}`}>{event.title}</h3>
         <p className={small ? 'event-description event-description-small' : `event-description ${isUpcoming ? 'event-description-upcoming' : 'event-description-regular'}`}>{event.description}</p>
         <div className={`${small ? 'event-details-small' : 'event-details'} space-y-2`}>
           <div className={`event-detail-item ${isUpcoming ? 'event-detail-upcoming' : 'event-detail-regular'} ${small ? 'text-xs' : ''}`}>
-            <span>{formatDate(event.event_date)} • {event.event_time}</span>
+            <span>{formatDate(event.event_date)} | {event.event_time}</span>
           </div>
           <div className={`event-detail-item ${isUpcoming ? 'event-detail-upcoming' : 'event-detail-regular'} ${small ? 'text-xs' : ''}`}>
             <span>{event.location}</span>
@@ -74,18 +86,19 @@ const Events = () => {
       <EventsAnimatedBackground />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Upcoming <span className="text-blue-600 dark:text-blue-400">Events</span></h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto transition-colors duration-300">Join our exciting events and workshops to enhance your skills and connect with fellow tech enthusiasts.</p>
+          <div className="mb-4 inline-flex rounded-full border border-blue-200/70 bg-white/70 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-blue-600 shadow-sm backdrop-blur-xl dark:border-blue-400/20 dark:bg-white/5 dark:text-blue-300">Live Calendar</div>
+          <h2 className="text-4xl font-black tracking-tight bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-5 transition-colors duration-300 sm:text-5xl md:text-6xl">Upcoming Events</h2>
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed transition-colors duration-300 sm:text-xl">Join our exciting events and workshops to enhance your skills and connect with fellow tech enthusiasts.</p>
         </div>
 
-        {isLoading && <p className="text-center text-gray-600 dark:text-gray-300">Loading events from database...</p>}
-        {error && <p className="text-center text-red-600">Unable to load events: {error}</p>}
-        {!isLoading && !error && events.length === 0 && <p className="text-center text-gray-600 dark:text-gray-300">No events available yet.</p>}
+        {isLoading && <SectionNotice>Loading events from database...</SectionNotice>}
+        {error && <SectionNotice tone="error">Unable to load events: {error}</SectionNotice>}
+        {!isLoading && !error && events.length === 0 && <SectionNotice>No events available yet.</SectionNotice>}
 
         {featuredEvents.length > 0 && <div className="grid md:grid-cols-2 gap-8 mb-12">{featuredEvents.map((event, index) => renderEventCard(event, index))}</div>}
         {pastEvents.length > 0 && (
           <div className="mt-16">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Past <span className="text-blue-600 dark:text-blue-400">Events</span></h3>
+            <h3 className="text-center text-2xl font-black tracking-tight text-gray-900 dark:text-white mb-6">Past <span className="text-blue-600 dark:text-blue-400">Events</span></h3>
             <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">{pastEvents.map((event, index) => renderEventCard(event, index, true))}</div>
           </div>
         )}

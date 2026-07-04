@@ -26,35 +26,6 @@ const GlobeIcon = ({ className = 'w-5 h-5' }) => (
   </svg>
 );
 
-const MailIcon = ({ className = 'w-5 h-5' }) => (
-  <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16v12H4V6zm0 1l8 6 8-6" />
-  </svg>
-);
-
-const cardThemes = [
-  {
-    image: 'from-pink-50 via-rose-50 to-pink-100',
-    company: 'text-pink-500'
-  },
-  {
-    image: 'from-purple-50 via-violet-50 to-purple-100',
-    company: 'text-violet-600'
-  },
-  {
-    image: 'from-emerald-50 via-green-50 to-emerald-100',
-    company: 'text-emerald-600'
-  },
-  {
-    image: 'from-blue-50 via-sky-50 to-blue-100',
-    company: 'text-blue-600'
-  },
-  {
-    image: 'from-orange-50 via-amber-50 to-orange-100',
-    company: 'text-orange-500'
-  }
-];
-
 const Speakers = () => {
   const [speakers, setSpeakers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,56 +63,48 @@ const Speakers = () => {
         {error && <p className="text-center text-red-600">Unable to load speakers: {error}</p>}
         {!isLoading && !error && speakers.length === 0 && <p className="text-center text-gray-600 dark:text-gray-300">No speakers available yet.</p>}
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-7xl mx-auto">
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-6xl mx-auto">
           {speakers.map((speaker, index) => {
-            const theme = cardThemes[index % cardThemes.length];
-
             return (
-              <div key={speaker.id || index} className="mx-auto flex w-full max-w-[245px] flex-col rounded-2xl border border-white/80 bg-white p-3 text-center shadow-[0_22px_60px_rgba(15,23,42,0.22),inset_1px_1px_0_rgba(255,255,255,0.95)]">
-                <div className={`relative h-64 overflow-hidden rounded-xl bg-gradient-to-br ${theme.image}`}>
+              <div key={speaker.id || index} className="mx-auto w-full max-w-[190px] rounded-xl border border-white/80 bg-white p-3 text-center shadow-[inset_1px_1px_0_rgba(255,255,255,0.9),inset_-1px_-1px_0_rgba(15,23,42,0.08),0_12px_28px_rgba(15,23,42,0.16)]">
+                <div className="h-44 overflow-hidden rounded-lg bg-gradient-to-br from-stone-100 via-purple-50 to-pink-100 shadow-inner">
                   {speaker.image_url ? (
                     <img src={speaker.image_url} alt={speaker.name} className="h-full w-full object-cover object-center" />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center">
-                      <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 text-5xl font-bold text-white shadow-lg ring-4 ring-white/90">
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple-100 via-pink-100 to-red-100">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 text-4xl font-bold text-white shadow-lg ring-4 ring-white/80">
                         {getDisplayInitial(speaker.name)}
                       </div>
                     </div>
                   )}
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent" />
                 </div>
 
-                <div className="relative z-10 -mt-10 px-1 pb-1 pt-0">
-                  <h3 className="truncate text-lg font-black leading-tight text-slate-950">{speaker.name}</h3>
-                  <p className="mt-3 truncate text-sm font-bold leading-tight text-slate-500">{speaker.title}</p>
-                  <p className={`mt-4 truncate text-sm font-black leading-tight ${theme.company}`}>{speaker.company}</p>
+                <div className="px-1 pb-2 pt-3">
+                  <h3 className="truncate text-sm font-extrabold leading-tight text-gray-950">{speaker.name}</h3>
+                  <p className="mt-1 truncate text-[10px] font-semibold leading-tight text-gray-600">{speaker.title}</p>
+                  <p className="mt-1 truncate text-[10px] font-bold leading-tight text-purple-600">{speaker.company}</p>
                 </div>
 
-                <div className="mt-2 border-t border-gray-200/80 pt-3">
+                <div className="border-t border-gray-200/80 pt-2">
                   <div className="flex items-center justify-center gap-3">
                     {speaker.website_url && (
-                      <a href={speaker.website_url} target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-blue-600 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100" aria-label={`${speaker.name} website`}>
-                        <GlobeIcon className="h-4 w-4" />
-                      </a>
-                    )}
-                    {speaker.email && (
-                      <a href={`mailto:${speaker.email}`} className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-pink-500 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100" aria-label={`${speaker.name} email`}>
-                        <MailIcon className="h-4 w-4" />
+                      <a href={speaker.website_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-orange-50 text-orange-500 shadow-sm" aria-label={`${speaker.name} website`}>
+                        <GlobeIcon className="h-3 w-3" />
                       </a>
                     )}
                     {speaker.twitter_url && (
-                      <a href={speaker.twitter_url} target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-sky-500 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100" aria-label={`${speaker.name} X`}>
-                        <XIcon className="h-4 w-4" />
+                      <a href={speaker.twitter_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-sky-50 text-sky-500 shadow-sm" aria-label={`${speaker.name} X`}>
+                        <XIcon className="h-3 w-3" />
                       </a>
                     )}
                     {speaker.linkedin_url && (
-                      <a href={speaker.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-sky-700 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100" aria-label={`${speaker.name} LinkedIn`}>
-                        <LinkedInIcon className="h-4 w-4" />
+                      <a href={speaker.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-blue-50 text-blue-600 shadow-sm" aria-label={`${speaker.name} LinkedIn`}>
+                        <LinkedInIcon className="h-3 w-3" />
                       </a>
                     )}
-                    {!speaker.website_url && !speaker.email && !speaker.twitter_url && !speaker.linkedin_url && (
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-gray-400 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100">
-                        <GlobeIcon className="h-4 w-4" />
+                    {!speaker.website_url && !speaker.twitter_url && !speaker.linkedin_url && (
+                      <span className="flex h-5 w-5 items-center justify-center rounded bg-gray-50 text-gray-400 shadow-sm">
+                        <GlobeIcon className="h-3 w-3" />
                       </span>
                     )}
                   </div>

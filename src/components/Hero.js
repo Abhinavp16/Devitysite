@@ -112,7 +112,7 @@ const Hero = () => {
         <div className="absolute -bottom-4 sm:-bottom-8 left-8 sm:left-20 w-24 h-24 sm:w-42 sm:h-42 bg-pink-400/10 dark:bg-pink-500/20 rounded-full animate-float-diagonal"></div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-12 hero-content hero-content-landscape">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 sm:pt-12 sm:pb-20 lg:pt-12 lg:pb-24 hero-content hero-content-landscape">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Hero Content */}
           <div className={`text-center lg:text-left ${isVisible ? 'animate-fadeInLeft' : 'opacity-0'}`}>
@@ -276,7 +276,7 @@ const Hero = () => {
         </div>
 
         {/* Scroll indicator - mobile responsive */}
-        <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 animate-fadeInUp delay-1000">
+        <div className="pointer-events-none absolute bottom-2 left-1/2 hidden -translate-x-1/2 transform animate-fadeInUp delay-1000 xl:block">
           <div className="flex flex-col items-center text-gray-700 dark:text-gray-300 transition-colors duration-300">
             <span className="text-xs sm:text-sm mb-1 sm:mb-2 font-semibold">Scroll to explore</span>
             <div className="w-5 h-8 sm:w-6 sm:h-10 border-2 border-gray-700 dark:border-gray-400 rounded-full flex justify-center transition-colors duration-300">

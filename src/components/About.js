@@ -35,52 +35,49 @@ const About = () => {
   ];
 
   return (
-    <section id="about" className="py-12 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm relative overflow-hidden transition-colors duration-300">
+    <section id="about" className="py-20 bg-slate-900/70 backdrop-blur-sm relative overflow-hidden transition-colors duration-300">
       <AboutAnimatedBackground />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-10">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
-            About <span className="text-blue-600 dark:text-blue-400">DevityClub</span>
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto transition-colors duration-300">
-            The Devity Club is a dynamic student-led initiative aimed at fostering technical skills and promoting innovation among students. With a focus on real-world applications and cutting-edge technologies, the club provides a platform for students to enhance their competitive programming abilities, engage in impactful projects, and contribute to open-source communities and shaping the future of tech together.
-          </p>
-        </div>
-
-        {/* Mission Section */}
-        <div className="mb-10">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 md:p-8 backdrop-blur-sm border border-white/20 dark:border-gray-600/20 transition-colors duration-300">
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 transition-colors duration-300">Our Mission</h3>
-            <p className="text-lg text-gray-700 dark:text-gray-300 mb-6 leading-relaxed transition-colors duration-300">
-              Devity Club  Empower students with hands-on skills across emerging domains like AI, Cybersecurity, DevOps, Cloud Computing, and Web Technologies.Bridge the gap between academic learning and industry expectations through impactful events, mentorship, and collaborative projects. Foster a culture of continuous learning, creativity, and open-source contribution. Serve as a launchpad for future-ready tech professionals and leaders.
+        <div className="mb-12 grid items-stretch gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="rounded-3xl border border-white/10 bg-white/[0.07] p-8 shadow-[0_24px_70px_rgba(0,0,0,0.25)] backdrop-blur-xl">
+            <div className="mb-5 inline-flex rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm font-bold uppercase tracking-[0.22em] text-blue-300">About Us</div>
+            <h2 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
+              Building The Future With <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">DevityClub</span>
+            </h2>
+            <p className="mt-6 text-lg leading-relaxed text-slate-300">
+              The Devity Club is a dynamic student-led initiative aimed at fostering technical skills and promoting innovation among students. We help learners build real-world projects, grow through mentorship, and contribute to open-source communities.
             </p>
-            <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed transition-colors duration-300">
-              Since our founding in 15th February 2023, we've hosted over 7+ events, supported 200+ members,
-              and launched dozens of innovative projects that have made a real impact.
+          </div>
+
+          <div className="rounded-3xl border border-blue-400/20 bg-gradient-to-br from-slate-800/90 via-slate-800/70 to-blue-950/60 p-8 shadow-[0_24px_70px_rgba(0,0,0,0.25)] backdrop-blur-xl">
+            <h3 className="text-2xl font-black text-white">Our Mission</h3>
+            <p className="mt-5 text-base leading-relaxed text-slate-300">
+              Empower students with hands-on skills across emerging domains like AI, Cybersecurity, DevOps, Cloud Computing, and Web Technologies. Bridge the gap between academic learning and industry expectations through impactful events, mentorship, and collaborative projects.
+            </p>
+            <p className="mt-5 text-base leading-relaxed text-slate-300">
+              Since our founding on 15th February 2023, we've hosted over 7+ events, supported 200+ members, and launched innovative projects that create real impact.
             </p>
           </div>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
           {features.map((feature, index) => (
-            <div key={index} className="text-center group">
-              <div className={`w-20 h-20 ${feature.color} rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 transform group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+            <div key={index} className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 text-center shadow-lg backdrop-blur-xl">
+              <div className={`w-16 h-16 ${feature.color} rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow-lg`}>
                 {feature.icon}
               </div>
-              <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-3 transition-colors duration-300">{feature.title}</h4>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed transition-colors duration-300">{feature.description}</p>
+              <h4 className="text-lg font-black text-white mb-3">{feature.title}</h4>
+              <p className="text-sm leading-relaxed text-slate-300">{feature.description}</p>
             </div>
           ))}
         </div>
 
-        {/* Stats Section */}
-        <div className="bg-gray-50/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-white/20 dark:border-gray-600/20 transition-colors duration-300">
+        <div className="rounded-3xl border border-white/10 bg-slate-950/45 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.24)] backdrop-blur-xl md:p-8">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             {stats.map((stat, index) => (
-              <div key={index} className="group">
-                <div className="text-4xl md:text-5xl font-bold text-blue-600 dark:text-blue-400 mb-2 group-hover:scale-110 transition-all duration-300">{stat.number}</div>
-                <div className="text-xl text-gray-700 dark:text-gray-300 font-medium transition-colors duration-300">{stat.label}</div>
+              <div key={index}>
+                <div className="text-4xl md:text-5xl font-black text-blue-400 mb-2">{stat.number}</div>
+                <div className="text-base text-slate-300 font-semibold">{stat.label}</div>
               </div>
             ))}
           </div>

@@ -2,15 +2,6 @@ import { useEffect, useState } from 'react';
 import { SpeakersAnimatedBackground } from './AnimatedBackground';
 import publicApiService from '../services/publicApiService';
 
-const gradients = [
-  ['from-red-500', 'to-pink-600', 'from-red-100 to-pink-100 dark:from-red-900/50 dark:to-pink-900/50', 'text-red-700 dark:text-red-300'],
-  ['from-purple-500', 'to-violet-600', 'from-purple-100 to-violet-100 dark:from-purple-900/50 dark:to-violet-900/50', 'text-purple-700 dark:text-purple-300'],
-  ['from-green-500', 'to-teal-600', 'from-green-100 to-teal-100 dark:from-green-900/50 dark:to-teal-900/50', 'text-green-700 dark:text-green-300'],
-  ['from-blue-500', 'to-cyan-600', 'from-blue-100 to-cyan-100 dark:from-blue-900/50 dark:to-cyan-900/50', 'text-blue-700 dark:text-blue-300'],
-  ['from-orange-500', 'to-red-600', 'from-orange-100 to-red-100 dark:from-orange-900/50 dark:to-red-900/50', 'text-orange-700 dark:text-orange-300'],
-  ['from-indigo-500', 'to-purple-600', 'from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50', 'text-indigo-700 dark:text-indigo-300']
-];
-
 const getDisplayInitial = (name = '') => {
   const parts = name.replace(/^(Mr\.|Ms\.|Mrs\.|Dr\.|Prof\.|Er\.)\s+/i, '').trim().split(/\s+/);
   return (parts[0] || name || '?').charAt(0).toUpperCase();
@@ -21,6 +12,48 @@ const LinkedInIcon = ({ className = 'w-5 h-5' }) => (
     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.919-2.063 2.063-2.063s2.063.925 2.063 2.063c0 1.139-.919 2.065-2.063 2.065zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
   </svg>
 );
+
+const XIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4l16 16M20 4L4 20" />
+  </svg>
+);
+
+const GlobeIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" />
+    <path strokeLinecap="round" d="M3.6 9h16.8M3.6 15h16.8M12 3c2.2 2.4 3.3 5.4 3.3 9S14.2 18.6 12 21M12 3C9.8 5.4 8.7 8.4 8.7 12s1.1 6.6 3.3 9" />
+  </svg>
+);
+
+const MailIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16v12H4V6zm0 1l8 6 8-6" />
+  </svg>
+);
+
+const cardThemes = [
+  {
+    image: 'from-pink-50 via-rose-50 to-pink-100',
+    company: 'text-pink-500'
+  },
+  {
+    image: 'from-purple-50 via-violet-50 to-purple-100',
+    company: 'text-violet-600'
+  },
+  {
+    image: 'from-emerald-50 via-green-50 to-emerald-100',
+    company: 'text-emerald-600'
+  },
+  {
+    image: 'from-blue-50 via-sky-50 to-blue-100',
+    company: 'text-blue-600'
+  },
+  {
+    image: 'from-orange-50 via-amber-50 to-orange-100',
+    company: 'text-orange-500'
+  }
+];
 
 const Speakers = () => {
   const [speakers, setSpeakers] = useState([]);
@@ -59,38 +92,59 @@ const Speakers = () => {
         {error && <p className="text-center text-red-600">Unable to load speakers: {error}</p>}
         {!isLoading && !error && speakers.length === 0 && <p className="text-center text-gray-600 dark:text-gray-300">No speakers available yet.</p>}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-7xl mx-auto">
           {speakers.map((speaker, index) => {
-            const [from, to, skillGradient, textColor] = gradients[index % gradients.length];
-            const expertise = speaker.expertise_areas || [];
+            const theme = cardThemes[index % cardThemes.length];
 
             return (
-              <div key={speaker.id || index} className="group relative bg-gradient-to-br from-white via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600 rounded-xl sm:rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-700 p-6 text-center transform hover:-translate-y-3 border border-gray-100 dark:border-gray-600 backdrop-blur-sm">
-                <div className="relative z-10">
-                  <div className={`w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br ${from} ${to} rounded-full flex items-center justify-center mx-auto mb-5 shadow-xl overflow-hidden ring-4 ring-white/50 group-hover:scale-110 transition-all duration-500`}>
-                    {speaker.image_url ? (
-                      <img src={speaker.image_url} alt={speaker.name} className="w-full h-full object-cover rounded-full" />
-                    ) : (
-                      <span className="text-white text-2xl font-bold">{getDisplayInitial(speaker.name)}</span>
-                    )}
-                  </div>
-                  <div className={`inline-block px-3 py-1.5 bg-gradient-to-r ${skillGradient} ${textColor} rounded-full text-xs font-semibold mb-4 shadow-md`}>{speaker.company}</div>
-                  <h3 className={`text-xl font-bold bg-gradient-to-r ${from} ${to} bg-clip-text text-transparent mb-2 leading-tight`}>{speaker.name}</h3>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 font-medium mb-4 transition-colors duration-300 leading-tight">{speaker.title}</p>
-                  {speaker.bio && <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">{speaker.bio}</p>}
-                  {expertise.length > 0 && (
-                    <div className="flex flex-wrap justify-center gap-2 mb-5">
-                      {expertise.slice(0, 3).map((skill, skillIndex) => (
-                        <span key={skillIndex} className={`px-3 py-1 bg-gradient-to-r ${skillGradient} ${textColor} rounded-full text-xs font-medium border border-gray-200/50 dark:border-gray-500/50`}>{skill}</span>
-                      ))}
-                      {expertise.length > 3 && <span className={`px-3 py-1 bg-gradient-to-r ${skillGradient} ${textColor} rounded-full text-xs font-medium`}>+{expertise.length - 3}</span>}
+              <div key={speaker.id || index} className="mx-auto flex w-full max-w-[245px] flex-col rounded-2xl border border-white/80 bg-white p-3 text-center shadow-[0_22px_60px_rgba(15,23,42,0.22),inset_1px_1px_0_rgba(255,255,255,0.95)]">
+                <div className={`relative h-64 overflow-hidden rounded-xl bg-gradient-to-br ${theme.image}`}>
+                  {speaker.image_url ? (
+                    <img src={speaker.image_url} alt={speaker.name} className="h-full w-full object-cover object-center" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 text-5xl font-bold text-white shadow-lg ring-4 ring-white/90">
+                        {getDisplayInitial(speaker.name)}
+                      </div>
                     </div>
                   )}
-                  {speaker.linkedin_url && (
-                    <a href={speaker.linkedin_url} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center justify-center bg-gradient-to-r ${from} ${to} p-3 rounded-full text-white hover:shadow-lg transition-all duration-300 transform hover:scale-110`} aria-label={`${speaker.name} LinkedIn`}>
-                      <LinkedInIcon className="w-5 h-5" />
-                    </a>
-                  )}
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent" />
+                </div>
+
+                <div className="relative z-10 -mt-10 px-1 pb-1 pt-0">
+                  <h3 className="truncate text-lg font-black leading-tight text-slate-950">{speaker.name}</h3>
+                  <p className="mt-3 truncate text-sm font-bold leading-tight text-slate-500">{speaker.title}</p>
+                  <p className={`mt-4 truncate text-sm font-black leading-tight ${theme.company}`}>{speaker.company}</p>
+                </div>
+
+                <div className="mt-2 border-t border-gray-200/80 pt-3">
+                  <div className="flex items-center justify-center gap-3">
+                    {speaker.website_url && (
+                      <a href={speaker.website_url} target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-blue-600 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100" aria-label={`${speaker.name} website`}>
+                        <GlobeIcon className="h-4 w-4" />
+                      </a>
+                    )}
+                    {speaker.email && (
+                      <a href={`mailto:${speaker.email}`} className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-pink-500 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100" aria-label={`${speaker.name} email`}>
+                        <MailIcon className="h-4 w-4" />
+                      </a>
+                    )}
+                    {speaker.twitter_url && (
+                      <a href={speaker.twitter_url} target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-sky-500 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100" aria-label={`${speaker.name} X`}>
+                        <XIcon className="h-4 w-4" />
+                      </a>
+                    )}
+                    {speaker.linkedin_url && (
+                      <a href={speaker.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-sky-700 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100" aria-label={`${speaker.name} LinkedIn`}>
+                        <LinkedInIcon className="h-4 w-4" />
+                      </a>
+                    )}
+                    {!speaker.website_url && !speaker.email && !speaker.twitter_url && !speaker.linkedin_url && (
+                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-gray-400 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100">
+                        <GlobeIcon className="h-4 w-4" />
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             );

@@ -25,12 +25,6 @@ const XIcon = ({ className = 'w-5 h-5' }) => (
   </svg>
 );
 
-const ArrowUpRightIcon = ({ className = 'w-5 h-5' }) => (
-  <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M9 7h8v8" />
-  </svg>
-);
-
 const GlobeIcon = ({ className = 'w-5 h-5' }) => (
   <svg className={className} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
     <circle cx="12" cy="12" r="9" />
@@ -85,49 +79,47 @@ const Team = () => {
       : 'from-purple-600 to-pink-600';
 
     if (!isLeadership) {
-      const primaryLink = member.linkedin_url || member.github_url || member.twitter_url || '#';
-
       return (
-        <div key={member.id || index} className="relative overflow-hidden rounded-md border border-white/40 bg-white shadow-[inset_1px_1px_0_rgba(255,255,255,0.75),inset_-1px_-1px_0_rgba(15,23,42,0.18),0_10px_24px_rgba(15,23,42,0.18)]">
-          <div className="relative aspect-[4/5] min-h-[360px] bg-gradient-to-br from-slate-100 via-gray-100 to-slate-200 overflow-hidden">
+        <div key={member.id || index} className="mx-auto w-full max-w-[190px] rounded-xl border border-white/80 bg-white p-3 text-center shadow-[inset_1px_1px_0_rgba(255,255,255,0.9),inset_-1px_-1px_0_rgba(15,23,42,0.08),0_12px_28px_rgba(15,23,42,0.16)]">
+          <div className="h-44 overflow-hidden rounded-lg bg-gradient-to-br from-stone-100 via-slate-100 to-indigo-100 shadow-inner">
             {member.image_url ? (
-              <img src={member.image_url} alt={member.name} className="w-full h-full object-cover object-center" />
+              <img src={member.image_url} alt={member.name} className="h-full w-full object-cover object-center" />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-slate-200 via-indigo-100 to-purple-100 flex items-center justify-center">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white flex items-center justify-center text-5xl font-bold shadow-xl ring-4 ring-white/70">
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 via-indigo-100 to-purple-100">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-4xl font-bold text-white shadow-lg ring-4 ring-white/80">
                   {getDisplayInitial(member.name)}
                 </div>
               </div>
             )}
+          </div>
 
-            <div className="absolute inset-x-4 bottom-4 rounded-lg border border-white/50 bg-gray-700/45 px-4 py-3 text-white shadow-[inset_1px_1px_0_rgba(255,255,255,0.45),inset_-1px_-1px_0_rgba(15,23,42,0.25),0_10px_28px_rgba(15,23,42,0.22)] backdrop-blur-md">
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <h3 className="text-base font-bold leading-tight truncate">{member.name}</h3>
-                  <p className="mt-1.5 text-xs font-bold leading-tight text-white/95 truncate">{member.role}</p>
-                </div>
-                <a href={primaryLink} target="_blank" rel="noopener noreferrer" className="shrink-0 text-white" aria-label={`${member.name} profile`}>
-                  <ArrowUpRightIcon className="w-4 h-4" />
+          <div className="px-1 pb-2 pt-3">
+            <h3 className="truncate text-sm font-extrabold leading-tight text-gray-950">{member.name}</h3>
+            <p className="mt-1 truncate text-[10px] font-semibold leading-tight text-gray-600">{member.role}</p>
+          </div>
+
+          <div className="border-t border-gray-200/80 pt-2">
+            <div className="flex items-center justify-center gap-3">
+              {member.github_url && (
+                <a href={member.github_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-orange-50 text-orange-500 shadow-sm" aria-label={`${member.name} GitHub`}>
+                  <GitHubIcon className="h-3 w-3" />
                 </a>
-              </div>
-
-              <div className="mt-3 flex items-center gap-3 text-white/95">
-                {member.twitter_url && (
-                  <a href={member.twitter_url} target="_blank" rel="noopener noreferrer" aria-label={`${member.name} X`}>
-                    <XIcon className="w-4 h-4" />
-                  </a>
-                )}
-                {member.linkedin_url && (
-                  <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" aria-label={`${member.name} LinkedIn`}>
-                    <LinkedInIcon className="w-4 h-4" />
-                  </a>
-                )}
-                {member.github_url && (
-                  <a href={member.github_url} target="_blank" rel="noopener noreferrer" aria-label={`${member.name} GitHub`}>
-                    <GlobeIcon className="w-4 h-4" />
-                  </a>
-                )}
-              </div>
+              )}
+              {member.twitter_url && (
+                <a href={member.twitter_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-sky-50 text-sky-500 shadow-sm" aria-label={`${member.name} X`}>
+                  <XIcon className="h-3 w-3" />
+                </a>
+              )}
+              {member.linkedin_url && (
+                <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-blue-50 text-blue-600 shadow-sm" aria-label={`${member.name} LinkedIn`}>
+                  <LinkedInIcon className="h-3 w-3" />
+                </a>
+              )}
+              {!member.github_url && !member.twitter_url && !member.linkedin_url && (
+                <span className="flex h-5 w-5 items-center justify-center rounded bg-gray-50 text-gray-400 shadow-sm">
+                  <GlobeIcon className="h-3 w-3" />
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -192,7 +184,7 @@ const Team = () => {
         {core.length > 0 && (
           <div>
             <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-8 text-center transition-colors duration-300">Core Team</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-6xl mx-auto">
               {core.map((member, index) => renderCard(member, index))}
             </div>
           </div>

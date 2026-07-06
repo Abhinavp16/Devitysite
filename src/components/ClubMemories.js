@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ClubMemoriesAnimatedBackground } from './AnimatedBackground';
 import publicApiService from '../services/publicApiService';
 
@@ -26,6 +26,7 @@ const ClubMemories = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const carouselRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -49,9 +50,30 @@ const ClubMemories = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel || memories.length === 0) return undefined;
+
+    const interval = setInterval(() => {
+      if (window.innerWidth >= 768) return;
+
+      const nextScroll = carousel.scrollLeft + carousel.clientWidth * 0.86;
+      const atEnd = nextScroll >= carousel.scrollWidth - carousel.clientWidth - 8;
+
+      carousel.scrollTo({
+        left: atEnd ? 0 : nextScroll,
+        behavior: 'smooth'
+      });
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [activeMemoryId, memories.length]);
+
   const activeIndex = memories.findIndex((memory) => memory.id === activeMemoryId);
   const activeMemory = memories[activeIndex] || memories[0];
   const activeGradient = gradients[(activeIndex >= 0 ? activeIndex : 0) % gradients.length];
+  const activeImages = activeMemory ? [...(activeMemory.image_urls && activeMemory.image_urls.length ? activeMemory.image_urls : [activeMemory.image_url || '']), '', '', '', ''].slice(0, 5) : [];
+  const activeImageTitles = activeMemory ? [...(activeMemory.image_titles && activeMemory.image_titles.length ? activeMemory.image_titles : placeholderTitles), '', '', '', ''].slice(0, 5) : [];
 
   const handleMemoryChange = (memoryId) => {
     if (memoryId === activeMemoryId) return;
@@ -118,30 +140,33 @@ const ClubMemories = () => {
                 )}
               </div>
 
-              <div key={activeMemory.id} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                {placeholderTitles.map((title, index) => (
+              <div ref={carouselRef} key={activeMemory.id} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:pb-0 lg:grid-cols-3 xl:grid-cols-5 hide-scrollbar">
+                {placeholderTitles.map((fallbackTitle, index) => {
+                  const imageUrl = activeImages[index];
+                  const title = activeImageTitles[index] || fallbackTitle;
+
+                  return (
                   <div
                     key={title}
-                    className="group relative bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl overflow-hidden hover:scale-105 hover:-translate-y-2 transition-all duration-500 border border-gray-700/50 hover:border-gray-600/50 shadow-xl hover:shadow-2xl"
+                    className="group relative min-w-[82vw] max-w-[82vw] snap-center overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-xl md:min-w-0 md:max-w-none"
                     style={{ animationDelay: `${index * 0.05}s`, animation: 'fadeInUp 0.4s ease-out forwards' }}
                   >
                     <div className="relative h-64 overflow-hidden rounded-2xl">
-                      {index === 0 && activeMemory.image_url ? (
-                        <img src={activeMemory.image_url} alt={activeMemory.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                      {imageUrl ? (
+                        <img src={imageUrl} alt={`${activeMemory.title} ${title}`} className="w-full h-full object-cover" />
                       ) : (
-                        <div className={`absolute inset-0 bg-gradient-to-br ${activeGradient} opacity-80 flex flex-col items-center justify-center text-white`}>
-                          <div className="text-5xl font-black mb-3">{activeMemory.title.charAt(0)}</div>
-                          <div className="text-xs uppercase tracking-[0.3em] opacity-80">Image Slot</div>
+                        <div className={`absolute inset-0 bg-gradient-to-br ${activeGradient} flex flex-col items-center justify-center text-white`}>
+                          <div className="text-5xl font-black mb-3">{title.charAt(0)}</div>
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-500"></div>
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <h4 className="text-white font-bold text-lg mb-1">{title}</h4>
-                        <p className="text-gray-300 text-sm">Add image URL from admin panel</p>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-black/10"></div>
+                      <div className="absolute right-3 top-3 rounded-full bg-pink-500 px-4 py-2 text-sm font-bold text-white shadow-lg">
+                        {title}
                       </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </>

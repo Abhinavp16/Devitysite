@@ -9,6 +9,8 @@ const memorySchema = Joi.object({
     title: Joi.string().min(1).max(255).required(),
     description: Joi.string().min(1).max(1000).required(),
     image_url: Joi.string().max(15000000).allow('', null).optional(),
+    image_urls: Joi.array().items(Joi.string().max(15000000).allow('', null)).max(5).optional(),
+    image_titles: Joi.array().items(Joi.string().max(100).allow('', null)).max(5).optional(),
     event_date: Joi.date().iso().required()
 });
 
@@ -16,8 +18,24 @@ const updateMemorySchema = Joi.object({
     title: Joi.string().min(1).max(255).optional(),
     description: Joi.string().min(1).max(1000).optional(),
     image_url: Joi.string().max(15000000).allow('', null).optional(),
+    image_urls: Joi.array().items(Joi.string().max(15000000).allow('', null)).max(5).optional(),
+    image_titles: Joi.array().items(Joi.string().max(100).allow('', null)).max(5).optional(),
     event_date: Joi.date().iso().optional()
 });
+
+const normalizeMemoryPayload = (payload) => {
+    const normalized = { ...payload };
+    if (normalized.image_urls) {
+        normalized.image_urls = normalized.image_urls.map((image) => image || null).filter(Boolean).slice(0, 5);
+        normalized.image_url = normalized.image_urls[0] || null;
+    } else if (normalized.image_url === '') {
+        normalized.image_url = null;
+    }
+    if (normalized.image_titles) {
+        normalized.image_titles = normalized.image_titles.map((title) => title || '').slice(0, 5);
+    }
+    return normalized;
+};
 
 router.get('/', authenticateToken, async (req, res) => {
     try {
@@ -62,9 +80,10 @@ router.post('/', authenticateToken, logActivity('CREATE', 'club_memories'), asyn
         const { error, value } = memorySchema.validate(req.body);
         if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
 
+        const normalizedValue = normalizeMemoryPayload(value);
         const memory = await ClubMemory.create({
-            ...value,
-            image_url: value.image_url || null,
+            ...normalizedValue,
+            image_url: normalizedValue.image_url || null,
             created_by: req.user._id,
             legacyCreatedBy: req.user.legacyId
         });
@@ -85,7 +104,7 @@ router.put('/:id', authenticateToken, logActivity('UPDATE', 'club_memories'), as
 
         const memory = await ClubMemory.findOneAndUpdate(
             legacyOrObjectIdQuery(req.params.id),
-            { $set: value },
+            { $set: normalizeMemoryPayload(value) },
             { returnDocument: 'after' }
         ).populate('created_by', 'username legacyId');
         if (!memory) return res.status(404).json({ error: 'Memory not found' });

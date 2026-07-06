@@ -70,7 +70,6 @@ const ImageUploadField = ({ label, value, onChange }) => {
           {uploading ? 'Compressing...' : 'Upload Image'}
           <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} className="hidden" />
         </label>
-        <p className="text-xs text-gray-500">Images are converted to compressed WebP and saved directly in MongoDB.</p>
       </div>
     </div>
   );
@@ -207,8 +206,22 @@ export const MemoriesTab = ({ dashboardData, setDashboardData }) => {
     title: '',
     description: '',
     image_url: '',
+    image_urls: ['', '', '', '', ''],
+    image_titles: ['Opening Ceremony', 'Interactive Session', 'Team Collaboration', 'Problem Solving', 'Award Ceremony'],
     event_date: ''
   });
+
+  const updateMemoryImage = (index, imageUrl) => {
+    const imageUrls = [...(formData.image_urls || ['', '', '', '', ''])];
+    imageUrls[index] = imageUrl;
+    setFormData({ ...formData, image_urls: imageUrls, image_url: imageUrls[0] || '' });
+  };
+
+  const updateMemoryImageTitle = (index, title) => {
+    const imageTitles = [...(formData.image_titles || ['Opening Ceremony', 'Interactive Session', 'Team Collaboration', 'Problem Solving', 'Award Ceremony'])];
+    imageTitles[index] = title;
+    setFormData({ ...formData, image_titles: imageTitles });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -248,6 +261,8 @@ export const MemoriesTab = ({ dashboardData, setDashboardData }) => {
       title: memory.title,
       description: memory.description,
       image_url: memory.image_url || '',
+      image_urls: [...(memory.image_urls && memory.image_urls.length ? memory.image_urls : [memory.image_url || '']), '', '', '', ''].slice(0, 5),
+      image_titles: [...(memory.image_titles && memory.image_titles.length ? memory.image_titles : ['Opening Ceremony', 'Interactive Session', 'Team Collaboration', 'Problem Solving', 'Award Ceremony']), '', '', '', ''].slice(0, 5),
       event_date: memory.event_date
     });
     setShowForm(true);
@@ -276,7 +291,7 @@ export const MemoriesTab = ({ dashboardData, setDashboardData }) => {
   };
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', image_url: '', event_date: '' });
+    setFormData({ title: '', description: '', image_url: '', image_urls: ['', '', '', '', ''], image_titles: ['Opening Ceremony', 'Interactive Session', 'Team Collaboration', 'Problem Solving', 'Award Ceremony'], event_date: '' });
     setEditingMemory(null);
     setShowForm(false);
   };
@@ -302,7 +317,7 @@ export const MemoriesTab = ({ dashboardData, setDashboardData }) => {
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold mb-4">
               {editingMemory ? 'Edit Memory' : 'Add New Memory'}
             </h3>
@@ -327,11 +342,30 @@ export const MemoriesTab = ({ dashboardData, setDashboardData }) => {
                   required
                 />
               </div>
-              <ImageUploadField
-                label="Image"
-                value={formData.image_url}
-                onChange={(imageUrl) => setFormData({...formData, image_url: imageUrl})}
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">Memory Card Images</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {(formData.image_urls || ['', '', '', '', '']).slice(0, 5).map((imageUrl, index) => (
+                    <div key={index} className="space-y-3 rounded-xl border border-gray-200 p-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Card {index + 1} Label</label>
+                        <input
+                          type="text"
+                          value={(formData.image_titles || [])[index] || ''}
+                          onChange={(e) => updateMemoryImageTitle(index, e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Opening Ceremony"
+                        />
+                      </div>
+                      <ImageUploadField
+                        label={`Card ${index + 1} Image`}
+                        value={imageUrl || ''}
+                        onChange={(nextImageUrl) => updateMemoryImage(index, nextImageUrl)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Event Date</label>
                 <input

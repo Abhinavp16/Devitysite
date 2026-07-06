@@ -20,6 +20,8 @@ const clubMemorySchema = new Schema({
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true },
     image_url: String,
+    image_urls: [String],
+    image_titles: [String],
     event_date: { type: Date, required: true },
     created_by: { type: Schema.Types.ObjectId, ref: 'AdminUser' },
     legacyCreatedBy: Number
@@ -146,6 +148,8 @@ const mapMemory = (doc) => ({
     title: doc.title,
     description: doc.description,
     image_url: doc.image_url || null,
+    image_urls: doc.image_urls && doc.image_urls.length > 0 ? doc.image_urls : (doc.image_url ? [doc.image_url] : []),
+    image_titles: doc.image_titles || [],
     event_date: formatDate(doc.event_date),
     created_at: doc.created_at,
     updated_at: doc.updated_at,

@@ -112,25 +112,25 @@ const Hero = () => {
         <div className="absolute -bottom-4 sm:-bottom-8 left-8 sm:left-20 w-24 h-24 sm:w-42 sm:h-42 bg-pink-400/10 dark:bg-pink-500/20 rounded-full animate-float-diagonal"></div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 sm:pt-12 sm:pb-20 lg:pt-12 lg:pb-24 hero-content hero-content-landscape">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-10 sm:pt-12 sm:pb-20 lg:pt-12 lg:pb-24 hero-content hero-content-landscape">
+        <div className="grid lg:grid-cols-2 gap-5 sm:gap-8 lg:gap-12 items-center">
           {/* Hero Content */}
           <div className={`text-center lg:text-left ${isVisible ? 'animate-fadeInLeft' : 'opacity-0'}`}>
-            <div className="mb-4 sm:mb-6">
+            <div className="mb-2 sm:mb-6">
               <span
                 onDoubleClick={() => window.location.href = '/login'}
-                className="hero-badge inline-block px-4 py-2 sm:px-4 sm:py-2 bg-blue-100 dark:bg-blue-500/30 text-blue-700 dark:text-blue-100 rounded-full text-sm sm:text-sm font-bold mb-3 sm:mb-4 animate-slideInFromBottom transition-colors duration-300 shadow-lg border border-blue-200 dark:border-blue-400/30 cursor-pointer select-none"
+                className="hero-badge inline-block px-4 py-2 sm:px-4 sm:py-2 bg-blue-100 dark:bg-blue-500/30 text-blue-700 dark:text-blue-100 rounded-full text-sm sm:text-sm font-bold mb-1 sm:mb-4 animate-slideInFromBottom transition-colors duration-300 shadow-lg border border-blue-200 dark:border-blue-400/30 cursor-pointer select-none"
               >
                 🚀 Welcome to the Future of Tech
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 leading-tight transition-colors duration-300">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-6 leading-tight transition-colors duration-300">
               Welcome to{' '}
               <span className="gradient-text animate-pulse-slow block sm:inline">Devity Club</span>
             </h1>
 
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 dark:text-white mb-6 sm:mb-8 leading-relaxed animate-fadeInUp delay-200 font-medium transition-colors duration-300 px-2 sm:px-0">
+            <p className="text-sm sm:text-lg md:text-xl lg:text-2xl text-gray-700 dark:text-white mb-4 sm:mb-8 leading-relaxed animate-fadeInUp delay-200 font-medium transition-colors duration-300 px-2 sm:px-0">
               Empowering the next generation of tech innovators through community,
               learning, and collaboration. Join us in shaping the future of technology.
             </p>
@@ -138,24 +138,24 @@ const Hero = () => {
 
 
             {/* Stats - Mobile optimized */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8 sm:mt-12 animate-fadeInUp delay-600 px-4 sm:px-0">
-              <div className="text-center bg-white/80 dark:bg-black/80 rounded-xl p-4 sm:p-3 lg:p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-                <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">25+</div>
-                <div className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-semibold transition-colors duration-300">Active Team Members</div>
+            <div className="grid grid-cols-3 gap-2 sm:gap-6 lg:gap-8 mt-4 sm:mt-12 animate-fadeInUp delay-600 px-1 sm:px-0">
+              <div className="text-center bg-white/80 dark:bg-black/80 rounded-xl p-2.5 sm:p-3 lg:p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                <div className="text-xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">25+</div>
+                <div className="text-gray-700 dark:text-gray-300 text-[10px] leading-tight sm:text-sm font-semibold transition-colors duration-300">Team Members</div>
               </div>
-              <div className="text-center bg-white/80 dark:bg-black/80 rounded-xl p-4 sm:p-3 lg:p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-                <div className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400 mb-1">7+</div>
-                <div className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-semibold transition-colors duration-300">Events</div>
+              <div className="text-center bg-white/80 dark:bg-black/80 rounded-xl p-2.5 sm:p-3 lg:p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                <div className="text-xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400 mb-1">7+</div>
+                <div className="text-gray-700 dark:text-gray-300 text-[10px] leading-tight sm:text-sm font-semibold transition-colors duration-300">Events</div>
               </div>
-              <div className="text-center bg-white/80 dark:bg-black/80 rounded-xl p-4 sm:p-3 lg:p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-                <div className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400 mb-1">10+</div>
-                <div className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-semibold transition-colors duration-300">Research Paper & Projects</div>
+              <div className="text-center bg-white/80 dark:bg-black/80 rounded-xl p-2.5 sm:p-3 lg:p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                <div className="text-xl sm:text-3xl font-bold text-green-600 dark:text-green-400 mb-1">10+</div>
+                <div className="text-gray-700 dark:text-gray-300 text-[10px] leading-tight sm:text-sm font-semibold transition-colors duration-300">Projects</div>
               </div>
             </div>
           </div>
 
           {/* Hero Visual - Mobile responsive */}
-          <div className={`flex justify-center lg:justify-end mt-8 lg:mt-0 ${isVisible ? 'animate-fadeInRight delay-300' : 'opacity-0'}`}>
+          <div className={`flex justify-center lg:justify-end mt-4 sm:mt-8 lg:mt-0 ${isVisible ? 'animate-fadeInRight delay-300' : 'opacity-0'}`}>
             <div className="relative">
               {/* Main circle with video logo - responsive sizing */}
               <div className="hero-video-container w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full flex items-center justify-center shadow-2xl hover-scale overflow-hidden relative p-2 sm:p-3 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600">

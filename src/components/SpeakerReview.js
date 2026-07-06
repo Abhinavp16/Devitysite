@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SpeakerReviewAnimatedBackground } from './AnimatedBackground';
 import publicApiService from '../services/publicApiService';
 
@@ -6,6 +6,7 @@ export default function SpeakerReview() {
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const carouselRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -26,6 +27,20 @@ export default function SpeakerReview() {
     };
   }, []);
 
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel || reviews.length === 0) return undefined;
+
+    const interval = setInterval(() => {
+      const halfWidth = carousel.scrollWidth / 2;
+      const nextScroll = carousel.scrollLeft + 1.2;
+
+      carousel.scrollLeft = nextScroll >= halfWidth ? 0 : nextScroll;
+    }, 24);
+
+    return () => clearInterval(interval);
+  }, [reviews.length]);
+
   if (!isLoading && !error && reviews.length === 0) {
     return null;
   }
@@ -43,12 +58,12 @@ export default function SpeakerReview() {
       {isLoading && <p className="relative z-10 text-center text-gray-300">Loading speaker voices from database...</p>}
       {error && <p className="relative z-10 text-center text-red-400">Unable to load speaker voices: {error}</p>}
 
-      <div className="relative w-full overflow-hidden z-20">
-        <div className="flex animate-marquee hover:[animation-play-state:paused] w-fit">
+      <div ref={carouselRef} className="hide-scrollbar relative w-full overflow-x-auto z-20 scroll-smooth">
+        <div className="flex w-fit">
           {[...Array(2)].map((_, loopIndex) => (
             <div key={loopIndex} className="flex gap-8 py-10 pr-8">
               {reviews.map((item, index) => (
-                <div key={`${item.id}-${loopIndex}`} className="group relative w-[320px] md:w-[380px] flex-shrink-0 transition-all duration-700 hover:-translate-y-3 hover:scale-[1.02] min-h-[360px]">
+                <div key={`${item.id}-${loopIndex}`} className="group relative w-[320px] md:w-[380px] flex-shrink-0 snap-center transition-all duration-700 hover:-translate-y-3 hover:scale-[1.02] min-h-[360px]">
                   <div className="relative h-full rounded-3xl overflow-hidden bg-gradient-to-br from-slate-800/90 via-slate-900/80 to-gray-900/90 border border-slate-700/50 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] group-hover:shadow-[0_20px_60px_rgba(59,130,246,0.4)] group-hover:border-blue-400/50">
                     <div className="relative z-10 p-6 h-full flex flex-col">
                       <div className="flex items-center gap-2 mb-4">

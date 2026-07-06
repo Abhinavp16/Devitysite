@@ -71,7 +71,7 @@ const Events = () => {
 
       return (
         <div key={event.id || index} className="overflow-hidden rounded-xl bg-white text-slate-950 shadow-[0_16px_40px_rgba(15,23,42,0.18)]">
-          <div className={`relative h-20 bg-gradient-to-br ${pastEventVisuals[index % pastEventVisuals.length]}`}>
+          <div className={`relative h-16 sm:h-20 bg-gradient-to-br ${pastEventVisuals[index % pastEventVisuals.length]}`}>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.35),transparent_26%),radial-gradient(circle_at_70%_65%,rgba(255,255,255,0.2),transparent_28%)]" />
             <div className="absolute left-3 top-3 rounded bg-orange-600 px-2 py-1 text-[10px] font-bold text-white">{event.event_type}</div>
             <div className="absolute right-3 top-3 rounded bg-white px-2 py-1 text-center text-slate-950 shadow-sm">
@@ -80,14 +80,14 @@ const Events = () => {
             </div>
           </div>
 
-          <div className="p-4">
-            <h3 className="line-clamp-2 text-base font-black leading-tight text-slate-950">{event.title}</h3>
-            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-slate-600">
+          <div className="p-3 sm:p-4">
+            <h3 className="line-clamp-2 text-sm font-black leading-tight text-slate-950 sm:text-base">{event.title}</h3>
+            <div className="mt-2 flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-medium text-slate-600 sm:mt-3 sm:gap-x-4 sm:text-xs">
               <span>{event.event_time}</span>
               <span>{event.location}</span>
             </div>
-            <p className="mt-3 line-clamp-4 text-xs leading-relaxed text-slate-600">{event.description}</p>
-            <button className={`mt-4 w-fit rounded px-3 py-2 text-xs font-semibold text-white ${event.status === 'completed' ? 'bg-slate-500' : isCancelled ? 'bg-red-500' : 'bg-blue-600'}`}>{buttonLabel}</button>
+            <p className="mt-2 line-clamp-3 text-[10px] leading-relaxed text-slate-600 sm:mt-3 sm:text-xs">{event.description}</p>
+            <button className={`mt-3 w-fit rounded px-2.5 py-1.5 text-[10px] font-semibold text-white sm:mt-4 sm:px-3 sm:py-2 sm:text-xs ${event.status === 'completed' ? 'bg-slate-500' : isCancelled ? 'bg-red-500' : 'bg-blue-600'}`}>{buttonLabel}</button>
           </div>
         </div>
       );
@@ -137,7 +137,7 @@ const Events = () => {
         {pastEvents.length > 0 && (
           <div className="mt-16">
             <h3 className="text-center text-2xl font-black tracking-tight text-gray-900 dark:text-white mb-6">Past <span className="text-blue-600 dark:text-blue-400">Events</span></h3>
-            <div className="grid gap-7 md:grid-cols-2 lg:grid-cols-3">{pastEvents.map((event, index) => renderEventCard(event, index, true))}</div>
+            <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">{pastEvents.map((event, index) => renderEventCard(event, index, true))}</div>
           </div>
         )}
       </div>

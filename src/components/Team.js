@@ -137,48 +137,46 @@ const Team = () => {
     }
 
     return (
-      <div key={member.id || index} className="mx-auto flex w-full max-w-sm flex-col overflow-hidden rounded-2xl border border-white/80 bg-white p-1.5 shadow-[0_14px_36px_rgba(15,23,42,0.16),inset_1px_1px_0_rgba(255,255,255,0.95)] sm:flex-row">
-        <div className="h-36 overflow-hidden rounded-xl bg-gradient-to-br from-slate-200 via-indigo-100 to-purple-100 sm:h-auto sm:w-[40%]">
+      <div key={member.id || index} className="mx-auto w-full max-w-[190px] rounded-xl border border-white/80 bg-white p-3 text-center shadow-[inset_1px_1px_0_rgba(255,255,255,0.9),inset_-1px_-1px_0_rgba(15,23,42,0.08),0_12px_28px_rgba(15,23,42,0.16)]">
+        <div className="h-44 overflow-hidden rounded-lg bg-gradient-to-br from-stone-100 via-slate-100 to-indigo-100 shadow-inner">
           {member.image_url ? (
             <img src={member.image_url} alt={member.name} className="h-full w-full object-cover object-center" />
           ) : (
-            <div className="flex h-full min-h-36 w-full items-center justify-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-3xl font-bold text-white shadow-lg ring-4 ring-white/90">
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200 via-indigo-100 to-purple-100">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-4xl font-bold text-white shadow-lg ring-4 ring-white/80">
                 {getDisplayInitial(member.name)}
               </div>
             </div>
           )}
         </div>
 
-        <div className="flex flex-1 flex-col px-3 py-3 text-left text-slate-950 sm:px-4">
-          <h3 className="text-base font-medium leading-tight text-black">{member.name}</h3>
-          <p className="mt-1.5 text-[11px] font-medium leading-tight text-black">{member.role}</p>
-          {member.bio && <p className="mt-3 text-xs font-normal leading-snug text-black">{member.bio}</p>}
+        <div className="px-1 pb-2 pt-3">
+          <h3 className="truncate text-sm font-extrabold leading-tight text-gray-950">{member.name}</h3>
+          <p className="mt-1 truncate text-[10px] font-semibold leading-tight text-gray-600">{member.role}</p>
+        </div>
 
-          <div className="mt-auto pt-3">
-            <div className="mb-2 h-px w-full bg-gray-200" />
-            <div className="flex items-center gap-3">
-              {member.github_url && (
-                <a href={member.github_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-gray-100 text-black shadow-sm" aria-label={`${member.name} GitHub`}>
-                  <GitHubIcon className="h-3 w-3" />
-                </a>
+        <div className="border-t border-gray-200/80 pt-2">
+          <div className="flex items-center justify-center gap-3">
+            {member.github_url && (
+              <a href={member.github_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-orange-50 text-orange-500 shadow-sm" aria-label={`${member.name} GitHub`}>
+                <GitHubIcon className="h-3 w-3" />
+              </a>
             )}
-              {member.twitter_url && (
-                <a href={member.twitter_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-gray-100 text-black shadow-sm" aria-label={`${member.name} X`}>
-                  <XIcon className="h-3 w-3" />
-                </a>
-              )}
+            {member.twitter_url && (
+              <a href={member.twitter_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-sky-50 text-sky-500 shadow-sm" aria-label={`${member.name} X`}>
+                <XIcon className="h-3 w-3" />
+              </a>
+            )}
             {member.linkedin_url && (
-                <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-gray-100 text-black shadow-sm" aria-label={`${member.name} LinkedIn`}>
-                  <LinkedInIcon className="h-3 w-3" />
-                </a>
+              <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-blue-50 text-blue-600 shadow-sm" aria-label={`${member.name} LinkedIn`}>
+                <LinkedInIcon className="h-3 w-3" />
+              </a>
             )}
-              {!member.github_url && !member.twitter_url && !member.linkedin_url && (
-                <span className="flex h-5 w-5 items-center justify-center rounded bg-gray-100 text-black shadow-sm">
-                  <GlobeIcon className="h-3 w-3" />
-                </span>
-              )}
-            </div>
+            {!member.github_url && !member.twitter_url && !member.linkedin_url && (
+              <span className="flex h-5 w-5 items-center justify-center rounded bg-gray-50 text-gray-400 shadow-sm">
+                <GlobeIcon className="h-3 w-3" />
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -201,7 +199,7 @@ const Team = () => {
         {leadership.length > 0 && (
           <div className="mb-16">
             <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-8 text-center transition-colors duration-300">Leadership Team</h3>
-            <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3 max-w-6xl mx-auto">
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-6xl mx-auto">
               {leadership.map((member, index) => renderCard(member, index, 'leadership'))}
             </div>
           </div>

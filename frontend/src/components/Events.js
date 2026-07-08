@@ -124,7 +124,6 @@ const Events = () => {
       <EventsAnimatedBackground />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
-          <div className="mb-4 inline-flex rounded-full border border-blue-200/70 bg-white/70 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-blue-600 shadow-sm backdrop-blur-xl dark:border-blue-400/20 dark:bg-white/5 dark:text-blue-300">Live Calendar</div>
           <h2 className="text-4xl font-black tracking-tight bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-5 transition-colors duration-300 sm:text-5xl md:text-6xl">Upcoming Events</h2>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed transition-colors duration-300 sm:text-xl">Join our exciting events and workshops to enhance your skills and connect with fellow tech enthusiasts.</p>
         </div>

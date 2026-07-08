@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import devityLogo from '../img/devity logo.png';
-import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -179,17 +178,8 @@ const Header = () => {
                 })}
               </nav>
 
-              {/* Theme Toggle */}
-              <div className="hidden md:flex items-center space-x-4">
-                <ThemeToggle />
-
-              </div>
-
-              {/* Mobile theme toggle and menu button */}
+              {/* Mobile menu button */}
               <div className="md:hidden flex items-center space-x-2">
-                <div className="scale-75 sm:scale-100">
-                  <ThemeToggle />
-                </div>
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   className="relative text-blue-100 hover:text-white p-2 sm:p-3 rounded-xl hover:bg-blue-500/30 transition-all duration-500 transform hover:scale-110 hover:rotate-3 group overflow-hidden"

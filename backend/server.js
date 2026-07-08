@@ -17,6 +17,13 @@ const publicRoutes = require('./routes/public');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const allowedOrigins = [
+    'https://devityclub.com',
+    'https://www.devityclub.com',
+    'https://devitysite.vercel.app',
+    process.env.FRONTEND_URL
+].filter(Boolean);
+
 // Security middleware
 app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }
@@ -34,8 +41,8 @@ app.use('/api/', limiter);
 
 // CORS configuration
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' 
-        ? ['https://devityclub.com', 'https://www.devityclub.com'] 
+    origin: process.env.NODE_ENV === 'production'
+        ? allowedOrigins
         : ['http://localhost:3000', 'http://127.0.0.1:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -49,15 +56,6 @@ app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 // Static files for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/memories', memoriesRoutes);
-app.use('/api/events', eventsRoutes);
-app.use('/api/team', teamRoutes);
-app.use('/api/speakers', speakersRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/public', publicRoutes);
-
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({
@@ -67,6 +65,24 @@ app.get('/api/health', (req, res) => {
         environment: process.env.NODE_ENV || 'development'
     });
 });
+
+app.use('/api', async (req, res, next) => {
+    try {
+        await connectMongoDB();
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/memories', memoriesRoutes);
+app.use('/api/events', eventsRoutes);
+app.use('/api/team', teamRoutes);
+app.use('/api/speakers', speakersRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/public', publicRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -98,33 +114,36 @@ app.use('*', (req, res) => {
     });
 });
 
-// Start server
-connectMongoDB()
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log(`🚀 DevityClub Backend Server running on port ${PORT}`);
-            console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-            console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
+const startServer = async () => {
+    await connectMongoDB();
 
-            if (process.env.NODE_ENV !== 'production') {
-                console.log('\n📋 Available Endpoints:');
-                console.log('   GET  /api/health - Health check');
-                console.log('   POST /api/auth/login - Admin login');
-                console.log('   GET  /api/dashboard/stats - Dashboard statistics');
-                console.log('   GET  /api/memories - Get all memories');
-                console.log('   POST /api/memories - Create memory');
-                console.log('   GET  /api/events - Get all events');
-                console.log('   POST /api/events - Create event');
-                console.log('   GET  /api/team - Get all team members');
-                console.log('   POST /api/team - Create team member');
-                console.log('   GET  /api/speakers - Get all speakers');
-                console.log('   POST /api/speakers - Create speaker');
-            }
-        });
-    })
-    .catch((error) => {
-        console.error('Failed to connect to MongoDB:', error);
+    app.listen(PORT, () => {
+        console.log(`DevityClub Backend Server running on port ${PORT}`);
+        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`API Base URL: http://localhost:${PORT}/api`);
+
+        if (process.env.NODE_ENV !== 'production') {
+            console.log('\nAvailable Endpoints:');
+            console.log('   GET  /api/health - Health check');
+            console.log('   POST /api/auth/login - Admin login');
+            console.log('   GET  /api/dashboard/stats - Dashboard statistics');
+            console.log('   GET  /api/memories - Get all memories');
+            console.log('   POST /api/memories - Create memory');
+            console.log('   GET  /api/events - Get all events');
+            console.log('   POST /api/events - Create event');
+            console.log('   GET  /api/team - Get all team members');
+            console.log('   POST /api/team - Create team member');
+            console.log('   GET  /api/speakers - Get all speakers');
+            console.log('   POST /api/speakers - Create speaker');
+        }
+    });
+};
+
+if (require.main === module) {
+    startServer().catch((error) => {
+        console.error('Failed to start server:', error);
         process.exit(1);
     });
+}
 
 module.exports = app;

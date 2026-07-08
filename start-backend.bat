@@ -2,17 +2,13 @@
 echo Starting DevityClub Backend Server...
 echo.
 
-cd server
+cd backend
 
 echo Installing dependencies...
 call npm install
 
 echo.
-echo Initializing database...
-call npm run init-db
-
-echo.
 echo Starting backend server...
-echo Backend will run on http://localhost:5000
+echo Backend will run on http://localhost:5001 unless PORT is overridden
 echo.
 call npm run dev

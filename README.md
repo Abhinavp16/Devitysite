@@ -19,6 +19,14 @@ A modern, responsive website for DevityClub - a tech community focused on empowe
 - **Build Tool**: Create React App
 - **Icons**: Heroicons (via SVG)
 
+## Project Layout
+
+```
+devitysite/
+├── frontend/   # React website for Vercel
+└── backend/    # Express API for Render/Railway/Fly/etc.
+```
+
 ## Getting Started
 
 ### Prerequisites
@@ -34,49 +42,57 @@ git clone <repository-url>
 cd devitysite
 ```
 
-2. Install dependencies:
+2. Install frontend dependencies:
 ```bash
+cd frontend
 npm install
 ```
 
-3. Start the development server:
+3. Start the frontend development server:
 ```bash
 npm start
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+4. Install backend dependencies in another terminal:
+```bash
+cd backend
+npm install
+```
+
+5. Start the backend API:
+```bash
+npm start
+```
+
+6. Open [http://localhost:3000](http://localhost:3000) to view the frontend.
 
 ## Available Scripts
 
-- `npm start` - Runs the app in development mode
-- `npm test` - Launches the test runner
-- `npm run build` - Builds the app for production
+- `cd frontend && npm start` - Runs the React app in development mode
+- `cd frontend && npm test` - Launches the frontend test runner
+- `cd frontend && npm run build` - Builds the frontend for production
+- `cd backend && npm start` - Runs the Express API
 - `npm run eject` - Ejects from Create React App (one-way operation)
 
 ## Project Structure
 
 ```
 devitysite/
-├── public/
-│   ├── index.html
-│   └── ...
-├── src/
-│   ├── components/
-│   │   ├── Header.js
-│   │   ├── Hero.js
-│   │   ├── About.js
-│   │   ├── Events.js
-│   │   ├── Team.js
-│   │   ├── Speakers.js
-│   │   ├── Contact.js
-│   │   └── Footer.js
-│   ├── App.js
-│   ├── App.css
-│   ├── index.js
-│   └── index.css
-├── tailwind.config.js
-├── postcss.config.js
-└── package.json
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   ├── package.json
+│   ├── tailwind.config.js
+│   ├── postcss.config.js
+│   └── vercel.json
+├── backend/
+│   ├── config/
+│   ├── models/
+│   ├── routes/
+│   ├── scripts/
+│   ├── package.json
+│   └── server.js
+└── README.md
 ```
 
 ## Components
@@ -126,7 +142,7 @@ devitysite/
 ## Customization
 
 ### Colors
-The website uses a blue-based color scheme. To customize colors, update the Tailwind configuration in `tailwind.config.js`.
+The website uses a blue-based color scheme. To customize colors, update the Tailwind configuration in `frontend/tailwind.config.js`.
 
 ### Content
 Update the content in each component file to match your club's information:
@@ -136,18 +152,32 @@ Update the content in each component file to match your club's information:
 - Contact information
 
 ### Styling
-Additional custom styles can be added to `src/App.css` or by extending Tailwind classes.
+Additional custom styles can be added to `frontend/src/App.css` or by extending Tailwind classes.
 
 ## Deployment
 
-To deploy the website:
+To deploy the frontend on Vercel:
+
+1. Set Vercel's root directory to `frontend`.
+2. Use build command `npm run build`.
+3. Use output directory `build`.
+4. Add `REACT_APP_API_URL=https://your-backend-url/api` in Vercel environment variables.
+
+Deploy the backend separately on a Node hosting provider such as Render, Railway, or Fly.io:
+
+1. Set the service root directory to `backend`.
+2. Use start command `npm start`.
+3. Add required environment variables like `MONGODB_URI` and `JWT_SECRET`.
+
+To build the frontend locally:
 
 1. Build the project:
 ```bash
+cd frontend
 npm run build
 ```
 
-2. Deploy the `build` folder to your hosting service (Netlify, Vercel, GitHub Pages, etc.)
+2. Deploy the `frontend/build` folder to your hosting service.
 
 ## Contributing
 

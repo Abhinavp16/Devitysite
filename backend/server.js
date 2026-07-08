@@ -24,6 +24,18 @@ const allowedOrigins = [
     process.env.FRONTEND_URL
 ].filter(Boolean);
 
+const isAllowedOrigin = (origin) => {
+    if (!origin) return true;
+    if (allowedOrigins.includes(origin)) return true;
+
+    try {
+        const { hostname } = new URL(origin);
+        return hostname.endsWith('.vercel.app');
+    } catch (error) {
+        return false;
+    }
+};
+
 // Security middleware
 app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }
@@ -41,9 +53,14 @@ app.use('/api/', limiter);
 
 // CORS configuration
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production'
-        ? allowedOrigins
-        : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    origin: (origin, callback) => {
+        const localOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
+        const isAllowed = process.env.NODE_ENV === 'production'
+            ? isAllowedOrigin(origin)
+            : !origin || localOrigins.includes(origin);
+
+        callback(isAllowed ? null : new Error('Not allowed by CORS'), isAllowed);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']

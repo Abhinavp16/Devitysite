@@ -83,6 +83,25 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+app.get('/api/db-health', async (req, res) => {
+    try {
+        const connection = await connectMongoDB();
+
+        res.json({
+            status: 'OK',
+            database: connection.name,
+            readyState: connection.readyState
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'ERROR',
+            error: 'MongoDB connection failed',
+            reason: error.message,
+            hint: 'Check MONGODB_URI in Vercel and allow Vercel outbound IPs in MongoDB Atlas Network Access.'
+        });
+    }
+});
+
 app.use('/api', async (req, res, next) => {
     try {
         await connectMongoDB();

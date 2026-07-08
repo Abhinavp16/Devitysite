@@ -14,9 +14,15 @@ const connectMongoDB = async () => {
     }
 
     if (!connectionPromise) {
-        connectionPromise = mongoose.connect(uri).then(() => {
+        connectionPromise = mongoose.connect(uri, {
+            serverSelectionTimeoutMS: 8000,
+            connectTimeoutMS: 8000
+        }).then(() => {
             console.log('Connected to MongoDB database:', mongoose.connection.name);
             return mongoose.connection;
+        }).catch((error) => {
+            connectionPromise = null;
+            throw error;
         });
     }
 

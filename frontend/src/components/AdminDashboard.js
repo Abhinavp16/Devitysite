@@ -4,6 +4,7 @@ import apiService from '../services/apiService';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [refreshVersion, setRefreshVersion] = useState(0);
   const [dashboardData, setDashboardData] = useState({
     clubMemories: [],
     events: [],
@@ -18,39 +19,22 @@ const AdminDashboard = () => {
 
   const loadDashboardData = async () => {
     try {
-      // Check if API is available
-      const isApiAvailable = await apiService.isApiAvailable();
-      
-      if (isApiAvailable) {
-        // Load data from API
-        const [memoriesRes, eventsRes, teamRes, speakersRes] = await Promise.all([
-          apiService.getMemories().catch(() => ({ success: false, data: [] })),
-          apiService.getEvents().catch(() => ({ success: false, data: [] })),
-          apiService.getTeamMembers().catch(() => ({ success: false, data: [] })),
-          apiService.getSpeakers().catch(() => ({ success: false, data: [] }))
-        ]);
+      const [memoriesRes, eventsRes, teamRes, speakersRes] = await Promise.all([
+        apiService.getMemories(),
+        apiService.getEvents(),
+        apiService.getTeamMembers(),
+        apiService.getSpeakers()
+      ]);
 
-        setDashboardData({
-          clubMemories: memoriesRes.success ? memoriesRes.data : [],
-          events: eventsRes.success ? eventsRes.data : [],
-          teamMembers: teamRes.success ? teamRes.data : [],
-          speakers: speakersRes.success ? speakersRes.data : []
-        });
-      } else {
-        // Fallback to localStorage
-        console.warn('API not available, using localStorage fallback');
-        const fallbackData = await apiService.fallbackToLocalStorage();
-        setDashboardData(fallbackData.data);
-      }
+      setDashboardData({
+        clubMemories: memoriesRes.success ? memoriesRes.data : [],
+        events: eventsRes.success ? eventsRes.data : [],
+        teamMembers: teamRes.success ? teamRes.data : [],
+        speakers: speakersRes.success ? speakersRes.data : []
+      });
     } catch (error) {
       console.error('Error loading dashboard data:', error);
-      // Load default data
-      setDashboardData({
-        clubMemories: [],
-        events: [],
-        teamMembers: [],
-        speakers: []
-      });
+      alert('Unable to load admin data: ' + error.message);
     }
   };
 
@@ -99,6 +83,10 @@ const AdminDashboard = () => {
       console.error('Export error:', error);
       alert('Export failed: ' + error.message);
     }
+  };
+
+  const handleDataChanged = () => {
+    setRefreshVersion(prev => prev + 1);
   };
 
   const tabs = [
@@ -194,11 +182,11 @@ const AdminDashboard = () => {
           {/* Main Content */}
           <div className="flex-1">
             <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-blue-100 p-8">
-              {activeTab === 'overview' && <OverviewTab dashboardData={dashboardData} setActiveTab={setActiveTab} />}
-              {activeTab === 'memories' && <MemoriesTab dashboardData={dashboardData} setDashboardData={setDashboardData} />}
-              {activeTab === 'events' && <EventsTab dashboardData={dashboardData} setDashboardData={setDashboardData} />}
-              {activeTab === 'team' && <TeamTab dashboardData={dashboardData} setDashboardData={setDashboardData} />}
-              {activeTab === 'speakers' && <SpeakersTab dashboardData={dashboardData} setDashboardData={setDashboardData} />}
+              {activeTab === 'overview' && <OverviewTab dashboardData={dashboardData} refreshKey={refreshVersion} setActiveTab={setActiveTab} />}
+              {activeTab === 'memories' && <MemoriesTab dashboardData={dashboardData} setDashboardData={setDashboardData} onDataChanged={handleDataChanged} refreshData={loadDashboardData} />}
+              {activeTab === 'events' && <EventsTab dashboardData={dashboardData} setDashboardData={setDashboardData} onDataChanged={handleDataChanged} refreshData={loadDashboardData} />}
+              {activeTab === 'team' && <TeamTab dashboardData={dashboardData} setDashboardData={setDashboardData} onDataChanged={handleDataChanged} refreshData={loadDashboardData} />}
+              {activeTab === 'speakers' && <SpeakersTab dashboardData={dashboardData} setDashboardData={setDashboardData} onDataChanged={handleDataChanged} refreshData={loadDashboardData} />}
             </div>
           </div>
         </div>

@@ -54,13 +54,21 @@ const logActivity = (action, tableName, recordId = null, oldValues = null, newVa
                     responseRecordId = responseRecordId || req.params.id || null;
                 }
 
+                const responseSummary = responseData?.data ? {
+                    id: responseData.data.id || responseData.data._id,
+                    title: responseData.data.title,
+                    name: responseData.data.name,
+                    role: responseData.data.role,
+                    status: responseData.data.status
+                } : null;
+
                 const logData = {
                     user_id: req.user.id,
                     action: action,
                     table_name: tableName,
                     record_id: responseRecordId,
                     old_values: oldValues ? JSON.stringify(oldValues) : null,
-                    new_values: newValues ? JSON.stringify(newValues) : (responseData?.data ? JSON.stringify(responseData.data) : null),
+                    new_values: newValues ? JSON.stringify(newValues) : (responseSummary ? JSON.stringify(responseSummary) : null),
                     ip_address: req.ip || req.connection.remoteAddress,
                     user_agent: req.get('User-Agent')
                 };

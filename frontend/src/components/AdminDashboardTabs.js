@@ -76,7 +76,7 @@ const ImageUploadField = ({ label, value, onChange }) => {
 };
 
 // Overview Tab Component
-export const OverviewTab = ({ dashboardData, refreshData, setActiveTab }) => {
+export const OverviewTab = ({ dashboardData, refreshKey, setActiveTab }) => {
   const [apiStats, setApiStats] = useState(null);
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,7 +90,7 @@ export const OverviewTab = ({ dashboardData, refreshData, setActiveTab }) => {
       console.log('No token available, skipping API stats load');
       setLoading(false);
     }
-  }, []);
+  }, [refreshKey]);
 
   const loadApiStats = async () => {
     try {
@@ -225,7 +225,7 @@ export const OverviewTab = ({ dashboardData, refreshData, setActiveTab }) => {
 };
 
 // Club Memories Tab Component with Full CRUD
-export const MemoriesTab = ({ dashboardData, setDashboardData }) => {
+export const MemoriesTab = ({ dashboardData, setDashboardData, onDataChanged, refreshData }) => {
   const [showForm, setShowForm] = useState(false);
   const [editingMemory, setEditingMemory] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -237,6 +237,12 @@ export const MemoriesTab = ({ dashboardData, setDashboardData }) => {
     image_titles: ['Opening Ceremony', 'Interactive Session', 'Team Collaboration', 'Problem Solving', 'Award Ceremony'],
     event_date: ''
   });
+
+  useEffect(() => {
+    if (dashboardData.clubMemories.length === 0) {
+      refreshData && refreshData();
+    }
+  }, []);
 
   const updateMemoryImage = (index, imageUrl) => {
     const imageUrls = [...(formData.image_urls || ['', '', '', '', ''])];
@@ -272,6 +278,7 @@ export const MemoriesTab = ({ dashboardData, setDashboardData }) => {
           }));
         }
         resetForm();
+        onDataChanged && onDataChanged();
         alert(editingMemory ? 'Memory updated successfully!' : 'Memory created successfully!');
       }
     } catch (error) {
@@ -307,6 +314,7 @@ export const MemoriesTab = ({ dashboardData, setDashboardData }) => {
               ...prev,
               clubMemories: memoriesResponse.data
             }));
+            onDataChanged && onDataChanged();
           }
           alert('Memory deleted successfully!');
         }
@@ -476,7 +484,7 @@ export const MemoriesTab = ({ dashboardData, setDashboardData }) => {
 };
 
 // Placeholder tabs - Full CRUD versions available in separate files
-export const EventsTab = ({ dashboardData, setDashboardData }) => {
+export const EventsTab = ({ dashboardData, setDashboardData, onDataChanged, refreshData }) => {
   const [showForm, setShowForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -491,6 +499,12 @@ export const EventsTab = ({ dashboardData, setDashboardData }) => {
     max_participants: '',
     registration_link: ''
   });
+
+  useEffect(() => {
+    if (dashboardData.events.length === 0) {
+      refreshData && refreshData();
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -513,6 +527,7 @@ export const EventsTab = ({ dashboardData, setDashboardData }) => {
           }));
         }
         resetForm();
+        onDataChanged && onDataChanged();
         alert(editingEvent ? 'Event updated successfully!' : 'Event created successfully!');
       }
     } catch (error) {
@@ -550,6 +565,7 @@ export const EventsTab = ({ dashboardData, setDashboardData }) => {
               ...prev,
               events: eventsResponse.data
             }));
+            onDataChanged && onDataChanged();
           }
           alert('Event deleted successfully!');
         }
@@ -805,7 +821,7 @@ export const EventsTab = ({ dashboardData, setDashboardData }) => {
   );
 };
 
-export const TeamTab = ({ dashboardData, setDashboardData }) => {
+export const TeamTab = ({ dashboardData, setDashboardData, onDataChanged, refreshData }) => {
   const [showForm, setShowForm] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -823,6 +839,12 @@ export const TeamTab = ({ dashboardData, setDashboardData }) => {
     join_date: '',
     is_active: true
   });
+
+  useEffect(() => {
+    if (dashboardData.teamMembers.length === 0) {
+      refreshData && refreshData();
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -845,6 +867,7 @@ export const TeamTab = ({ dashboardData, setDashboardData }) => {
           }));
         }
         resetForm();
+        onDataChanged && onDataChanged();
         alert(editingMember ? 'Team member updated successfully!' : 'Team member added successfully!');
       }
     } catch (error) {
@@ -885,6 +908,7 @@ export const TeamTab = ({ dashboardData, setDashboardData }) => {
               ...prev,
               teamMembers: teamResponse.data
             }));
+            onDataChanged && onDataChanged();
           }
           alert('Team member deleted successfully!');
         }
@@ -1150,7 +1174,7 @@ export const TeamTab = ({ dashboardData, setDashboardData }) => {
   );
 };
 
-export const SpeakersTab = ({ dashboardData, setDashboardData }) => {
+export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, refreshData }) => {
   const [showForm, setShowForm] = useState(false);
   const [editingSpeaker, setEditingSpeaker] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -1168,6 +1192,12 @@ export const SpeakersTab = ({ dashboardData, setDashboardData }) => {
     speaking_topics: '',
     is_available: true
   });
+
+  useEffect(() => {
+    if (dashboardData.speakers.length === 0) {
+      refreshData && refreshData();
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -1196,6 +1226,7 @@ export const SpeakersTab = ({ dashboardData, setDashboardData }) => {
           }));
         }
         resetForm();
+        onDataChanged && onDataChanged();
         alert(editingSpeaker ? 'Speaker updated successfully!' : 'Speaker added successfully!');
       }
     } catch (error) {
@@ -1236,6 +1267,7 @@ export const SpeakersTab = ({ dashboardData, setDashboardData }) => {
               ...prev,
               speakers: speakersResponse.data
             }));
+            onDataChanged && onDataChanged();
           }
           alert('Speaker deleted successfully!');
         }

@@ -124,7 +124,7 @@ class ApiService {
 
     // Club Memories methods
     async getMemories(params = {}) {
-        const queryString = new URLSearchParams(params).toString();
+        const queryString = new URLSearchParams({ limit: 1000, ...params }).toString();
         return this.request(`/memories${queryString ? `?${queryString}` : ''}`);
     }
 
@@ -161,7 +161,7 @@ class ApiService {
 
     // Events methods
     async getEvents(params = {}) {
-        const queryString = new URLSearchParams(params).toString();
+        const queryString = new URLSearchParams({ limit: 1000, ...params }).toString();
         return this.request(`/events${queryString ? `?${queryString}` : ''}`);
     }
 
@@ -204,7 +204,7 @@ class ApiService {
 
     // Team methods
     async getTeamMembers(params = {}) {
-        const queryString = new URLSearchParams(params).toString();
+        const queryString = new URLSearchParams({ limit: 1000, ...params }).toString();
         return this.request(`/team${queryString ? `?${queryString}` : ''}`);
     }
 
@@ -240,7 +240,7 @@ class ApiService {
 
     // Speakers methods
     async getSpeakers(params = {}) {
-        const queryString = new URLSearchParams(params).toString();
+        const queryString = new URLSearchParams({ limit: 1000, ...params }).toString();
         return this.request(`/speakers${queryString ? `?${queryString}` : ''}`);
     }
 

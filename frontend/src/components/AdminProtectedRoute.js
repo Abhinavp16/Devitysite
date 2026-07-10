@@ -20,6 +20,7 @@ const AdminProtectedRoute = () => {
         await apiService.verifyToken();
         setIsAuthenticated(true);
       } catch (error) {
+        console.error('Admin token verification failed:', error);
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminUser');
         setIsAuthenticated(false);
@@ -43,7 +44,6 @@ const AdminProtectedRoute = () => {
   }
 
   if (!isAuthenticated) {
-    // For static deployment, redirect to home or show message
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-8">

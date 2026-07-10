@@ -59,7 +59,10 @@ function App() {
   }
 
   if (currentPage === 'login') {
-    return <AdminLogin />;
+    return <AdminLogin onLoginSuccess={() => {
+      window.history.pushState({}, '', '/dashboard');
+      setCurrentPage('dashboard');
+    }} />;
   }
 
   return (

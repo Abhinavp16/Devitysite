@@ -78,6 +78,7 @@ const ImageUploadField = ({ label, value, onChange }) => {
 // Overview Tab Component
 export const OverviewTab = ({ dashboardData, refreshData, setActiveTab }) => {
   const [apiStats, setApiStats] = useState(null);
+  const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -96,6 +97,7 @@ export const OverviewTab = ({ dashboardData, refreshData, setActiveTab }) => {
       const response = await apiService.getDashboardStats();
       if (response.success) {
         setApiStats(response.data.statistics);
+        setRecentActivities(response.data.recent_activities || []);
       }
     } catch (error) {
       console.error('Error loading API stats:', error);
@@ -116,6 +118,32 @@ export const OverviewTab = ({ dashboardData, refreshData, setActiveTab }) => {
     { label: 'Team Members', value: dashboardData.teamMembers.length, icon: '👥', color: 'from-purple-500 to-pink-500' },
     { label: 'Guest Speakers', value: dashboardData.speakers.length, icon: '🎤', color: 'from-orange-500 to-red-500' }
   ];
+
+  const activityLabels = {
+    club_memories: 'club memory',
+    events: 'event',
+    team_members: 'team member',
+    guest_speakers: 'guest speaker',
+    event_speakers: 'event speaker',
+    admin_users: 'admin user'
+  };
+
+  const activityColors = {
+    CREATE: 'bg-green-500',
+    UPDATE: 'bg-blue-500',
+    DELETE: 'bg-red-500',
+    LOGIN: 'bg-purple-500',
+    LOGOUT: 'bg-gray-500'
+  };
+
+  const formatActivity = (activity) => {
+    const action = String(activity.action || '').toLowerCase();
+    const label = activityLabels[activity.table_name] || activity.table_name || 'item';
+
+    if (activity.action === 'LOGIN') return `${activity.username || 'Admin'} logged in`;
+    if (activity.action === 'LOGOUT') return `${activity.username || 'Admin'} logged out`;
+    return `${activity.username || 'Admin'} ${action}d ${label}`;
+  };
 
   return (
     <div>
@@ -154,18 +182,17 @@ export const OverviewTab = ({ dashboardData, refreshData, setActiveTab }) => {
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activities</h3>
           <div className="space-y-3">
-            <div className="flex items-center text-sm text-gray-600">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-              New event "AI Workshop" added
-            </div>
-            <div className="flex items-center text-sm text-gray-600">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-              Team member profile updated
-            </div>
-            <div className="flex items-center text-sm text-gray-600">
-              <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
-              New club memory uploaded
-            </div>
+            {recentActivities.length > 0 ? recentActivities.slice(0, 5).map((activity) => (
+              <div key={activity.id} className="flex items-start text-sm text-gray-600">
+                <div className={`w-2 h-2 ${activityColors[activity.action] || 'bg-indigo-500'} rounded-full mr-3 mt-1.5 flex-shrink-0`}></div>
+                <div>
+                  <p>{formatActivity(activity)}</p>
+                  {activity.created_at && <p className="text-xs text-gray-400 mt-0.5">{new Date(activity.created_at).toLocaleString()}</p>}
+                </div>
+              </div>
+            )) : (
+              <p className="text-sm text-gray-500">No recent activities yet.</p>
+            )}
           </div>
         </div>
 

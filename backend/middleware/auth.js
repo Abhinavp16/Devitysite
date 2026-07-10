@@ -41,18 +41,26 @@ const authenticateToken = (req, res, next) => {
 
 const logActivity = (action, tableName, recordId = null, oldValues = null, newValues = null) => {
     return (req, res, next) => {
-        // Log the activity after the request is processed
         const originalSend = res.send;
         res.send = function(data) {
-            // Only log if the request was successful
             if (res.statusCode >= 200 && res.statusCode < 300 && req.user) {
+                let responseRecordId = recordId;
+                let responseData = null;
+
+                try {
+                    responseData = typeof data === 'string' ? JSON.parse(data) : data;
+                    responseRecordId = responseRecordId || responseData?.data?.id || responseData?.data?._id || req.params.id || null;
+                } catch (error) {
+                    responseRecordId = responseRecordId || req.params.id || null;
+                }
+
                 const logData = {
                     user_id: req.user.id,
                     action: action,
                     table_name: tableName,
-                    record_id: recordId,
+                    record_id: responseRecordId,
                     old_values: oldValues ? JSON.stringify(oldValues) : null,
-                    new_values: newValues ? JSON.stringify(newValues) : null,
+                    new_values: newValues ? JSON.stringify(newValues) : (responseData?.data ? JSON.stringify(responseData.data) : null),
                     ip_address: req.ip || req.connection.remoteAddress,
                     user_agent: req.get('User-Agent')
                 };
@@ -66,11 +74,19 @@ const logActivity = (action, tableName, recordId = null, oldValues = null, newVa
                     new_values: logData.new_values,
                     ip_address: logData.ip_address,
                     user_agent: logData.user_agent
-                }).catch((error) => {
-                    console.error('Error logging activity:', error);
-                });
+                })
+                    .catch((error) => {
+                        console.error('Error logging activity:', error);
+                    })
+                    .finally(() => {
+                        originalSend.call(this, data);
+                    });
+
+                return this;
             }
+
             originalSend.call(this, data);
+            return this;
         };
         next();
     };

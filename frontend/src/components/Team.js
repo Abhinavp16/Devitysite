@@ -197,8 +197,12 @@ const Team = () => {
         {!isLoading && !error && teamMembers.length === 0 && <p className="text-center text-gray-600 dark:text-gray-300">No team members available yet.</p>}
 
         {leadership.length > 0 && (
-          <div className="mb-16">
-            <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-8 text-center transition-colors duration-300">Leadership Team</h3>
+          <div className="mb-20 rounded-[2rem] border border-white/70 bg-white/70 px-4 py-10 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/50 sm:px-8 lg:px-10">
+            <div className="mx-auto mb-10 max-w-3xl text-center">
+              <p className="mb-3 text-xs font-black uppercase tracking-[0.35em] text-indigo-500 dark:text-indigo-300">Leadership</p>
+              <h3 className="text-3xl font-black text-gray-900 dark:text-white sm:text-4xl">Leadership Team</h3>
+              <div className="mx-auto mt-4 h-1 w-24 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+            </div>
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-6xl mx-auto">
               {leadership.map((member, index) => renderCard(member, index, 'leadership'))}
             </div>
@@ -206,9 +210,13 @@ const Team = () => {
         )}
 
         {core.length > 0 && (
-          <div>
-            <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-8 text-center transition-colors duration-300">Core Team</h3>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-7xl mx-auto">
+          <div className="rounded-[2rem] border border-indigo-100/80 bg-gradient-to-br from-slate-50/95 via-white/95 to-indigo-50/95 px-4 py-10 shadow-[0_28px_90px_rgba(30,64,175,0.14)] backdrop-blur-xl dark:border-white/10 dark:from-slate-950/80 dark:via-slate-900/80 dark:to-indigo-950/70 sm:px-8 lg:px-10">
+            <div className="mx-auto mb-10 max-w-3xl text-center">
+              <p className="mb-3 text-xs font-black uppercase tracking-[0.35em] text-blue-500 dark:text-blue-300">Builders</p>
+              <h3 className="text-3xl font-black text-gray-900 dark:text-white sm:text-4xl">Core Team</h3>
+              <div className="mx-auto mt-4 h-1 w-24 rounded-full bg-gradient-to-r from-blue-500 via-cyan-500 to-emerald-500" />
+            </div>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-7xl mx-auto">
               {core.map((member, index) => renderCard(member, index))}
             </div>
           </div>

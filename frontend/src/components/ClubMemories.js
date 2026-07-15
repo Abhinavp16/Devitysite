@@ -17,8 +17,15 @@ const placeholderTitles = [
   'Interactive Session',
   'Team Collaboration',
   'Problem Solving',
-  'Award Ceremony'
+  'Award Ceremony',
+  'Networking Session',
+  'Project Showcase',
+  'Hands-on Training',
+  'Team Presentation',
+  'Closing Ceremony'
 ];
+
+const MAX_MEMORY_IMAGES = 10;
 
 const ClubMemories = () => {
   const [memories, setMemories] = useState([]);
@@ -72,8 +79,11 @@ const ClubMemories = () => {
   const activeIndex = memories.findIndex((memory) => memory.id === activeMemoryId);
   const activeMemory = memories[activeIndex] || memories[0];
   const activeGradient = gradients[(activeIndex >= 0 ? activeIndex : 0) % gradients.length];
-  const activeImages = activeMemory ? [...(activeMemory.image_urls && activeMemory.image_urls.length ? activeMemory.image_urls : [activeMemory.image_url || '']), '', '', '', ''].slice(0, 5) : [];
-  const activeImageTitles = activeMemory ? [...(activeMemory.image_titles && activeMemory.image_titles.length ? activeMemory.image_titles : placeholderTitles), '', '', '', ''].slice(0, 5) : [];
+  const memoryImages = activeMemory && activeMemory.image_urls && activeMemory.image_urls.length ? activeMemory.image_urls : [activeMemory?.image_url || ''];
+  const memoryTitles = activeMemory && activeMemory.image_titles && activeMemory.image_titles.length ? activeMemory.image_titles : placeholderTitles;
+  const activeCardCount = activeMemory ? Math.max(5, Math.min(MAX_MEMORY_IMAGES, memoryImages.filter(Boolean).length || 1)) : 0;
+  const activeImages = activeMemory ? [...memoryImages, ...Array(activeCardCount).fill('')].slice(0, activeCardCount) : [];
+  const activeImageTitles = activeMemory ? [...memoryTitles, ...Array(activeCardCount).fill('')].slice(0, activeCardCount) : [];
 
   const handleMemoryChange = (memoryId) => {
     if (memoryId === activeMemoryId) return;
@@ -141,8 +151,8 @@ const ClubMemories = () => {
               </div>
 
               <div ref={carouselRef} key={activeMemory.id} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:pb-0 lg:grid-cols-3 xl:grid-cols-5 hide-scrollbar">
-                {placeholderTitles.map((fallbackTitle, index) => {
-                  const imageUrl = activeImages[index];
+                {activeImages.map((imageUrl, index) => {
+                  const fallbackTitle = placeholderTitles[index] || `Memory ${index + 1}`;
                   const title = activeImageTitles[index] || fallbackTitle;
 
                   return (

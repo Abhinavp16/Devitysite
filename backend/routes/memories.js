@@ -4,13 +4,14 @@ const { ClubMemory, legacyOrObjectIdQuery, mapMemory } = require('../models');
 const { authenticateToken, logActivity } = require('../middleware/auth');
 
 const router = express.Router();
+const MAX_MEMORY_IMAGES = 10;
 
 const memorySchema = Joi.object({
     title: Joi.string().min(1).max(255).required(),
     description: Joi.string().min(1).max(1000).required(),
     image_url: Joi.string().max(15000000).allow('', null).optional(),
-    image_urls: Joi.array().items(Joi.string().max(15000000).allow('', null)).max(5).optional(),
-    image_titles: Joi.array().items(Joi.string().max(100).allow('', null)).max(5).optional(),
+    image_urls: Joi.array().items(Joi.string().max(15000000).allow('', null)).max(MAX_MEMORY_IMAGES).optional(),
+    image_titles: Joi.array().items(Joi.string().max(100).allow('', null)).max(MAX_MEMORY_IMAGES).optional(),
     event_date: Joi.date().iso().required()
 });
 
@@ -18,21 +19,21 @@ const updateMemorySchema = Joi.object({
     title: Joi.string().min(1).max(255).optional(),
     description: Joi.string().min(1).max(1000).optional(),
     image_url: Joi.string().max(15000000).allow('', null).optional(),
-    image_urls: Joi.array().items(Joi.string().max(15000000).allow('', null)).max(5).optional(),
-    image_titles: Joi.array().items(Joi.string().max(100).allow('', null)).max(5).optional(),
+    image_urls: Joi.array().items(Joi.string().max(15000000).allow('', null)).max(MAX_MEMORY_IMAGES).optional(),
+    image_titles: Joi.array().items(Joi.string().max(100).allow('', null)).max(MAX_MEMORY_IMAGES).optional(),
     event_date: Joi.date().iso().optional()
 });
 
 const normalizeMemoryPayload = (payload) => {
     const normalized = { ...payload };
     if (normalized.image_urls) {
-        normalized.image_urls = normalized.image_urls.map((image) => image || null).filter(Boolean).slice(0, 5);
+        normalized.image_urls = normalized.image_urls.map((image) => image || null).filter(Boolean).slice(0, MAX_MEMORY_IMAGES);
         normalized.image_url = normalized.image_urls[0] || null;
     } else if (normalized.image_url === '') {
         normalized.image_url = null;
     }
     if (normalized.image_titles) {
-        normalized.image_titles = normalized.image_titles.map((title) => title || '').slice(0, 5);
+        normalized.image_titles = normalized.image_titles.map((title) => title || '').slice(0, MAX_MEMORY_IMAGES);
     }
     return normalized;
 };

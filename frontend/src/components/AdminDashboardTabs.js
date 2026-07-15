@@ -1,6 +1,21 @@
 import { useState, useEffect } from 'react';
 import apiService from '../services/apiService';
 
+const MAX_MEMORY_IMAGES = 10;
+const defaultMemoryImageTitles = [
+  'Opening Ceremony',
+  'Interactive Session',
+  'Team Collaboration',
+  'Problem Solving',
+  'Award Ceremony',
+  'Networking Session',
+  'Project Showcase',
+  'Hands-on Training',
+  'Team Presentation',
+  'Closing Ceremony'
+];
+const emptyMemoryImages = () => Array(MAX_MEMORY_IMAGES).fill('');
+
 const ImageUploadField = ({ label, value, onChange }) => {
   const [uploading, setUploading] = useState(false);
 
@@ -233,8 +248,8 @@ export const MemoriesTab = ({ dashboardData, setDashboardData, onDataChanged, re
     title: '',
     description: '',
     image_url: '',
-    image_urls: ['', '', '', '', ''],
-    image_titles: ['Opening Ceremony', 'Interactive Session', 'Team Collaboration', 'Problem Solving', 'Award Ceremony'],
+    image_urls: emptyMemoryImages(),
+    image_titles: defaultMemoryImageTitles,
     event_date: ''
   });
 
@@ -245,13 +260,13 @@ export const MemoriesTab = ({ dashboardData, setDashboardData, onDataChanged, re
   }, []);
 
   const updateMemoryImage = (index, imageUrl) => {
-    const imageUrls = [...(formData.image_urls || ['', '', '', '', ''])];
+    const imageUrls = [...(formData.image_urls || emptyMemoryImages())];
     imageUrls[index] = imageUrl;
     setFormData({ ...formData, image_urls: imageUrls, image_url: imageUrls[0] || '' });
   };
 
   const updateMemoryImageTitle = (index, title) => {
-    const imageTitles = [...(formData.image_titles || ['Opening Ceremony', 'Interactive Session', 'Team Collaboration', 'Problem Solving', 'Award Ceremony'])];
+    const imageTitles = [...(formData.image_titles || defaultMemoryImageTitles)];
     imageTitles[index] = title;
     setFormData({ ...formData, image_titles: imageTitles });
   };
@@ -295,8 +310,8 @@ export const MemoriesTab = ({ dashboardData, setDashboardData, onDataChanged, re
       title: memory.title,
       description: memory.description,
       image_url: memory.image_url || '',
-      image_urls: [...(memory.image_urls && memory.image_urls.length ? memory.image_urls : [memory.image_url || '']), '', '', '', ''].slice(0, 5),
-      image_titles: [...(memory.image_titles && memory.image_titles.length ? memory.image_titles : ['Opening Ceremony', 'Interactive Session', 'Team Collaboration', 'Problem Solving', 'Award Ceremony']), '', '', '', ''].slice(0, 5),
+      image_urls: [...(memory.image_urls && memory.image_urls.length ? memory.image_urls : [memory.image_url || '']), ...emptyMemoryImages()].slice(0, MAX_MEMORY_IMAGES),
+      image_titles: [...(memory.image_titles && memory.image_titles.length ? memory.image_titles : defaultMemoryImageTitles), ...emptyMemoryImages()].slice(0, MAX_MEMORY_IMAGES),
       event_date: memory.event_date
     });
     setShowForm(true);
@@ -326,7 +341,7 @@ export const MemoriesTab = ({ dashboardData, setDashboardData, onDataChanged, re
   };
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', image_url: '', image_urls: ['', '', '', '', ''], image_titles: ['Opening Ceremony', 'Interactive Session', 'Team Collaboration', 'Problem Solving', 'Award Ceremony'], event_date: '' });
+    setFormData({ title: '', description: '', image_url: '', image_urls: emptyMemoryImages(), image_titles: defaultMemoryImageTitles, event_date: '' });
     setEditingMemory(null);
     setShowForm(false);
   };
@@ -380,7 +395,7 @@ export const MemoriesTab = ({ dashboardData, setDashboardData, onDataChanged, re
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Memory Card Images</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {(formData.image_urls || ['', '', '', '', '']).slice(0, 5).map((imageUrl, index) => (
+                  {(formData.image_urls || emptyMemoryImages()).slice(0, MAX_MEMORY_IMAGES).map((imageUrl, index) => (
                     <div key={index} className="space-y-3 rounded-xl border border-gray-200 p-3">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Card {index + 1} Label</label>

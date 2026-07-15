@@ -238,6 +238,13 @@ class ApiService {
         });
     }
 
+    async reorderTeamMember(id, direction) {
+        return this.request(`/team/${id}/reorder`, {
+            method: 'PATCH',
+            body: JSON.stringify({ direction }),
+        });
+    }
+
     // Speakers methods
     async getSpeakers(params = {}) {
         const queryString = new URLSearchParams({ limit: 1000, ...params }).toString();

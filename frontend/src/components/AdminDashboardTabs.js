@@ -919,6 +919,25 @@ export const TeamTab = ({ dashboardData, setDashboardData, onDataChanged, refres
     }
   };
 
+  const handleReorder = async (id, direction) => {
+    try {
+      const response = await apiService.reorderTeamMember(id, direction);
+      if (response.success) {
+        const teamResponse = await apiService.getTeamMembers();
+        if (teamResponse.success) {
+          setDashboardData(prev => ({
+            ...prev,
+            teamMembers: teamResponse.data
+          }));
+          onDataChanged && onDataChanged();
+        }
+      }
+    } catch (error) {
+      console.error('Error reordering team member:', error);
+      alert('Error changing position: ' + error.message);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       name: '',
@@ -1138,6 +1157,20 @@ export const TeamTab = ({ dashboardData, setDashboardData, onDataChanged, refres
               {member.bio && (
                 <p className="text-gray-600 text-sm mb-4 line-clamp-3">{member.bio}</p>
               )}
+              <div className="mb-3 grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => handleReorder(member.id, 'up')}
+                  className="bg-purple-50 text-purple-700 py-2 px-3 rounded-lg hover:bg-purple-100 transition-colors text-sm font-medium"
+                >
+                  Move Up
+                </button>
+                <button
+                  onClick={() => handleReorder(member.id, 'down')}
+                  className="bg-purple-50 text-purple-700 py-2 px-3 rounded-lg hover:bg-purple-100 transition-colors text-sm font-medium"
+                >
+                  Move Down
+                </button>
+              </div>
               <div className="flex space-x-2">
                 <button
                   onClick={() => handleEdit(member)}

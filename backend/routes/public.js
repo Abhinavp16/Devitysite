@@ -25,7 +25,15 @@ router.get('/events', async (req, res) => {
 
 router.get('/team', async (req, res) => {
     try {
-        const members = await TeamMember.find({ is_active: true }).sort({ team_type: 1, name: 1 });
+        const unorderedCount = await TeamMember.countDocuments({ $or: [{ display_order: { $exists: false } }, { display_order: 0 }] });
+        if (unorderedCount > 0) {
+            const allMembers = await TeamMember.find().sort({ created_at: 1, _id: 1 });
+            await Promise.all(allMembers.map((member, index) => {
+                member.display_order = index + 1;
+                return member.save();
+            }));
+        }
+        const members = await TeamMember.find({ is_active: true }).sort({ display_order: 1, created_at: 1, _id: 1 });
         res.json({ success: true, data: members.map(mapTeamMember) });
     } catch (error) {
         console.error('Public team error:', error);

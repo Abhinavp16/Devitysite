@@ -18,6 +18,7 @@ const teamMemberSchema = Joi.object({
     twitter_url: Joi.string().max(500).allow('', null).optional(),
     join_date: Joi.date().iso().allow('', null).optional(),
     is_active: Joi.boolean().optional(),
+    display_order: Joi.number().integer().min(0).optional(),
     skills: Joi.array().items(Joi.string().min(1).max(100)).optional()
 });
 
@@ -36,8 +37,20 @@ const normalizeTeamPayload = (payload) => {
     return normalized;
 };
 
+const ensureTeamDisplayOrder = async () => {
+    const unorderedCount = await TeamMember.countDocuments({ $or: [{ display_order: { $exists: false } }, { display_order: 0 }] });
+    if (unorderedCount === 0) return;
+
+    const members = await TeamMember.find().sort({ created_at: 1, _id: 1 });
+    await Promise.all(members.map((member, index) => {
+        member.display_order = index + 1;
+        return member.save();
+    }));
+};
+
 router.get('/', authenticateToken, async (req, res) => {
     try {
+        await ensureTeamDisplayOrder();
         const { page = 1, limit = 20, search = '', team_type = '', is_active = 'true' } = req.query;
         const skip = (Number(page) - 1) * Number(limit);
         const filter = {};
@@ -53,7 +66,7 @@ router.get('/', authenticateToken, async (req, res) => {
         if (is_active !== 'all') filter.is_active = is_active === 'true';
 
         const [members, total] = await Promise.all([
-            TeamMember.find(filter).populate('created_by', 'username legacyId').sort({ team_type: 1, name: 1 }).skip(skip).limit(Number(limit)),
+            TeamMember.find(filter).populate('created_by', 'username legacyId').sort({ display_order: 1, created_at: 1, _id: 1 }).skip(skip).limit(Number(limit)),
             TeamMember.countDocuments(filter)
         ]);
 
@@ -84,6 +97,10 @@ router.post('/', authenticateToken, logActivity('CREATE', 'team_members'), async
         const { error, value } = teamMemberSchema.validate(req.body);
         if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
         const { skills, ...memberData } = normalizeTeamPayload(value);
+        if (memberData.display_order === undefined) {
+            const lastMember = await TeamMember.findOne().sort({ display_order: -1, created_at: -1 });
+            memberData.display_order = lastMember ? (lastMember.display_order || 0) + 1 : 1;
+        }
 
         const member = await TeamMember.create({
             ...memberData,
@@ -126,6 +143,39 @@ router.delete('/:id', authenticateToken, logActivity('DELETE', 'team_members'), 
     } catch (error) {
         console.error('Delete team member error:', error);
         res.status(500).json({ error: 'Failed to delete team member' });
+    }
+});
+
+router.patch('/:id/reorder', authenticateToken, logActivity('UPDATE', 'team_members'), async (req, res) => {
+    try {
+        const { direction } = req.body;
+        if (!['up', 'down'].includes(direction)) {
+            return res.status(400).json({ error: 'Direction must be up or down' });
+        }
+
+        const member = await TeamMember.findOne(legacyOrObjectIdQuery(req.params.id));
+        if (!member) return res.status(404).json({ error: 'Team member not found' });
+
+        const currentOrder = member.display_order || 0;
+        const target = await TeamMember.findOne({
+            team_type: member.team_type,
+            is_active: member.is_active,
+            display_order: direction === 'up' ? { $lt: currentOrder } : { $gt: currentOrder }
+        }).sort(direction === 'up' ? { display_order: -1, created_at: -1 } : { display_order: 1, created_at: 1 });
+
+        if (!target) {
+            return res.json({ success: true, message: 'Team member already at boundary', data: mapTeamMember(member) });
+        }
+
+        member.display_order = target.display_order || 0;
+        target.display_order = currentOrder;
+        await Promise.all([member.save(), target.save()]);
+        await member.populate('created_by', 'username legacyId');
+
+        res.json({ success: true, message: 'Team member reordered successfully', data: mapTeamMember(member) });
+    } catch (error) {
+        console.error('Reorder team member error:', error);
+        res.status(500).json({ error: 'Failed to reorder team member' });
     }
 });
 

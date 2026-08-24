@@ -29,8 +29,10 @@ const normalizeMemoryPayload = (payload) => {
     if (normalized.image_urls) {
         normalized.image_urls = normalized.image_urls.map((image) => image || null).filter(Boolean).slice(0, MAX_MEMORY_IMAGES);
         normalized.image_url = normalized.image_urls[0] || null;
-    } else if (normalized.image_url === '') {
-        normalized.image_url = null;
+    } else if (normalized.image_url !== undefined) {
+        // image_url updated alone — keep image_urls in sync
+        if (normalized.image_url === '') normalized.image_url = null;
+        if (normalized.image_url) normalized.image_urls = [normalized.image_url];
     }
     if (normalized.image_titles) {
         normalized.image_titles = normalized.image_titles.map((title) => title || '').slice(0, MAX_MEMORY_IMAGES);
@@ -128,11 +130,34 @@ router.delete('/:id', authenticateToken, logActivity('DELETE', 'club_memories'),
     }
 });
 
+const MAX_BULK_DELETE = 100;
+
+const validateBulkIds = (ids) => {
+    if (!Array.isArray(ids) || ids.length === 0) return 'IDs must be a non-empty array';
+    if (ids.length > MAX_BULK_DELETE) return `Maximum ${MAX_BULK_DELETE} IDs per request`;
+    if (!ids.every((id) => typeof id === 'string' || typeof id === 'number')) return 'Each ID must be a string or number';
+    return null;
+};
+
 router.delete('/', authenticateToken, logActivity('DELETE', 'club_memories'), async (req, res) => {
     try {
-        const { ids } = req.body;
-        if (!Array.isArray(ids) || ids.length === 0) return res.status(400).json({ error: 'Invalid or empty IDs array' });
-        const queries = ids.map(legacyOrObjectIdQuery);
+        const validationError = validateBulkIds(req.body.ids);
+        if (validationError) return res.status(400).json({ error: validationError });
+        const queries = req.body.ids.map(legacyOrObjectIdQuery);
+        const result = await ClubMemory.deleteMany({ $or: queries });
+        res.json({ success: true, message: `${result.deletedCount} memories deleted successfully`, deletedCount: result.deletedCount });
+    } catch (error) {
+        console.error('Bulk delete memories error:', error);
+        res.status(500).json({ error: 'Failed to delete memories' });
+    }
+});
+
+// POST /bulk-delete — preferred over DELETE with body (more reliable across proxies)
+router.post('/bulk-delete', authenticateToken, logActivity('DELETE', 'club_memories'), async (req, res) => {
+    try {
+        const validationError = validateBulkIds(req.body.ids);
+        if (validationError) return res.status(400).json({ error: validationError });
+        const queries = req.body.ids.map(legacyOrObjectIdQuery);
         const result = await ClubMemory.deleteMany({ $or: queries });
         res.json({ success: true, message: `${result.deletedCount} memories deleted successfully`, deletedCount: result.deletedCount });
     } catch (error) {

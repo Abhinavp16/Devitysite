@@ -52,7 +52,6 @@ class ApiService {
             if (!response.ok) {
                 // Handle authentication errors specifically
                 if (response.status === 401 || response.status === 403) {
-                    console.error('Authentication failed:', data.error);
                     this.setToken(null);
                     throw new Error(data.error || 'Authentication failed');
                 }
@@ -61,35 +60,28 @@ class ApiService {
 
             return data;
         } catch (error) {
-            console.error('API request failed:', error);
+            // Only log unexpected errors, not authentication rejections
+            if (!(error.message === 'Authentication failed' || error.message?.includes('HTTP error'))) {
+                console.error('API request failed:', error.message);
+            }
             throw error;
         }
     }
 
     // Authentication methods
     async login(credentials) {
-        console.log('ApiService: Attempting login with:', { 
-            email: credentials.email, 
-            username: credentials.username,
-            password: '***' 
-        });
-        
         try {
             const response = await this.request('/auth/login', {
                 method: 'POST',
                 body: JSON.stringify(credentials),
             });
 
-            console.log('ApiService: Login response received:', response);
-
             if (response.success && response.token) {
-                console.log('ApiService: Setting token');
                 this.setToken(response.token);
             }
 
             return response;
         } catch (error) {
-            console.error('ApiService: Login error:', error);
             throw error;
         }
     }
@@ -153,8 +145,8 @@ class ApiService {
     }
 
     async bulkDeleteMemories(ids) {
-        return this.request('/memories', {
-            method: 'DELETE',
+        return this.request('/memories/bulk-delete', {
+            method: 'POST',
             body: JSON.stringify({ ids }),
         });
     }
@@ -186,6 +178,13 @@ class ApiService {
     async deleteEvent(id) {
         return this.request(`/events/${id}`, {
             method: 'DELETE',
+        });
+    }
+
+    async reorderEvent(id, direction) {
+        return this.request(`/events/${id}/reorder`, {
+            method: 'PATCH',
+            body: JSON.stringify({ direction }),
         });
     }
 
@@ -281,25 +280,48 @@ class ApiService {
         });
     }
 
+    async reorderSpeaker(id, direction) {
+        return this.request(`/speakers/${id}/reorder`, {
+            method: 'PATCH',
+            body: JSON.stringify({ direction }),
+        });
+    }
+
+    // Speaker Reviews methods
+    async getReviews(params = {}) {
+        const queryString = new URLSearchParams({ limit: 100, ...params }).toString();
+        return this.request(`/reviews${queryString ? `?${queryString}` : ''}`);
+    }
+
+    async createReview(reviewData) {
+        return this.request('/reviews', {
+            method: 'POST',
+            body: JSON.stringify(reviewData),
+        });
+    }
+
+    async updateReview(id, reviewData) {
+        return this.request(`/reviews/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(reviewData),
+        });
+    }
+
+    async deleteReview(id) {
+        return this.request(`/reviews/${id}`, {
+            method: 'DELETE',
+        });
+    }
+
+    async toggleReviewStatus(id) {
+        return this.request(`/reviews/${id}/toggle-status`, {
+            method: 'PATCH',
+        });
+    }
+
     // Utility methods
     async checkHealth() {
         return this.request('/health');
-    }
-
-    // Fallback to localStorage for development
-    async fallbackToLocalStorage() {
-        console.warn('API not available, using localStorage fallback');
-        
-        // Return mock data structure
-        return {
-            success: true,
-            data: {
-                clubMemories: JSON.parse(localStorage.getItem('devityclub_memories') || '[]'),
-                events: JSON.parse(localStorage.getItem('devityclub_events') || '[]'),
-                teamMembers: JSON.parse(localStorage.getItem('devityclub_team') || '[]'),
-                speakers: JSON.parse(localStorage.getItem('devityclub_speakers') || '[]')
-            }
-        };
     }
 
     // Check if API is available

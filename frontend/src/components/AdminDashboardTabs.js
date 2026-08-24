@@ -1,6 +1,52 @@
 import { useState, useEffect } from 'react';
 import apiService from '../services/apiService';
 
+// ─── Toast notification system ────────────────────────────────────────────────
+// Usage: const { toasts, toast } = useToast();
+//        toast.success('Done!') | toast.error('Oops') | toast.info('Note')
+// Render: <ToastContainer toasts={toasts} />
+
+const useToast = () => {
+  const [toasts, setToasts] = useState([]);
+
+  const push = (message, type = 'success') => {
+    const id = Date.now() + Math.random();
+    setToasts((prev) => [...prev, { id, message, type }]);
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3500);
+  };
+
+  return {
+    toasts,
+    toast: {
+      success: (msg) => push(msg, 'success'),
+      error:   (msg) => push(msg, 'error'),
+      info:    (msg) => push(msg, 'info'),
+    }
+  };
+};
+
+const ToastContainer = ({ toasts }) => {
+  if (!toasts.length) return null;
+  const colours = {
+    success: 'bg-green-600',
+    error:   'bg-red-600',
+    info:    'bg-blue-600',
+  };
+  return (
+    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2">
+      {toasts.map((t) => (
+        <div
+          key={t.id}
+          className={`${colours[t.type] || colours.success} text-white px-4 py-3 rounded-xl shadow-xl text-sm font-medium max-w-sm animate-fadeInUp`}
+        >
+          {t.message}
+        </div>
+      ))}
+    </div>
+  );
+};
+// ──────────────────────────────────────────────────────────────────────────────
+
 const MAX_MEMORY_IMAGES = 10;
 const defaultMemoryImageTitles = [
   'Opening Ceremony',
@@ -16,7 +62,7 @@ const defaultMemoryImageTitles = [
 ];
 const emptyMemoryImages = () => Array(MAX_MEMORY_IMAGES).fill('');
 
-const ImageUploadField = ({ label, value, onChange }) => {
+const ImageUploadField = ({ label, value, onChange, onError }) => {
   const [uploading, setUploading] = useState(false);
 
   const convertImageToWebpDataUrl = (file) => {
@@ -58,7 +104,8 @@ const ImageUploadField = ({ label, value, onChange }) => {
       const dataUrl = await convertImageToWebpDataUrl(file);
       onChange(dataUrl);
     } catch (error) {
-      alert('Image processing failed: ' + error.message);
+      if (onError) onError('Image processing failed: ' + error.message);
+      else console.error('Image processing failed:', error);
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -76,7 +123,7 @@ const ImageUploadField = ({ label, value, onChange }) => {
         )}
         <input
           type="url"
-          value={value}
+          value={value?.startsWith('data:') ? '' : value}
           onChange={(e) => onChange(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="https://example.com/image.jpg"
@@ -102,7 +149,7 @@ export const OverviewTab = ({ dashboardData, refreshKey, setActiveTab }) => {
     if (token && token !== 'null') {
       loadApiStats();
     } else {
-      console.log('No token available, skipping API stats load');
+      console.warn('No token available, skipping API stats load');
       setLoading(false);
     }
   }, [refreshKey]);
@@ -241,6 +288,7 @@ export const OverviewTab = ({ dashboardData, refreshKey, setActiveTab }) => {
 
 // Club Memories Tab Component with Full CRUD
 export const MemoriesTab = ({ dashboardData, setDashboardData, onDataChanged, refreshData }) => {
+  const { toasts, toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [editingMemory, setEditingMemory] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -257,6 +305,7 @@ export const MemoriesTab = ({ dashboardData, setDashboardData, onDataChanged, re
     if (dashboardData.clubMemories.length === 0) {
       refreshData && refreshData();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateMemoryImage = (index, imageUrl) => {
@@ -294,11 +343,11 @@ export const MemoriesTab = ({ dashboardData, setDashboardData, onDataChanged, re
         }
         resetForm();
         onDataChanged && onDataChanged();
-        alert(editingMemory ? 'Memory updated successfully!' : 'Memory created successfully!');
+        toast.success(editingMemory ? 'Memory updated!' : 'Memory created!');
       }
     } catch (error) {
       console.error('Error saving memory:', error);
-      alert('Error saving memory: ' + error.message);
+      toast.error('Error saving memory: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -311,7 +360,7 @@ export const MemoriesTab = ({ dashboardData, setDashboardData, onDataChanged, re
       description: memory.description,
       image_url: memory.image_url || '',
       image_urls: [...(memory.image_urls && memory.image_urls.length ? memory.image_urls : [memory.image_url || '']), ...emptyMemoryImages()].slice(0, MAX_MEMORY_IMAGES),
-      image_titles: [...(memory.image_titles && memory.image_titles.length ? memory.image_titles : defaultMemoryImageTitles), ...emptyMemoryImages()].slice(0, MAX_MEMORY_IMAGES),
+      image_titles: [...(memory.image_titles && memory.image_titles.length ? memory.image_titles : defaultMemoryImageTitles), ...defaultMemoryImageTitles].slice(0, MAX_MEMORY_IMAGES),
       event_date: memory.event_date
     });
     setShowForm(true);
@@ -331,11 +380,11 @@ export const MemoriesTab = ({ dashboardData, setDashboardData, onDataChanged, re
             }));
             onDataChanged && onDataChanged();
           }
-          alert('Memory deleted successfully!');
+          toast.success('Memory deleted!');
         }
       } catch (error) {
         console.error('Error deleting memory:', error);
-        alert('Error deleting memory: ' + error.message);
+        toast.error('Error deleting memory: ' + error.message);
       }
     }
   };
@@ -461,7 +510,7 @@ export const MemoriesTab = ({ dashboardData, setDashboardData, onDataChanged, re
             <div className="p-4">
               <h3 className="font-semibold text-gray-900 mb-2">{memory.title}</h3>
               <p className="text-gray-600 text-sm mb-3">{memory.description}</p>
-              <p className="text-gray-500 text-xs mb-4">{new Date(memory.event_date).toLocaleDateString()}</p>
+              <p className="text-gray-500 text-xs mb-4">{memory.event_date ? new Date(memory.event_date).toLocaleDateString() : ''}</p>
               <div className="flex space-x-2">
                 <button
                   onClick={() => handleEdit(memory)}
@@ -494,12 +543,14 @@ export const MemoriesTab = ({ dashboardData, setDashboardData, onDataChanged, re
           </button>
         </div>
       )}
+      <ToastContainer toasts={toasts} />
     </div>
   );
 };
 
 // Placeholder tabs - Full CRUD versions available in separate files
 export const EventsTab = ({ dashboardData, setDashboardData, onDataChanged, refreshData }) => {
+  const { toasts, toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -519,6 +570,7 @@ export const EventsTab = ({ dashboardData, setDashboardData, onDataChanged, refr
     if (dashboardData.events.length === 0) {
       refreshData && refreshData();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = async (e) => {
@@ -543,11 +595,11 @@ export const EventsTab = ({ dashboardData, setDashboardData, onDataChanged, refr
         }
         resetForm();
         onDataChanged && onDataChanged();
-        alert(editingEvent ? 'Event updated successfully!' : 'Event created successfully!');
+        toast.success(editingEvent ? 'Event updated!' : 'Event created!');
       }
     } catch (error) {
       console.error('Error saving event:', error);
-      alert('Error saving event: ' + error.message);
+      toast.error('Error saving event: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -582,12 +634,26 @@ export const EventsTab = ({ dashboardData, setDashboardData, onDataChanged, refr
             }));
             onDataChanged && onDataChanged();
           }
-          alert('Event deleted successfully!');
+          toast.success('Event deleted!');
         }
       } catch (error) {
         console.error('Error deleting event:', error);
-        alert('Error deleting event: ' + error.message);
+        toast.error('Error deleting event: ' + error.message);
       }
+    }
+  };
+
+  const handleReorder = async (id, direction) => {
+    try {
+      const response = await apiService.reorderEvent(id, direction);
+      if (response.success) {
+        const eventsResponse = await apiService.getEvents();
+        if (eventsResponse.success) {
+          setDashboardData(prev => ({ ...prev, events: eventsResponse.data }));
+        }
+      }
+    } catch (error) {
+      console.error('Error reordering event:', error);
     }
   };
 
@@ -800,7 +866,21 @@ export const EventsTab = ({ dashboardData, setDashboardData, onDataChanged, refr
                   )}
                 </div>
               </div>
-              <div className="flex space-x-2 ml-4">
+              <div className="flex flex-col space-y-1 ml-4">
+                <button
+                  onClick={() => handleReorder(event.id, 'up')}
+                  className="px-3 py-1 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-xs font-medium"
+                  title="Move Up"
+                >
+                  ▲
+                </button>
+                <button
+                  onClick={() => handleReorder(event.id, 'down')}
+                  className="px-3 py-1 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-xs font-medium"
+                  title="Move Down"
+                >
+                  ▼
+                </button>
                 <button
                   onClick={() => handleEdit(event)}
                   className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
@@ -832,11 +912,13 @@ export const EventsTab = ({ dashboardData, setDashboardData, onDataChanged, refr
           </button>
         </div>
       )}
+      <ToastContainer toasts={toasts} />
     </div>
   );
 };
 
 export const TeamTab = ({ dashboardData, setDashboardData, onDataChanged, refreshData }) => {
+  const { toasts, toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -859,6 +941,7 @@ export const TeamTab = ({ dashboardData, setDashboardData, onDataChanged, refres
     if (dashboardData.teamMembers.length === 0) {
       refreshData && refreshData();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = async (e) => {
@@ -883,11 +966,11 @@ export const TeamTab = ({ dashboardData, setDashboardData, onDataChanged, refres
         }
         resetForm();
         onDataChanged && onDataChanged();
-        alert(editingMember ? 'Team member updated successfully!' : 'Team member added successfully!');
+        toast.success(editingMember ? 'Team member updated!' : 'Team member added!');
       }
     } catch (error) {
       console.error('Error saving team member:', error);
-      alert('Error saving team member: ' + error.message);
+      toast.error('Error saving team member: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -925,11 +1008,11 @@ export const TeamTab = ({ dashboardData, setDashboardData, onDataChanged, refres
             }));
             onDataChanged && onDataChanged();
           }
-          alert('Team member deleted successfully!');
+          toast.success('Team member deleted!');
         }
       } catch (error) {
         console.error('Error deleting team member:', error);
-        alert('Error deleting team member: ' + error.message);
+        toast.error('Error deleting team member: ' + error.message);
       }
     }
   };
@@ -949,7 +1032,7 @@ export const TeamTab = ({ dashboardData, setDashboardData, onDataChanged, refres
       }
     } catch (error) {
       console.error('Error reordering team member:', error);
-      alert('Error changing position: ' + error.message);
+      toast.error('Error changing position: ' + error.message);
     }
   };
 
@@ -1218,11 +1301,13 @@ export const TeamTab = ({ dashboardData, setDashboardData, onDataChanged, refres
           </button>
         </div>
       )}
+      <ToastContainer toasts={toasts} />
     </div>
   );
 };
 
 export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, refreshData }) => {
+  const { toasts, toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [editingSpeaker, setEditingSpeaker] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -1237,7 +1322,6 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
     linkedin_url: '',
     twitter_url: '',
     website_url: '',
-    speaking_topics: '',
     is_available: true
   });
 
@@ -1245,6 +1329,7 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
     if (dashboardData.speakers.length === 0) {
       refreshData && refreshData();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = async (e) => {
@@ -1252,11 +1337,7 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
     setLoading(true);
 
     try {
-      // Convert speaking_topics string to array
-      const speakerData = {
-        ...formData,
-        speaking_topics: formData.speaking_topics.split(',').map(topic => topic.trim()).filter(topic => topic)
-      };
+      const speakerData = { ...formData };
 
       let response;
       if (editingSpeaker) {
@@ -1275,11 +1356,11 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
         }
         resetForm();
         onDataChanged && onDataChanged();
-        alert(editingSpeaker ? 'Speaker updated successfully!' : 'Speaker added successfully!');
+        toast.success(editingSpeaker ? 'Speaker updated!' : 'Speaker added!');
       }
     } catch (error) {
       console.error('Error saving speaker:', error);
-      alert('Error saving speaker: ' + error.message);
+      toast.error('Error saving speaker: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -1298,7 +1379,6 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
       linkedin_url: speaker.linkedin_url || '',
       twitter_url: speaker.twitter_url || '',
       website_url: speaker.website_url || '',
-      speaking_topics: Array.isArray(speaker.speaking_topics) ? speaker.speaking_topics.join(', ') : speaker.speaking_topics || '',
       is_available: speaker.is_available
     });
     setShowForm(true);
@@ -1317,12 +1397,26 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
             }));
             onDataChanged && onDataChanged();
           }
-          alert('Speaker deleted successfully!');
+          toast.success('Speaker deleted!');
         }
       } catch (error) {
         console.error('Error deleting speaker:', error);
-        alert('Error deleting speaker: ' + error.message);
+        toast.error('Error deleting speaker: ' + error.message);
       }
+    }
+  };
+
+  const handleReorder = async (id, direction) => {
+    try {
+      const response = await apiService.reorderSpeaker(id, direction);
+      if (response.success) {
+        const speakersResponse = await apiService.getSpeakers();
+        if (speakersResponse.success) {
+          setDashboardData(prev => ({ ...prev, speakers: speakersResponse.data }));
+        }
+      }
+    } catch (error) {
+      console.error('Error reordering speaker:', error);
     }
   };
 
@@ -1338,7 +1432,6 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
       linkedin_url: '',
       twitter_url: '',
       website_url: '',
-      speaking_topics: '',
       is_available: true
     });
     setEditingSpeaker(null);
@@ -1417,16 +1510,6 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
                 value={formData.image_url}
                 onChange={(imageUrl) => setFormData({...formData, image_url: imageUrl})}
               />
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Speaking Topics (comma-separated)</label>
-                <input
-                  type="text"
-                  value={formData.speaking_topics}
-                  onChange={(e) => setFormData({...formData, speaking_topics: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  placeholder="AI, Machine Learning, Web Development"
-                />
-              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
@@ -1537,18 +1620,20 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
               {speaker.bio && (
                 <p className="text-gray-600 text-sm mb-4 line-clamp-3">{speaker.bio}</p>
               )}
-              {speaker.speaking_topics && (
-                <div className="mb-4">
-                  <p className="text-xs text-gray-500 mb-1">Topics:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {(Array.isArray(speaker.speaking_topics) ? speaker.speaking_topics : speaker.speaking_topics.split(',')).slice(0, 3).map((topic, index) => (
-                      <span key={index} className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs">
-                        {topic.trim()}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                <button
+                  onClick={() => handleReorder(speaker.id, 'up')}
+                  className="bg-orange-50 text-orange-700 py-2 px-3 rounded-lg hover:bg-orange-100 transition-colors text-sm font-medium"
+                >
+                  ▲ Up
+                </button>
+                <button
+                  onClick={() => handleReorder(speaker.id, 'down')}
+                  className="bg-orange-50 text-orange-700 py-2 px-3 rounded-lg hover:bg-orange-100 transition-colors text-sm font-medium"
+                >
+                  ▼ Down
+                </button>
+              </div>
               <div className="flex space-x-2">
                 <button
                   onClick={() => handleEdit(speaker)}
@@ -1581,6 +1666,246 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
           </button>
         </div>
       )}
+      <ToastContainer toasts={toasts} />
+    </div>
+  );
+};
+
+// ─── Speaker Reviews Tab ───────────────────────────────────────────────────────
+export const ReviewsTab = ({ refreshData }) => {
+  const { toasts, toast } = useToast();
+  const [reviews, setReviews] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingReview, setEditingReview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+  const [formData, setFormData] = useState({
+    name: '',
+    role: '',
+    review: '',
+    highlight: '',
+    image_url: '',
+    is_active: true
+  });
+
+  const loadReviews = async () => {
+    try {
+      setFetching(true);
+      const res = await apiService.getReviews({ is_active: 'all' });
+      if (res.success) setReviews(res.data);
+    } catch (err) {
+      toast.error('Failed to load reviews: ' + err.message);
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    loadReviews();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const payload = {
+        ...formData,
+        highlight: formData.highlight || null,
+        image_url: formData.image_url || null
+      };
+      let res;
+      if (editingReview) {
+        res = await apiService.updateReview(editingReview.id, payload);
+      } else {
+        res = await apiService.createReview(payload);
+      }
+      if (res.success) {
+        await loadReviews();
+        resetForm();
+        refreshData && refreshData();
+        toast.success(editingReview ? 'Review updated!' : 'Review created!');
+      }
+    } catch (err) {
+      toast.error('Error saving review: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (review) => {
+    setEditingReview(review);
+    setFormData({
+      name: review.name,
+      role: review.role,
+      review: review.review,
+      highlight: review.highlight || '',
+      image_url: review.image_url || '',
+      is_active: review.is_active
+    });
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this review?')) return;
+    try {
+      const res = await apiService.deleteReview(id);
+      if (res.success) {
+        await loadReviews();
+        toast.success('Review deleted!');
+      }
+    } catch (err) {
+      toast.error('Error deleting review: ' + err.message);
+    }
+  };
+
+  const handleToggleStatus = async (review) => {
+    try {
+      await apiService.toggleReviewStatus(review.id);
+      await loadReviews();
+      toast.success(`Review ${review.is_active ? 'deactivated' : 'activated'}!`);
+    } catch (err) {
+      toast.error('Error toggling status: ' + err.message);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({ name: '', role: '', review: '', highlight: '', image_url: '', is_active: true });
+    setEditingReview(null);
+    setShowForm(false);
+  };
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Speaker Reviews</h2>
+          <p className="text-gray-600">Manage testimonials shown in the public carousel</p>
+        </div>
+        <button
+          onClick={() => setShowForm(true)}
+          className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-lg"
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Add Review
+        </button>
+      </div>
+
+      {/* Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold mb-4">{editingReview ? 'Edit Review' : 'Add Review'}</h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Speaker Name</label>
+                  <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Role / Title</label>
+                  <input type="text" value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Review Text</label>
+                <textarea value={formData.review} onChange={(e) => setFormData({ ...formData, review: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4" required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Highlight Label <span className="text-gray-400">(optional — shown as badge)</span></label>
+                <input type="text" value={formData.highlight} onChange={(e) => setFormData({ ...formData, highlight: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g. Keynote Speaker" />
+              </div>
+              <ImageUploadField
+                label="Profile Photo (optional)"
+                value={formData.image_url}
+                onChange={(url) => setFormData({ ...formData, image_url: url })}
+                onError={(msg) => toast.error(msg)}
+              />
+              <div className="flex items-center gap-2">
+                <input type="checkbox" id="review_active" checked={formData.is_active}
+                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })} />
+                <label htmlFor="review_active" className="text-sm font-medium text-gray-700">Show on public site</label>
+              </div>
+              <div className="flex space-x-3 pt-2">
+                <button type="submit" disabled={loading}
+                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50">
+                  {loading ? 'Saving...' : editingReview ? 'Update' : 'Add'} Review
+                </button>
+                <button type="button" onClick={resetForm}
+                  className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Reviews list */}
+      {fetching ? (
+        <p className="text-gray-500 text-center py-8">Loading reviews…</p>
+      ) : reviews.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="text-gray-400 text-6xl mb-4">💬</div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No reviews yet</h3>
+          <p className="text-gray-600 mb-4">Add the first speaker testimonial!</p>
+          <button onClick={() => setShowForm(true)}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Add First Review
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {reviews.map((review) => (
+            <div key={review.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+              <div className="flex items-start gap-4">
+                {/* Avatar */}
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold flex-shrink-0 overflow-hidden">
+                  {review.image_url
+                    ? <img src={review.image_url} alt={review.name} className="w-full h-full object-cover" />
+                    : (review.name || '?').charAt(0)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="font-semibold text-gray-900">{review.name}</span>
+                    <span className="text-sm text-gray-500">{review.role}</span>
+                    {review.highlight && (
+                      <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">{review.highlight}</span>
+                    )}
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${review.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                      {review.is_active ? 'Active' : 'Hidden'}
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm line-clamp-3 italic">"{review.review}"</p>
+                </div>
+                {/* Actions */}
+                <div className="flex flex-col gap-2 flex-shrink-0">
+                  <button onClick={() => handleEdit(review)}
+                    className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium">
+                    Edit
+                  </button>
+                  <button onClick={() => handleToggleStatus(review)}
+                    className={`px-3 py-1.5 rounded-lg transition-colors text-sm font-medium ${review.is_active ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
+                    {review.is_active ? 'Hide' : 'Show'}
+                  </button>
+                  <button onClick={() => handleDelete(review.id)}
+                    className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      <ToastContainer toasts={toasts} />
     </div>
   );
 };

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { OverviewTab, MemoriesTab, EventsTab, TeamTab, SpeakersTab } from './AdminDashboardTabs';
+import { useState, useEffect, useCallback } from 'react';
+import { OverviewTab, MemoriesTab, EventsTab, TeamTab, SpeakersTab, ReviewsTab } from './AdminDashboardTabs';
 import apiService from '../services/apiService';
 
 const AdminDashboard = () => {
@@ -12,12 +12,20 @@ const AdminDashboard = () => {
     speakers: []
   });
 
+  // Read stored admin user once on mount — avoids re-parsing localStorage on every render
+  const [storedUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('adminUser') || '{}'); } catch (_) { return {}; }
+  });
+
+  const [loadError, setLoadError] = useState('');
+
   // Load data on component mount
   useEffect(() => {
-    loadDashboardData();
+    loadDashboardData().catch((err) => setLoadError(err.message));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       const [memoriesRes, eventsRes, teamRes, speakersRes] = await Promise.all([
         apiService.getMemories(),
@@ -34,9 +42,10 @@ const AdminDashboard = () => {
       });
     } catch (error) {
       console.error('Error loading dashboard data:', error);
-      alert('Unable to load admin data: ' + error.message);
+      // Throw so callers can handle — avoids double-alert when wrapped by handleDataRefresh
+      throw error;
     }
-  };
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -50,16 +59,12 @@ const AdminDashboard = () => {
     window.location.href = '/';
   };
 
-  const handleDataReset = async () => {
-    if (window.confirm('Are you sure you want to reset all data to defaults? This cannot be undone.')) {
-      try {
-        // For now, just reload the data from API
-        await loadDashboardData();
-        alert('Data refreshed from server!');
-      } catch (error) {
-        console.error('Reset error:', error);
-        alert('Reset failed: ' + error.message);
-      }
+  const handleDataRefresh = async () => {
+    try {
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Refresh error:', error);
+      alert('Refresh failed: ' + error.message);
     }
   };
 
@@ -90,11 +95,12 @@ const AdminDashboard = () => {
   };
 
   const tabs = [
-    { id: 'overview', name: 'Overview', icon: '📊' },
-    { id: 'memories', name: 'Club Memories', icon: '📸' },
-    { id: 'events', name: 'Events', icon: '📅' },
-    { id: 'team', name: 'Team', icon: '👥' },
-    { id: 'speakers', name: 'Speakers', icon: '🎤' }
+    { id: 'overview',  name: 'Overview',         icon: '📊' },
+    { id: 'memories',  name: 'Club Memories',     icon: '📸' },
+    { id: 'events',    name: 'Events',            icon: '📅' },
+    { id: 'team',      name: 'Team',              icon: '👥' },
+    { id: 'speakers',  name: 'Speakers',          icon: '🎤' },
+    { id: 'reviews',   name: 'Speaker Reviews',   icon: '💬' }
   ];
 
   return (
@@ -129,18 +135,22 @@ const AdminDashboard = () => {
                   Export
                 </button>
                 <button
-                  onClick={handleDataReset}
+                  onClick={handleDataRefresh}
                   className="flex items-center px-3 py-2 text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg transition-all duration-300 border border-orange-200 hover:border-orange-300 text-sm">
                   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
-                  Reset
+                  Refresh
                 </button>
               </div>
 
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">Admin User</p>
-                <p className="text-xs text-gray-500">Last login: Today</p>
+                <p className="text-sm font-medium text-gray-900">{storedUser.username || 'Admin'}</p>
+                <p className="text-xs text-gray-500">
+                  {storedUser.last_login
+                    ? `Last login: ${new Date(storedUser.last_login).toLocaleString()}`
+                    : 'Welcome back'}
+                </p>
               </div>
               <button
                 onClick={handleLogout}
@@ -157,6 +167,11 @@ const AdminDashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {loadError && (
+          <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            Unable to load dashboard data: {loadError}
+          </div>
+        )}
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
           <div className="lg:w-64 flex-shrink-0">
@@ -182,11 +197,12 @@ const AdminDashboard = () => {
           {/* Main Content */}
           <div className="flex-1">
             <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-blue-100 p-8">
-              {activeTab === 'overview' && <OverviewTab dashboardData={dashboardData} refreshKey={refreshVersion} setActiveTab={setActiveTab} />}
-              {activeTab === 'memories' && <MemoriesTab dashboardData={dashboardData} setDashboardData={setDashboardData} onDataChanged={handleDataChanged} refreshData={loadDashboardData} />}
-              {activeTab === 'events' && <EventsTab dashboardData={dashboardData} setDashboardData={setDashboardData} onDataChanged={handleDataChanged} refreshData={loadDashboardData} />}
-              {activeTab === 'team' && <TeamTab dashboardData={dashboardData} setDashboardData={setDashboardData} onDataChanged={handleDataChanged} refreshData={loadDashboardData} />}
-              {activeTab === 'speakers' && <SpeakersTab dashboardData={dashboardData} setDashboardData={setDashboardData} onDataChanged={handleDataChanged} refreshData={loadDashboardData} />}
+              {activeTab === 'overview'  && <OverviewTab dashboardData={dashboardData} refreshKey={refreshVersion} setActiveTab={setActiveTab} />}
+              {activeTab === 'memories'  && <MemoriesTab dashboardData={dashboardData} setDashboardData={setDashboardData} onDataChanged={handleDataChanged} refreshData={loadDashboardData} />}
+              {activeTab === 'events'    && <EventsTab dashboardData={dashboardData} setDashboardData={setDashboardData} onDataChanged={handleDataChanged} refreshData={loadDashboardData} />}
+              {activeTab === 'team'      && <TeamTab dashboardData={dashboardData} setDashboardData={setDashboardData} onDataChanged={handleDataChanged} refreshData={loadDashboardData} />}
+              {activeTab === 'speakers'  && <SpeakersTab dashboardData={dashboardData} setDashboardData={setDashboardData} onDataChanged={handleDataChanged} refreshData={loadDashboardData} />}
+              {activeTab === 'reviews'   && <ReviewsTab refreshData={loadDashboardData} />}
             </div>
           </div>
         </div>

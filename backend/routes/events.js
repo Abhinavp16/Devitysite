@@ -1,9 +1,11 @@
 const express = require('express');
 const Joi = require('joi');
-const { Event, GuestSpeaker, legacyOrObjectIdQuery, publicId, mapEvent, mapSpeaker } = require('../models');
+const { Event, GuestSpeaker, legacyOrObjectIdQuery, mapEvent, mapSpeaker } = require('../models');
 const { authenticateToken, logActivity } = require('../middleware/auth');
 
 const router = express.Router();
+
+const VALID_SPEAKER_ROLES = ['speaker', 'keynote', 'moderator', 'panelist'];
 
 const eventSchema = Joi.object({
     title: Joi.string().min(1).max(255).required(),
@@ -14,7 +16,8 @@ const eventSchema = Joi.object({
     event_type: Joi.string().valid('Workshop', 'Bootcamp', 'Seminar', 'Competition', 'Hackathon').required(),
     status: Joi.string().valid('upcoming', 'completed', 'cancelled').default('upcoming'),
     max_participants: Joi.number().integer().min(1).optional(),
-    registration_link: Joi.string().uri().allow('').optional()
+    registration_link: Joi.string().uri().allow('').optional(),
+    display_order: Joi.number().integer().min(0).optional()
 });
 
 const updateEventSchema = Joi.object({
@@ -26,17 +29,21 @@ const updateEventSchema = Joi.object({
     event_type: Joi.string().valid('Workshop', 'Bootcamp', 'Seminar', 'Competition', 'Hackathon').optional(),
     status: Joi.string().valid('upcoming', 'completed', 'cancelled').optional(),
     max_participants: Joi.number().integer().min(1).allow(null).optional(),
-    registration_link: Joi.string().uri().allow('').optional()
+    registration_link: Joi.string().uri().allow('').optional(),
+    display_order: Joi.number().integer().min(0).optional()
 });
 
 const getEventSpeakerDocs = async (event) => {
     const assignments = event.speakers || [];
+    if (assignments.length === 0) return [];
     const objectIds = assignments.filter((item) => item.speaker).map((item) => item.speaker);
     const legacyIds = assignments.filter((item) => item.legacySpeakerId).map((item) => item.legacySpeakerId);
     const speakers = await GuestSpeaker.find({ $or: [{ _id: { $in: objectIds } }, { legacyId: { $in: legacyIds } }] });
 
     return assignments.map((assignment) => {
-        const speaker = speakers.find((item) => String(item._id) === String(assignment.speaker) || item.legacyId === assignment.legacySpeakerId);
+        const speaker = speakers.find(
+            (item) => String(item._id) === String(assignment.speaker) || item.legacyId === assignment.legacySpeakerId
+        );
         return speaker ? { ...mapSpeaker(speaker), speaker_role: assignment.role } : null;
     }).filter(Boolean);
 };
@@ -63,7 +70,8 @@ router.get('/', authenticateToken, async (req, res) => {
         }
 
         const [events, total] = await Promise.all([
-            Event.find(filter).populate('created_by', 'username legacyId').sort({ event_date: 1, created_at: -1 }).skip(skip).limit(Number(limit)),
+            Event.find(filter).populate('created_by', 'username legacyId')
+                .sort({ display_order: 1, event_date: 1, created_at: -1 }).skip(skip).limit(Number(limit)),
             Event.countDocuments(filter)
         ]);
 
@@ -95,10 +103,17 @@ router.post('/', authenticateToken, logActivity('CREATE', 'events'), async (req,
         const { error, value } = eventSchema.validate(req.body);
         if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
 
+        let display_order = value.display_order;
+        if (display_order === undefined) {
+            const lastEvent = await Event.findOne().sort({ display_order: -1, created_at: -1 });
+            display_order = lastEvent ? (lastEvent.display_order ?? 0) + 1 : 1;
+        }
+
         const event = await Event.create({
             ...value,
             max_participants: value.max_participants || null,
             registration_link: value.registration_link || null,
+            display_order,
             created_by: req.user._id,
             legacyCreatedBy: req.user.legacyId
         });
@@ -113,15 +128,24 @@ router.post('/', authenticateToken, logActivity('CREATE', 'events'), async (req,
 
 router.put('/:id', authenticateToken, logActivity('UPDATE', 'events'), async (req, res) => {
     try {
-        const { error, value } = updateEventSchema.validate(req.body);
+        const { error, value } = updateEventSchema.validate(req.body, { stripUnknown: true });
         if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
         if (Object.keys(value).length === 0) return res.status(400).json({ error: 'No valid fields to update' });
 
-        const event = await Event.findOneAndUpdate(legacyOrObjectIdQuery(req.params.id), { $set: value }, { returnDocument: 'after' })
-            .populate('created_by', 'username legacyId');
+        // Normalize empty strings to null for optional URL/number fields
+        if (value.registration_link === '') value.registration_link = null;
+        if (value.max_participants === '') value.max_participants = null;
+
+        const event = await Event.findOneAndUpdate(
+            legacyOrObjectIdQuery(req.params.id),
+            { $set: value },
+            { returnDocument: 'after' }
+        ).populate('created_by', 'username legacyId');
         if (!event) return res.status(404).json({ error: 'Event not found' });
 
-        res.json({ success: true, message: 'Event updated successfully', data: mapEvent(event) });
+        // Resolve speakers so the PUT response is consistent with GET /:id
+        const speakers = await getEventSpeakerDocs(event);
+        res.json({ success: true, message: 'Event updated successfully', data: mapEvent(event, speakers) });
     } catch (error) {
         console.error('Update event error:', error);
         res.status(500).json({ error: 'Failed to update event' });
@@ -145,13 +169,20 @@ router.post('/:id/speakers', authenticateToken, logActivity('CREATE', 'event_spe
         const { speaker_id, role = 'speaker' } = req.body;
         if (!speaker_id) return res.status(400).json({ error: 'Speaker ID is required' });
 
+        // Validate role against schema enum
+        if (!VALID_SPEAKER_ROLES.includes(role)) {
+            return res.status(400).json({ error: `role must be one of: ${VALID_SPEAKER_ROLES.join(', ')}` });
+        }
+
         const event = await Event.findOne(legacyOrObjectIdQuery(id));
         if (!event) return res.status(404).json({ error: 'Event not found' });
 
         const speaker = await GuestSpeaker.findOne(legacyOrObjectIdQuery(speaker_id));
         if (!speaker) return res.status(404).json({ error: 'Speaker not found' });
 
-        const exists = (event.speakers || []).some((item) => String(item.speaker) === String(speaker._id) || item.legacySpeakerId === speaker.legacyId);
+        const exists = (event.speakers || []).some(
+            (item) => String(item.speaker) === String(speaker._id) || item.legacySpeakerId === speaker.legacyId
+        );
         if (exists) return res.status(409).json({ error: 'Speaker is already assigned to this event' });
 
         event.speakers.push({ speaker: speaker._id, legacySpeakerId: speaker.legacyId, role });
@@ -169,7 +200,10 @@ router.delete('/:id/speakers/:speaker_id', authenticateToken, logActivity('DELET
         if (!event) return res.status(404).json({ error: 'Event not found' });
 
         const before = event.speakers.length;
-        event.speakers = event.speakers.filter((item) => String(item.speaker) !== String(req.params.speaker_id) && String(item.legacySpeakerId) !== String(req.params.speaker_id));
+        event.speakers = event.speakers.filter(
+            (item) => String(item.speaker) !== String(req.params.speaker_id) &&
+                      String(item.legacySpeakerId) !== String(req.params.speaker_id)
+        );
         if (event.speakers.length === before) return res.status(404).json({ error: 'Speaker assignment not found' });
 
         await event.save();
@@ -177,6 +211,36 @@ router.delete('/:id/speakers/:speaker_id', authenticateToken, logActivity('DELET
     } catch (error) {
         console.error('Remove speaker from event error:', error);
         res.status(500).json({ error: 'Failed to remove speaker from event' });
+    }
+});
+
+router.patch('/:id/reorder', authenticateToken, logActivity('UPDATE', 'events'), async (req, res) => {
+    try {
+        const { direction } = req.body;
+        if (!['up', 'down'].includes(direction)) {
+            return res.status(400).json({ error: 'direction must be "up" or "down"' });
+        }
+
+        const event = await Event.findOne(legacyOrObjectIdQuery(req.params.id));
+        if (!event) return res.status(404).json({ error: 'Event not found' });
+
+        const currentOrder = event.display_order ?? 0;
+        const target = await Event.findOne({
+            display_order: direction === 'up' ? { $lt: currentOrder } : { $gt: currentOrder }
+        }).sort(direction === 'up' ? { display_order: -1 } : { display_order: 1 });
+
+        if (!target) return res.json({ success: true, message: 'Already at boundary', data: mapEvent(event) });
+
+        const tempOrder = target.display_order ?? 0;
+        event.display_order = tempOrder;
+        target.display_order = currentOrder;
+        await Promise.all([event.save(), target.save()]);
+        await event.populate('created_by', 'username legacyId');
+
+        res.json({ success: true, message: 'Event reordered successfully', data: mapEvent(event) });
+    } catch (error) {
+        console.error('Reorder event error:', error);
+        res.status(500).json({ error: 'Failed to reorder event' });
     }
 });
 

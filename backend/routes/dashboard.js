@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const { ClubMemory, Event, TeamMember, GuestSpeaker, ActivityLog, mapMemory, mapEvent, mapTeamMember, mapSpeaker } = require('../models');
 const { authenticateToken } = require('../middleware/auth');
 
@@ -57,7 +58,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
                     id: String(activity.legacyId || activity._id),
                     action: activity.action,
                     table_name: activity.table_name,
-                    username: activity.user_id ? activity.user_id.username : undefined,
+                    username: activity.user_id?.username ?? null,
                     created_at: activity.created_at
                 })),
                 upcoming_events: upcomingEvents.map((event) => mapEvent(event)),
@@ -94,7 +95,7 @@ router.get('/activities', authenticateToken, async (req, res) => {
                 action: activity.action,
                 table_name: activity.table_name,
                 record_id: activity.record_id,
-                username: activity.user_id ? activity.user_id.username : undefined,
+                username: activity.user_id?.username ?? null,
                 created_at: activity.created_at
             })),
             pagination: { page: Number(page), limit: Number(limit), total, pages: Math.ceil(total / Number(limit)) }
@@ -108,10 +109,10 @@ router.get('/activities', authenticateToken, async (req, res) => {
 router.get('/export', authenticateToken, async (req, res) => {
     try {
         const [memories, events, teamMembers, speakers] = await Promise.all([
-            ClubMemory.find().sort({ event_date: -1 }),
-            Event.find().sort({ event_date: -1 }),
-            TeamMember.find().sort({ team_type: 1, name: 1 }),
-            GuestSpeaker.find().sort({ name: 1 })
+            ClubMemory.find().sort({ event_date: -1 }).limit(500),
+            Event.find().sort({ event_date: -1 }).limit(500),
+            TeamMember.find().sort({ team_type: 1, name: 1 }).limit(500),
+            GuestSpeaker.find().sort({ name: 1 }).limit(500)
         ]);
 
         res.json({
@@ -134,10 +135,12 @@ router.get('/export', authenticateToken, async (req, res) => {
 });
 
 router.get('/health', authenticateToken, async (req, res) => {
+    const state = mongoose.connection.readyState;
     res.json({
         success: true,
-        status: 'healthy',
-        database: 'connected',
+        status: state === 1 ? 'healthy' : 'degraded',
+        database: state === 1 ? 'connected' : 'disconnected',
+        readyState: state,
         timestamp: new Date().toISOString()
     });
 });

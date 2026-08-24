@@ -1,11 +1,26 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const { ClubMemory, Event, TeamMember, GuestSpeaker, SpeakerReview, mapMemory, mapEvent, mapTeamMember, mapSpeaker, mapSpeakerReview } = require('../models');
 
 const router = express.Router();
 
+// Dedicated public rate limiter — 60 req / min per IP
+const publicLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 60,
+    message: { error: 'Too many requests. Please slow down.' },
+    standardHeaders: true,
+    legacyHeaders: false
+});
+router.use(publicLimiter);
+
+const PUBLIC_LIMIT = 100; // hard cap per collection
+
 router.get('/memories', async (req, res) => {
     try {
-        const memories = await ClubMemory.find().sort({ event_date: -1, created_at: -1 });
+        const memories = await ClubMemory.find()
+            .sort({ event_date: -1, created_at: -1 })
+            .limit(PUBLIC_LIMIT);
         res.json({ success: true, data: memories.map(mapMemory) });
     } catch (error) {
         console.error('Public memories error:', error);
@@ -13,9 +28,12 @@ router.get('/memories', async (req, res) => {
     }
 });
 
+// Exclude cancelled events from public view
 router.get('/events', async (req, res) => {
     try {
-        const events = await Event.find().sort({ event_date: 1, created_at: -1 });
+        const events = await Event.find({ status: { $ne: 'cancelled' } })
+            .sort({ display_order: 1, event_date: 1, created_at: -1 })
+            .limit(PUBLIC_LIMIT);
         res.json({ success: true, data: events.map((event) => mapEvent(event)) });
     } catch (error) {
         console.error('Public events error:', error);
@@ -23,17 +41,12 @@ router.get('/events', async (req, res) => {
     }
 });
 
+// Pure read — no DB mutations
 router.get('/team', async (req, res) => {
     try {
-        const unorderedCount = await TeamMember.countDocuments({ $or: [{ display_order: { $exists: false } }, { display_order: 0 }] });
-        if (unorderedCount > 0) {
-            const allMembers = await TeamMember.find().sort({ created_at: 1, _id: 1 });
-            await Promise.all(allMembers.map((member, index) => {
-                member.display_order = index + 1;
-                return member.save();
-            }));
-        }
-        const members = await TeamMember.find({ is_active: true }).sort({ display_order: 1, created_at: 1, _id: 1 });
+        const members = await TeamMember.find({ is_active: true })
+            .sort({ display_order: 1, created_at: 1, _id: 1 })
+            .limit(PUBLIC_LIMIT);
         res.json({ success: true, data: members.map(mapTeamMember) });
     } catch (error) {
         console.error('Public team error:', error);
@@ -43,7 +56,9 @@ router.get('/team', async (req, res) => {
 
 router.get('/speakers', async (req, res) => {
     try {
-        const speakers = await GuestSpeaker.find({ is_available: true }).sort({ name: 1 });
+        const speakers = await GuestSpeaker.find({ is_available: true })
+            .sort({ display_order: 1, name: 1 })
+            .limit(PUBLIC_LIMIT);
         res.json({ success: true, data: speakers.map(mapSpeaker) });
     } catch (error) {
         console.error('Public speakers error:', error);
@@ -53,7 +68,9 @@ router.get('/speakers', async (req, res) => {
 
 router.get('/reviews', async (req, res) => {
     try {
-        const reviews = await SpeakerReview.find({ is_active: true }).sort({ legacyId: 1, created_at: 1 });
+        const reviews = await SpeakerReview.find({ is_active: true })
+            .sort({ legacyId: 1, created_at: 1 })
+            .limit(PUBLIC_LIMIT);
         res.json({ success: true, data: reviews.map(mapSpeakerReview) });
     } catch (error) {
         console.error('Public reviews error:', error);

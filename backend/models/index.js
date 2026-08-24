@@ -45,6 +45,7 @@ const eventSchema = new Schema({
     status: { type: String, enum: ['upcoming', 'completed', 'cancelled'], default: 'upcoming' },
     max_participants: Number,
     registration_link: String,
+    display_order: { type: Number, default: 0 },
     speakers: [eventSpeakerSchema],
     created_by: { type: Schema.Types.ObjectId, ref: 'AdminUser' },
     legacyCreatedBy: Number
@@ -92,9 +93,9 @@ const guestSpeakerSchema = new Schema({
     linkedin_url: String,
     twitter_url: String,
     website_url: String,
-    speaking_topics: [String],
     expertise: [speakerExpertiseSchema],
     is_available: { type: Boolean, default: true },
+    display_order: { type: Number, default: 0 },
     created_by: { type: Schema.Types.ObjectId, ref: 'AdminUser' },
     legacyCreatedBy: Number
 }, baseOptions);
@@ -169,6 +170,7 @@ const mapEvent = (doc, speakerDocs = []) => ({
     status: doc.status,
     max_participants: doc.max_participants || null,
     registration_link: doc.registration_link || null,
+    display_order: doc.display_order || 0,
     speaker_count: doc.speakers ? doc.speakers.length : 0,
     speakers: speakerDocs,
     created_at: doc.created_at,
@@ -192,7 +194,11 @@ const mapTeamMember = (doc) => ({
     is_active: Boolean(doc.is_active),
     display_order: doc.display_order || 0,
     join_date: formatDate(doc.join_date),
-    skills: (doc.skills || []).map((skill) => skill.skill_name || skill),
+    // Preserve full skill object (skill_name + proficiency_level) so frontend can display proficiency
+    skills: (doc.skills || []).map((skill) => ({
+        skill_name: skill.skill_name || skill,
+        proficiency_level: skill.proficiency_level || 'intermediate'
+    })),
     created_at: doc.created_at,
     updated_at: doc.updated_at,
     created_by: doc.created_by ? publicId(doc.created_by) : doc.legacyCreatedBy,
@@ -211,10 +217,10 @@ const mapSpeaker = (doc) => ({
     linkedin_url: doc.linkedin_url || null,
     twitter_url: doc.twitter_url || null,
     website_url: doc.website_url || null,
-    speaking_topics: doc.speaking_topics || [],
     expertise: doc.expertise || [],
     expertise_areas: (doc.expertise || []).map((item) => item.area),
     is_available: Boolean(doc.is_available),
+    display_order: doc.display_order || 0,
     created_at: doc.created_at,
     updated_at: doc.updated_at,
     created_by: doc.created_by ? publicId(doc.created_by) : doc.legacyCreatedBy,

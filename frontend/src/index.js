@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import AppSimple from './AppSimple';
 import ErrorBoundary from './ErrorBoundary';
 import reportWebVitals from './reportWebVitals';
 
@@ -15,4 +14,4 @@ root.render(
   </React.StrictMode>
 );
 
-reportWebVitals();
+reportWebVitals(process.env.NODE_ENV !== 'production' ? console.log : undefined);

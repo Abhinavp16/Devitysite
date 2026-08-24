@@ -45,7 +45,8 @@ class ErrorBoundary extends React.Component {
           >
             Reload Page
           </button>
-          {this.state.error && (
+          {/* Only expose error details in development */}
+          {process.env.NODE_ENV !== 'production' && this.state.error && (
             <details style={{ marginTop: '20px', textAlign: 'left' }}>
               <summary style={{ cursor: 'pointer', color: '#6c757d' }}>Error Details</summary>
               <pre style={{ 

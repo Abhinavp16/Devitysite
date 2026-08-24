@@ -11,22 +11,20 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
-
-  useEffect(() => {
-    // Check for saved theme preference or default to dark mode
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      setIsDarkMode(savedTheme === 'dark');
-    } else {
-      // Default to dark mode
-      setIsDarkMode(true);
-      localStorage.setItem('theme', 'dark');
+  // Lazy initializer reads localStorage synchronously — prevents flash of wrong theme
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem('theme');
+      if (saved) return saved === 'dark';
+      // Respect OS preference on first visit, default dark if unavailable
+      return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? true;
+    } catch (_) {
+      return true;
     }
-  }, []);
+  });
 
+  // Apply class and persist whenever theme changes
   useEffect(() => {
-    // Apply theme to document
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
@@ -36,9 +34,7 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [isDarkMode]);
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+  const toggleTheme = () => setIsDarkMode(prev => !prev);
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>

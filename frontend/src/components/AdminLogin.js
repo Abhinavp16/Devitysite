@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import apiService from '../services/apiService';
-import '../styles/AdminLogin.css';
+import { navigate } from '../App';
 
 const AdminLogin = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState({
@@ -11,6 +11,7 @@ const AdminLogin = ({ onLoginSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState('');
+  const [loginError, setLoginError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,9 +24,9 @@ const AdminLogin = ({ onLoginSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setLoginError('');
 
     try {
-      // Try to login with the backend API
       const response = await apiService.login({
         email: formData.email,
         username: formData.username,
@@ -33,31 +34,29 @@ const AdminLogin = ({ onLoginSuccess }) => {
       });
 
       if (response.success && response.token) {
-        // Store user data and token
+        // apiService.login() already stores the token via setToken()
+        // Store user data for display in the dashboard
         localStorage.setItem('adminUser', JSON.stringify(response.user));
-        localStorage.setItem('adminToken', response.token);
 
-        // Call success callback if provided, otherwise redirect
         if (onLoginSuccess) {
           onLoginSuccess();
         } else {
-          window.location.href = '/dashboard';
+          window.history.pushState({}, '', '/dashboard');
+          window.dispatchEvent(new PopStateEvent('popstate'));
         }
       } else {
-        alert('Login failed: ' + (response.error || 'Invalid credentials'));
+        setLoginError(response.error || 'Invalid credentials');
       }
     } catch (error) {
       console.error('Login error:', error);
-
-      alert('Login failed: ' + error.message);
+      setLoginError(error.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleBackToHome = () => {
-    window.history.pushState({}, '', '/');
-    window.location.reload();
+    navigate('/');
   };
 
   return (
@@ -200,6 +199,13 @@ const AdminLogin = ({ onLoginSuccess }) => {
                 )}
               </div>
             </div>
+            {/* Inline error message */}
+            {loginError && (
+              <div className="rounded-xl bg-red-500/20 border border-red-400/40 px-4 py-3 text-sm text-red-200 text-center">
+                {loginError}
+              </div>
+            )}
+
             {/* Login Button */}
             <div className="animate-slideInLeft" style={{ animationDelay: '0.8s' }}>
               <button

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import AdminDashboard from './AdminDashboard';
 import apiService from '../services/apiService';
+import { navigate } from '../App';
 
 const AdminProtectedRoute = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -50,7 +51,7 @@ const AdminProtectedRoute = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Admin Access Required</h2>
           <p className="text-gray-600 mb-6">This area requires admin authentication.</p>
           <button 
-            onClick={() => window.location.href = '/login'}
+            onClick={() => navigate('/login')}
             className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
           >
             Go to Login

@@ -2,12 +2,17 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api
 
 const request = async (endpoint) => {
   const response = await fetch(`${API_BASE_URL}/public${endpoint}`);
-  const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error || `HTTP error! status: ${response.status}`);
+    let message = `HTTP ${response.status}`;
+    try {
+      const errData = await response.json();
+      message = errData.error || message;
+    } catch (_) { /* non-JSON error body */ }
+    throw new Error(message);
   }
 
+  const data = await response.json();
   return data.data || [];
 };
 

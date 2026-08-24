@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { initMobileOptimizations } from '../utils/mobileUtils';
 
 const Hero = () => {
@@ -6,102 +6,75 @@ const Hero = () => {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
+  const videoRef = useRef(null);
+
+  // Play the rendered <video> element once it signals it can play
+  useEffect(() => {
+    if (!videoRef.current || !videoLoaded || videoError) return;
+    const controller = new AbortController();
+    videoRef.current.play().catch(() => {
+      document.addEventListener(
+        'click',
+        () => videoRef.current?.play().catch(() => {}),
+        { once: true, signal: controller.signal }
+      );
+    });
+    return () => controller.abort();
+  }, [videoLoaded, videoError]);
 
   useEffect(() => {
     setIsVisible(true);
-
-
     initMobileOptimizations();
 
-    const preloadVideo = async () => {
-      try {
-        const video = document.createElement('video');
-        video.src = '/assets/videos/devity_logo.mp4';
-        video.preload = 'auto';
-        video.muted = true;
-        video.playsInline = true;
+    const video = document.createElement('video');
+    video.src = process.env.PUBLIC_URL + '/assets/videos/devity_logo.mp4';
+    video.preload = 'auto';
+    video.muted = true;
+    video.playsInline = true;
 
+    // Closure boolean — avoids relying on a custom DOM property
+    let loaded = false;
 
-        const handleLoadedData = () => {
-          console.log('Video preload: loaded successfully');
-          setVideoLoaded(true);
-
-          video.play().catch(e => {
-            console.warn('Preload video play failed:', e);
-          });
-          cleanup();
-        };
-
-        const handleCanPlay = () => {
-          console.log('Video preload: can play');
-          setVideoLoaded(true);
-
-          video.play().catch(e => {
-            console.warn('Preload video play failed:', e);
-          });
-          cleanup();
-        };
-
-        const handleError = (e) => {
-          console.warn('Video preload error:', e);
-          setVideoError(true);
-          setVideoLoaded(false);
-          cleanup();
-        };
-
-        const cleanup = () => {
-          video.removeEventListener('loadeddata', handleLoadedData);
-          video.removeEventListener('canplaythrough', handleCanPlay);
-          video.removeEventListener('error', handleError);
-        };
-
-        video.addEventListener('loadeddata', handleLoadedData);
-        video.addEventListener('canplaythrough', handleCanPlay);
-        video.addEventListener('error', handleError);
-
-
-        video.load();
-
-
-        setTimeout(() => {
-          if (!videoLoaded && !videoError) {
-            console.log('Showing fallback after 2 seconds');
-            setShowFallback(true);
-          }
-        }, 2000);
-
-
-        setTimeout(() => {
-          if (!videoLoaded && !videoError) {
-            console.warn('Video loading timeout, showing fallback');
-            setVideoError(true);
-            cleanup();
-          }
-        }, 10000);
-
-      } catch (error) {
-        console.warn('Video preload failed:', error);
-        setVideoError(true);
-      }
+    const handleCanPlay = () => {
+      loaded = true;
+      setVideoLoaded(true);
+      video.play().catch(() => {});
+      cleanup();
     };
 
-    preloadVideo();
+    const handleError = () => {
+      cleanup();
+      setVideoError(true);
+    };
 
-    // Debug: Check if video file is accessible
-    fetch('/assets/videos/devity_logo.mp4', { method: 'HEAD' })
-      .then(response => {
-        if (response.ok) {
-          console.log('Video file is accessible');
-        } else {
-          console.warn('Video file not accessible:', response.status);
-          setVideoError(true);
-        }
-      })
-      .catch(error => {
-        console.warn('Video file check failed:', error);
+    const cleanup = () => {
+      video.removeEventListener('canplaythrough', handleCanPlay);
+      video.removeEventListener('error', handleError);
+    };
+
+    video.addEventListener('canplaythrough', handleCanPlay);
+    video.addEventListener('error', handleError);
+    video.load();
+
+    // Show fallback after 2 s only if video hasn't loaded yet
+    const fallbackTimer = setTimeout(() => {
+      if (!loaded) setShowFallback(true);
+    }, 2000);
+
+    // Hard timeout after 10 s
+    const errorTimer = setTimeout(() => {
+      if (!loaded) {
         setVideoError(true);
-      });
-  }, [videoLoaded, videoError]);
+        cleanup();
+      }
+    }, 10000);
+
+    return () => {
+      cleanup();
+      clearTimeout(fallbackTimer);
+      clearTimeout(errorTimer);
+    };
+  }, []); // mount-only — no videoLoaded/videoError deps to avoid infinite loop
 
   return (
     <section id="home" className="relative min-h-screen hero-mobile hero-mobile-landscape bg-white dark:bg-gray-900 overflow-hidden transition-colors duration-300 pt-20 sm:pt-24 md:pt-28">
@@ -181,47 +154,18 @@ const Hero = () => {
 
                   {/* Video Logo */}
                   <video
-                    ref={(video) => {
-                      if (video && videoLoaded && !videoError) {
-                        video.play().catch(e => {
-                          console.warn('Video autoplay failed:', e);
-                          // Try to play again after user interaction
-                          document.addEventListener('click', () => {
-                            video.play().catch(() => { });
-                          }, { once: true });
-                        });
-                      }
-                    }}
+                    ref={videoRef}
                     className={`hero-video w-full h-full object-contain transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
                     autoPlay
                     loop
                     muted
                     playsInline
                     preload="auto"
-                    style={{
-                      filter: 'contrast(1.1) brightness(1.05) saturate(1.2)',
-                    }}
-                    onLoadedData={(e) => {
-                      console.log('Video loaded data');
-                      setVideoLoaded(true);
-                      // Force play
-                      e.target.play().catch(err => console.warn('Play failed:', err));
-                    }}
-                    onCanPlay={(e) => {
-                      console.log('Video can play');
-                      setVideoLoaded(true);
-                      // Force play
-                      e.target.play().catch(err => console.warn('Play failed:', err));
-                    }}
-                    onError={(e) => {
-                      console.warn('Video failed to load, showing fallback', e);
-                      setVideoError(true);
-                      setVideoLoaded(false);
-                    }}
-                    onLoadStart={() => console.log('Video load started')}
-                    onLoadedMetadata={() => console.log('Video metadata loaded')}
+                    style={{ filter: 'contrast(1.1) brightness(1.05) saturate(1.2)' }}
+                    onCanPlay={() => setVideoLoaded(true)}
+                    onError={() => { setVideoError(true); setVideoLoaded(false); }}
                   >
-                    <source src="/assets/videos/devity_logo.mp4" type="video/mp4" />
+                    <source src={process.env.PUBLIC_URL + '/assets/videos/devity_logo.mp4'} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
 

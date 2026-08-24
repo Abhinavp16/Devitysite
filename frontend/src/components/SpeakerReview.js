@@ -36,8 +36,8 @@ export default function SpeakerReview() {
 
     const scroll = (timestamp) => {
       if (!lastTimestamp) lastTimestamp = timestamp;
-
-      const elapsed = timestamp - lastTimestamp;
+      const elapsed = Math.min(timestamp - lastTimestamp, 16);
+      // Recompute loopWidth on every frame so resize doesn't cause drift
       const loopWidth = carousel.scrollWidth / 3;
 
       carousel.scrollLeft += elapsed * 0.055;
@@ -55,7 +55,7 @@ export default function SpeakerReview() {
     return () => cancelAnimationFrame(animationFrame);
   }, [reviews.length]);
 
-  if (!isLoading && !error && reviews.length === 0) {
+  if (!isLoading && (error || reviews.length === 0)) {
     return null;
   }
 
@@ -77,7 +77,7 @@ export default function SpeakerReview() {
           {[...Array(3)].map((_, loopIndex) => (
             <div key={loopIndex} className="flex gap-8 py-10 pr-8">
               {reviews.map((item, index) => (
-                <div key={`${item.id || index}-${loopIndex}`} className="group relative w-[320px] md:w-[380px] flex-shrink-0 snap-center transition-all duration-700 hover:-translate-y-3 hover:scale-[1.02] min-h-[360px]">
+                <div key={`${item.id ?? item._id ?? index}-${loopIndex}`} className="group relative w-[320px] md:w-[380px] flex-shrink-0 snap-center transition-all duration-700 hover:-translate-y-3 hover:scale-[1.02] min-h-[360px]">
                   <div className="relative h-full rounded-3xl overflow-hidden bg-gradient-to-br from-slate-800/90 via-slate-900/80 to-gray-900/90 border border-slate-700/50 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] group-hover:shadow-[0_20px_60px_rgba(59,130,246,0.4)] group-hover:border-blue-400/50">
                     <div className="relative z-10 p-6 h-full flex flex-col">
                       <div className="flex items-center gap-2 mb-4">
@@ -87,7 +87,7 @@ export default function SpeakerReview() {
                       <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent mb-4"></div>
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 p-0.5 overflow-hidden flex items-center justify-center text-white font-bold">
-                          {item.image_url ? <img src={item.image_url} alt={item.name} className="w-full h-full rounded-full object-cover" /> : item.name.charAt(0)}
+                          {item.image_url ? <img src={item.image_url} alt={item.name} className="w-full h-full rounded-full object-cover" /> : (item.name || '?').charAt(0)}
                         </div>
                         <div className="flex-1">
                           <h4 className="text-white font-bold text-base mb-0.5 group-hover:text-blue-300 transition-colors duration-300">{item.name}</h4>

@@ -42,7 +42,8 @@ const ClubMemories = () => {
       .then((data) => {
         if (isMounted) {
           setMemories(data);
-          setActiveMemoryId(data[0]?.id || '');
+          // Handle both string id (from mapMemory) and _id fallback
+          setActiveMemoryId(data[0]?.id ?? data[0]?._id ?? '');
         }
       })
       .catch((err) => {
@@ -74,9 +75,11 @@ const ClubMemories = () => {
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [activeMemoryId, memories.length]);
+  }, [memories.length]); // removed activeMemoryId — interval restarts unnecessarily on every tab switch
 
-  const activeIndex = memories.findIndex((memory) => memory.id === activeMemoryId);
+  const getMemoryId = (m) => m?.id ?? m?._id ?? '';
+
+  const activeIndex = memories.findIndex((memory) => getMemoryId(memory) === activeMemoryId);
   const activeMemory = memories[activeIndex] || memories[0];
   const activeGradient = gradients[(activeIndex >= 0 ? activeIndex : 0) % gradients.length];
   const memoryImages = activeMemory && activeMemory.image_urls && activeMemory.image_urls.length ? activeMemory.image_urls : [activeMemory?.image_url || ''];
@@ -93,6 +96,9 @@ const ClubMemories = () => {
       setIsTransitioning(false);
     }, 120);
   };
+
+  // helper for comparing and keying memories
+  const memoryButtonActive = (memory) => getMemoryId(activeMemory) === getMemoryId(memory);
 
   return (
     <section id="memories" className="py-20 bg-gradient-to-br from-slate-900 via-gray-900 to-black relative overflow-hidden">
@@ -120,10 +126,10 @@ const ClubMemories = () => {
                 const gradient = gradients[index % gradients.length];
                 return (
                   <button
-                    key={memory.id || memory.title}
-                    onClick={() => handleMemoryChange(memory.id)}
+                    key={getMemoryId(memory) || memory.title}
+                    onClick={() => handleMemoryChange(getMemoryId(memory))}
                     disabled={isTransitioning}
-                    className={`relative px-6 py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 group overflow-hidden ${activeMemory.id === memory.id
+                    className={`relative px-6 py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 group overflow-hidden ${memoryButtonActive(memory)
                       ? `bg-gradient-to-r ${gradient} text-white shadow-xl`
                       : 'bg-gray-800/50 text-gray-300 hover:text-white border border-gray-700/50 hover:border-gray-600/50'
                       } ${isTransitioning ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -150,14 +156,14 @@ const ClubMemories = () => {
                 )}
               </div>
 
-              <div ref={carouselRef} key={activeMemory.id} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:pb-0 lg:grid-cols-3 xl:grid-cols-5 hide-scrollbar">
+              <div ref={carouselRef} key={getMemoryId(activeMemory)} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:pb-0 lg:grid-cols-3 xl:grid-cols-5 hide-scrollbar">
                 {activeImages.map((imageUrl, index) => {
                   const fallbackTitle = placeholderTitles[index] || `Memory ${index + 1}`;
                   const title = activeImageTitles[index] || fallbackTitle;
 
                   return (
                   <div
-                    key={title}
+                    key={`${activeMemory.id}-${index}`}
                     className="group relative min-w-[82vw] max-w-[82vw] snap-center overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-xl md:min-w-0 md:max-w-none"
                     style={{ animationDelay: `${index * 0.05}s`, animation: 'fadeInUp 0.4s ease-out forwards' }}
                   >

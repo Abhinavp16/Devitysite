@@ -169,7 +169,6 @@ const AnimatedBackground = () => {
   );
 };
 
-export default AnimatedBackground;
 // Club Memories Section Animated Background
 export const ClubMemoriesAnimatedBackground = () => {
   const [particles, setParticles] = useState([]);
@@ -342,7 +341,7 @@ export const EventsAnimatedBackground = () => {
 export const SpeakersAnimatedBackground = () => {
   const [particles, setParticles] = useState([]);
 
-  const speakerIcons = [
+  const speakerIcons = useMemo(() => [
     { content: '🎤', color: 'text-blue-400' },
     { content: '🎙️', color: 'text-purple-400' },
     { content: '💡', color: 'text-yellow-400' },
@@ -357,7 +356,7 @@ export const SpeakersAnimatedBackground = () => {
     { content: '⚡', color: 'text-yellow-400' },
     { content: '🌐', color: 'text-cyan-400' },
     { content: '🔥', color: 'text-orange-400' },
-  ];
+  ], []);
 
   useEffect(() => {
     const newParticles = [];
@@ -376,7 +375,7 @@ export const SpeakersAnimatedBackground = () => {
       });
     }
     setParticles(newParticles);
-  }, []);
+  }, [speakerIcons]);
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -410,9 +409,9 @@ export const SpeakersAnimatedBackground = () => {
       })}
 
       {/* Speaker-themed geometric shapes */}
-      <div className="absolute top-24 left-20 w-34 h-34 bg-gradient-to-br from-blue-200/20 to-indigo-200/20 rounded-full animate-float"></div>
-      <div className="absolute bottom-28 right-16 w-30 h-30 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-lg animate-float-reverse"></div>
-      <div className="absolute top-1/3 right-1/4 w-26 h-26 bg-gradient-to-br from-green-200/20 to-emerald-200/20 rounded-full animate-pulse"></div>
+      <div className="absolute top-24 left-20 w-32 h-32 bg-gradient-to-br from-blue-200/20 to-indigo-200/20 rounded-full animate-float"></div>
+      <div className="absolute bottom-28 right-16 w-28 h-28 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-lg animate-float-reverse"></div>
+      <div className="absolute top-1/3 right-1/4 w-24 h-24 bg-gradient-to-br from-green-200/20 to-emerald-200/20 rounded-full animate-pulse"></div>
     </div>
   );
 };
@@ -421,7 +420,7 @@ export const SpeakersAnimatedBackground = () => {
 export const ContactAnimatedBackground = () => {
   const [particles, setParticles] = useState([]);
 
-  const contactIcons = [
+  const contactIcons = useMemo(() => [
     { content: '📧', color: 'text-blue-400' },
     { content: '📱', color: 'text-green-400' },
     { content: '🌐', color: 'text-purple-400' },
@@ -440,7 +439,7 @@ export const ContactAnimatedBackground = () => {
     { content: '⚡', color: 'text-yellow-400' },
     { content: '💡', color: 'text-yellow-300' },
     { content: '✨', color: 'text-blue-300' },
-  ];
+  ], []);
 
   useEffect(() => {
     const newParticles = [];
@@ -459,7 +458,7 @@ export const ContactAnimatedBackground = () => {
       });
     }
     setParticles(newParticles);
-  }, []);
+  }, [contactIcons]);
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -473,7 +472,6 @@ export const ContactAnimatedBackground = () => {
             default: return 'animate-float';
           }
         };
-
         return (
           <div
             key={particle.id}
@@ -491,7 +489,6 @@ export const ContactAnimatedBackground = () => {
           </div>
         );
       })}
-
       {/* Contact-themed geometric shapes */}
       <div className="absolute top-16 left-20 w-28 h-28 bg-blue-100/25 rounded-full animate-float"></div>
       <div className="absolute bottom-24 right-16 w-32 h-32 bg-green-100/25 rounded-lg animate-float-reverse"></div>
@@ -505,7 +502,7 @@ export const ContactAnimatedBackground = () => {
 export const SpeakerReviewAnimatedBackground = () => {
   const [particles, setParticles] = useState([]);
 
-  const speakerReviewIcons = [
+  const speakerReviewIcons = useMemo(() => [
     { content: '🎤', color: 'text-blue-400' },
     { content: '🗣️', color: 'text-purple-400' },
     { content: '💬', color: 'text-green-400' },
@@ -526,7 +523,7 @@ export const SpeakerReviewAnimatedBackground = () => {
     { content: '⚡', color: 'text-yellow-300' },
     { content: '🚀', color: 'text-blue-500' },
     { content: '💻', color: 'text-gray-300' },
-  ];
+  ], []);
 
   useEffect(() => {
     const newParticles = [];
@@ -545,7 +542,7 @@ export const SpeakerReviewAnimatedBackground = () => {
       });
     }
     setParticles(newParticles);
-  }, []);
+  }, [speakerReviewIcons]);
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -586,3 +583,5 @@ export const SpeakerReviewAnimatedBackground = () => {
     </div>
   );
 };
+
+export default AnimatedBackground;

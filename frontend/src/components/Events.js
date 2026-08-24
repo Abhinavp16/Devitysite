@@ -87,7 +87,20 @@ const Events = () => {
               <span>{event.location}</span>
             </div>
             <p className="mt-2 line-clamp-3 text-[10px] leading-relaxed text-slate-600 sm:mt-3 sm:text-xs">{event.description}</p>
-            <button className={`mt-3 w-fit rounded px-2.5 py-1.5 text-[10px] font-semibold text-white sm:mt-4 sm:px-3 sm:py-2 sm:text-xs ${event.status === 'completed' ? 'bg-slate-500' : isCancelled ? 'bg-red-500' : 'bg-blue-600'}`}>{buttonLabel}</button>
+            {event.registration_link && (isUpcoming || isOngoing) ? (
+              <a
+                href={event.registration_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`mt-3 w-fit rounded px-2.5 py-1.5 text-[10px] font-semibold text-white sm:mt-4 sm:px-3 sm:py-2 sm:text-xs bg-blue-600 hover:bg-blue-700 transition-colors`}
+              >
+                Register Now
+              </a>
+            ) : (
+              <span className={`mt-3 w-fit rounded px-2.5 py-1.5 text-[10px] font-semibold text-white sm:mt-4 sm:px-3 sm:py-2 sm:text-xs ${isCancelled ? 'bg-red-500' : 'bg-slate-500'}`}>
+                {isCancelled ? 'Cancelled' : 'Completed'}
+              </span>
+            )}
           </div>
         </div>
       );
@@ -112,7 +125,7 @@ const Events = () => {
             <span>{event.location}</span>
           </div>
         </div>
-        {!small && event.registration_link && isUpcoming && (
+        {!small && event.registration_link && (isUpcoming || isOngoing) && (
           <a href={event.registration_link} target="_blank" rel="noopener noreferrer" className="event-button event-button-upcoming group/btn block text-center no-underline mt-4">Register Now</a>
         )}
       </div>

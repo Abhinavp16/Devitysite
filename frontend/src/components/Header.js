@@ -13,32 +13,26 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Custom styles for logo animations
-  const logoAnimationStyles = {
-    logoFloat: {
-      animation: 'logoFloat 3s ease-in-out infinite'
+  // Custom styles for logo animations injected via a real <style> tag (not jsx prop)
+  const logoKeyframes = `
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      25% { transform: translateY(-3px) rotate(1deg); }
+      50% { transform: translateY(-6px) rotate(0deg); }
+      75% { transform: translateY(-3px) rotate(-1deg); }
     }
-  };
+    .logo-glow {
+      filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3)) brightness(110%) contrast(110%);
+      transition: filter 0.5s ease;
+    }
+    .logo-glow:hover {
+      filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.6)) brightness(120%) contrast(120%);
+    }
+  `;
 
   return (
     <>
-      <style jsx>{`
-        @keyframes logoFloat {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          25% { transform: translateY(-3px) rotate(1deg); }
-          50% { transform: translateY(-6px) rotate(0deg); }
-          75% { transform: translateY(-3px) rotate(-1deg); }
-        }
-        
-        .logo-glow {
-          filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3)) brightness(110%) contrast(110%);
-          transition: filter 0.5s ease;
-        }
-        
-        .logo-glow:hover {
-          filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.6)) brightness(120%) contrast(120%);
-        }
-      `}</style>
+      <style>{logoKeyframes}</style>
 
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out flex justify-center items-start pointer-events-none ${isScrolled ? 'pt-1 sm:pt-2' : 'pt-2 sm:pt-4 md:pt-6'}`}>
         <div className={`relative w-[98%] sm:w-[95%] max-w-7xl pointer-events-auto transition-all duration-500 ease-in-out rounded-2xl border border-white/20 shadow-2xl ${isScrolled
@@ -72,7 +66,7 @@ const Header = () => {
                       src={devityLogo}
                       alt="DevityClub Logo"
                       className="h-10 sm:h-12 w-auto transform transition-all duration-700 ease-out group-hover:scale-125 cursor-pointer logo-glow"
-                      style={logoAnimationStyles.logoFloat}
+                      style={{ animation: 'logoFloat 3s ease-in-out infinite' }}
                     />
 
                     {/* Shimmer effect overlay */}
@@ -213,6 +207,7 @@ const Header = () => {
                     <a
                       key={item}
                       href={`#${item.toLowerCase()}`}
+                      onClick={() => setIsMenuOpen(false)}
                       className="relative text-blue-100 hover:text-white hover:bg-gradient-to-r hover:from-blue-500/40 hover:to-indigo-500/40 px-6 py-3 rounded-xl transition-all duration-500 transform hover:translate-x-3 hover:scale-105 group overflow-hidden"
                       style={{
                         animationDelay: `${index * 0.1}s`,

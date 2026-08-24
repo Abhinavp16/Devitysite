@@ -88,7 +88,6 @@ CREATE TABLE IF NOT EXISTS guest_speakers (
     linkedin_url VARCHAR(255),
     twitter_url VARCHAR(255),
     website_url VARCHAR(255),
-    speaking_topics TEXT, -- JSON array of topics
     is_available BOOLEAN DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,

@@ -105,7 +105,6 @@ async function migrate() {
             linkedin_url: speaker.linkedin_url,
             twitter_url: speaker.twitter_url,
             website_url: speaker.website_url,
-            speaking_topics: parseMaybeJson(speaker.speaking_topics, []),
             expertise,
             is_available: Boolean(speaker.is_available),
             created_by: adminIdMap.get(speaker.created_by),

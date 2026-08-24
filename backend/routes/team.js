@@ -19,14 +19,25 @@ const teamMemberSchema = Joi.object({
     join_date: Joi.date().iso().allow('', null).optional(),
     is_active: Joi.boolean().optional(),
     display_order: Joi.number().integer().min(0).optional(),
-    skills: Joi.array().items(Joi.string().min(1).max(100)).optional()
+    skills: Joi.array().items(
+        Joi.alternatives().try(
+            Joi.string().min(1).max(100),
+            Joi.object({
+                skill_name: Joi.string().min(1).max(100).required(),
+                proficiency_level: Joi.string().valid('beginner', 'intermediate', 'advanced', 'expert').optional()
+            })
+        )
+    ).optional()
 });
 
 const updateTeamMemberSchema = teamMemberSchema.fork(['name', 'role'], (schema) => schema.optional()).append({
     join_date: Joi.date().iso().allow('', null).optional()
 });
 
-const normalizeSkills = (skills = []) => skills.map((skill) => typeof skill === 'string' ? { skill_name: skill } : skill);
+const normalizeSkills = (skills = []) => skills.map((skill) => {
+    if (typeof skill === 'string') return { skill_name: skill, proficiency_level: 'intermediate' };
+    return { skill_name: skill.skill_name, proficiency_level: skill.proficiency_level || 'intermediate' };
+});
 
 const normalizeTeamPayload = (payload) => {
     const normalized = { ...payload };
@@ -50,7 +61,6 @@ const ensureTeamDisplayOrder = async () => {
 
 router.get('/', authenticateToken, async (req, res) => {
     try {
-        await ensureTeamDisplayOrder();
         const { page = 1, limit = 20, search = '', team_type = '', is_active = 'true' } = req.query;
         const skip = (Number(page) - 1) * Number(limit);
         const filter = {};
@@ -123,6 +133,7 @@ router.put('/:id', authenticateToken, logActivity('UPDATE', 'team_members'), asy
         if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
         const normalizedValue = normalizeTeamPayload(value);
         if (normalizedValue.skills !== undefined) normalizedValue.skills = normalizeSkills(normalizedValue.skills);
+        if (Object.keys(normalizedValue).length === 0) return res.status(400).json({ error: 'No valid fields to update' });
 
         const member = await TeamMember.findOneAndUpdate(legacyOrObjectIdQuery(req.params.id), { $set: normalizedValue }, { returnDocument: 'after' })
             .populate('created_by', 'username legacyId');
@@ -159,7 +170,6 @@ router.patch('/:id/reorder', authenticateToken, logActivity('UPDATE', 'team_memb
         const currentOrder = member.display_order || 0;
         const target = await TeamMember.findOne({
             team_type: member.team_type,
-            is_active: member.is_active,
             display_order: direction === 'up' ? { $lt: currentOrder } : { $gt: currentOrder }
         }).sort(direction === 'up' ? { display_order: -1, created_at: -1 } : { display_order: 1, created_at: 1 });
 
@@ -167,7 +177,7 @@ router.patch('/:id/reorder', authenticateToken, logActivity('UPDATE', 'team_memb
             return res.json({ success: true, message: 'Team member already at boundary', data: mapTeamMember(member) });
         }
 
-        member.display_order = target.display_order || 0;
+        member.display_order = target.display_order ?? 0;
         target.display_order = currentOrder;
         await Promise.all([member.save(), target.save()]);
         await member.populate('created_by', 'username legacyId');

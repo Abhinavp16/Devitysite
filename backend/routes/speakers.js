@@ -1,6 +1,6 @@
 const express = require('express');
 const Joi = require('joi');
-const { GuestSpeaker, Event, legacyOrObjectIdQuery, mapSpeaker } = require('../models');
+const { GuestSpeaker, Event, legacyOrObjectIdQuery, mapSpeaker, formatDate } = require('../models');
 const { authenticateToken, logActivity } = require('../middleware/auth');
 
 const router = express.Router();
@@ -16,7 +16,7 @@ const speakerSchema = Joi.object({
     linkedin_url: Joi.string().max(500).allow('', null).optional(),
     twitter_url: Joi.string().max(500).allow('', null).optional(),
     website_url: Joi.string().max(500).allow('', null).optional(),
-    speaking_topics: Joi.array().items(Joi.string().min(1).max(200)).optional(),
+    display_order: Joi.number().integer().min(0).optional(),
     expertise: Joi.array().items(Joi.object({
         area: Joi.string().min(1).max(100).required(),
         years_experience: Joi.number().integer().min(0).max(50).default(0)
@@ -53,21 +53,50 @@ router.get('/', authenticateToken, async (req, res) => {
         if (expertise_area) filter['expertise.area'] = { $regex: expertise_area, $options: 'i' };
 
         const [speakers, total] = await Promise.all([
-            GuestSpeaker.find(filter).populate('created_by', 'username legacyId').sort({ name: 1 }).skip(skip).limit(Number(limit)),
+            GuestSpeaker.find(filter).populate('created_by', 'username legacyId')
+                .sort({ display_order: 1, name: 1 }).skip(skip).limit(Number(limit)),
             GuestSpeaker.countDocuments(filter)
         ]);
 
+        // Deduplicated event count per speaker — group by event first, then count per speaker
+        const speakerObjectIds = speakers.map((s) => s._id);
+        const speakerLegacyIds = speakers.map((s) => s.legacyId).filter(Boolean);
+
         const eventCounts = await Event.aggregate([
             { $unwind: '$speakers' },
-            { $group: { _id: '$speakers.speaker', count: { $sum: 1 } } }
+            {
+                $match: {
+                    $or: [
+                        { 'speakers.speaker': { $in: speakerObjectIds } },
+                        { 'speakers.legacySpeakerId': { $in: speakerLegacyIds } }
+                    ]
+                }
+            },
+            // Use the first non-null identifier as the canonical speaker key
+            {
+                $group: {
+                    _id: {
+                        $cond: [
+                            { $ifNull: ['$speakers.speaker', false] },
+                            { $toString: '$speakers.speaker' },
+                            { $toString: '$speakers.legacySpeakerId' }
+                        ]
+                    },
+                    count: { $sum: 1 }
+                }
+            }
         ]);
 
         res.json({
             success: true,
             data: speakers.map((speaker) => {
                 const data = mapSpeaker(speaker);
-                const count = eventCounts.find((item) => String(item._id) === String(speaker._id));
-                data.events_count = count ? count.count : 0;
+                const objId = String(speaker._id);
+                const legId = speaker.legacyId != null ? String(speaker.legacyId) : null;
+                const entry = eventCounts.find(
+                    (item) => item._id === objId || (legId && item._id === legId)
+                );
+                data.events_count = entry?.count || 0;
                 return data;
             }),
             pagination: { page: Number(page), limit: Number(limit), total, pages: Math.ceil(total / Number(limit)) }
@@ -83,12 +112,22 @@ router.get('/:id', authenticateToken, async (req, res) => {
         const speaker = await GuestSpeaker.findOne(legacyOrObjectIdQuery(req.params.id)).populate('created_by', 'username legacyId');
         if (!speaker) return res.status(404).json({ error: 'Speaker not found' });
 
-        const events = await Event.find({ $or: [{ 'speakers.speaker': speaker._id }, { 'speakers.legacySpeakerId': speaker.legacyId }] })
-            .select('legacyId title event_date status speakers');
+        const events = await Event.find({
+            $or: [{ 'speakers.speaker': speaker._id }, { 'speakers.legacySpeakerId': speaker.legacyId }]
+        }).select('legacyId title event_date status speakers');
+
         const data = mapSpeaker(speaker);
         data.events = events.map((event) => {
-            const assignment = event.speakers.find((item) => String(item.speaker) === String(speaker._id) || item.legacySpeakerId === speaker.legacyId);
-            return { id: String(event.legacyId || event._id), title: event.title, event_date: event.event_date, status: event.status, role: assignment ? assignment.role : 'speaker' };
+            const assignment = event.speakers.find(
+                (item) => String(item.speaker) === String(speaker._id) || item.legacySpeakerId === speaker.legacyId
+            );
+            return {
+                id: String(event.legacyId || event._id),
+                title: event.title,
+                event_date: formatDate(event.event_date),
+                status: event.status,
+                role: assignment ? assignment.role : 'speaker'
+            };
         });
 
         res.json({ success: true, data });
@@ -103,8 +142,15 @@ router.post('/', authenticateToken, logActivity('CREATE', 'guest_speakers'), asy
         const { error, value } = speakerSchema.validate(req.body);
         if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
 
+        let display_order = value.display_order;
+        if (display_order === undefined) {
+            const lastSpeaker = await GuestSpeaker.findOne().sort({ display_order: -1, created_at: -1 });
+            display_order = lastSpeaker ? (lastSpeaker.display_order ?? 0) + 1 : 1;
+        }
+
         const speaker = await GuestSpeaker.create({
             ...normalizeSpeakerPayload(value),
+            display_order,
             created_by: req.user._id,
             legacyCreatedBy: req.user.legacyId
         });
@@ -122,8 +168,16 @@ router.put('/:id', authenticateToken, logActivity('UPDATE', 'guest_speakers'), a
         const { error, value } = updateSpeakerSchema.validate(req.body);
         if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
 
-        const speaker = await GuestSpeaker.findOneAndUpdate(legacyOrObjectIdQuery(req.params.id), { $set: normalizeSpeakerPayload(value) }, { returnDocument: 'after' })
-            .populate('created_by', 'username legacyId');
+        const normalized = normalizeSpeakerPayload(value);
+        if (Object.keys(normalized).length === 0) {
+            return res.status(400).json({ error: 'No valid fields to update' });
+        }
+
+        const speaker = await GuestSpeaker.findOneAndUpdate(
+            legacyOrObjectIdQuery(req.params.id),
+            { $set: normalized },
+            { returnDocument: 'after' }
+        ).populate('created_by', 'username legacyId');
         if (!speaker) return res.status(404).json({ error: 'Speaker not found' });
 
         res.json({ success: true, message: 'Speaker updated successfully', data: mapSpeaker(speaker) });
@@ -137,13 +191,49 @@ router.delete('/:id', authenticateToken, logActivity('DELETE', 'guest_speakers')
     try {
         const speaker = await GuestSpeaker.findOne(legacyOrObjectIdQuery(req.params.id));
         if (!speaker) return res.status(404).json({ error: 'Speaker not found' });
-        const eventCount = await Event.countDocuments({ $or: [{ 'speakers.speaker': speaker._id }, { 'speakers.legacySpeakerId': speaker.legacyId }] });
-        if (eventCount > 0) return res.status(409).json({ error: 'Cannot delete speaker who is assigned to events. Remove from events first.' });
+
+        const eventCount = await Event.countDocuments({
+            $or: [{ 'speakers.speaker': speaker._id }, { 'speakers.legacySpeakerId': speaker.legacyId }]
+        });
+        if (eventCount > 0) {
+            return res.status(409).json({ error: 'Cannot delete speaker who is assigned to events. Remove from events first.' });
+        }
+
         await speaker.deleteOne();
         res.json({ success: true, message: 'Speaker deleted successfully' });
     } catch (error) {
         console.error('Delete speaker error:', error);
         res.status(500).json({ error: 'Failed to delete speaker' });
+    }
+});
+
+router.patch('/:id/reorder', authenticateToken, logActivity('UPDATE', 'guest_speakers'), async (req, res) => {
+    try {
+        const { direction } = req.body;
+        if (!['up', 'down'].includes(direction)) {
+            return res.status(400).json({ error: 'direction must be "up" or "down"' });
+        }
+
+        const speaker = await GuestSpeaker.findOne(legacyOrObjectIdQuery(req.params.id));
+        if (!speaker) return res.status(404).json({ error: 'Speaker not found' });
+
+        const currentOrder = speaker.display_order ?? 0;
+        const target = await GuestSpeaker.findOne({
+            display_order: direction === 'up' ? { $lt: currentOrder } : { $gt: currentOrder }
+        }).sort(direction === 'up' ? { display_order: -1 } : { display_order: 1 });
+
+        if (!target) return res.json({ success: true, message: 'Already at boundary', data: mapSpeaker(speaker) });
+
+        const tempOrder = target.display_order ?? 0;
+        speaker.display_order = tempOrder;
+        target.display_order = currentOrder;
+        await Promise.all([speaker.save(), target.save()]);
+        await speaker.populate('created_by', 'username legacyId');
+
+        res.json({ success: true, message: 'Speaker reordered successfully', data: mapSpeaker(speaker) });
+    } catch (error) {
+        console.error('Reorder speaker error:', error);
+        res.status(500).json({ error: 'Failed to reorder speaker' });
     }
 });
 
@@ -153,7 +243,11 @@ router.patch('/:id/toggle-availability', authenticateToken, logActivity('UPDATE'
         if (!speaker) return res.status(404).json({ error: 'Speaker not found' });
         speaker.is_available = !speaker.is_available;
         await speaker.save();
-        res.json({ success: true, message: `Speaker ${speaker.is_available ? 'marked as available' : 'marked as unavailable'}`, is_available: speaker.is_available });
+        res.json({
+            success: true,
+            message: `Speaker ${speaker.is_available ? 'marked as available' : 'marked as unavailable'}`,
+            is_available: speaker.is_available
+        });
     } catch (error) {
         console.error('Toggle speaker availability error:', error);
         res.status(500).json({ error: 'Failed to toggle speaker availability' });

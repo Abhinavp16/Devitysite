@@ -115,7 +115,6 @@ async function seed() {
         ...speaker,
         image_url: null,
         bio: speaker.bio || '',
-        speaking_topics: [],
         expertise: expertiseDocs(speaker.expertise),
         created_by: admin ? admin._id : undefined,
         legacyCreatedBy: admin ? admin.legacyId : undefined

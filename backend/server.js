@@ -4,6 +4,13 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
+
+// Guard required env vars at startup
+if (!process.env.JWT_SECRET) {
+    console.error('FATAL: JWT_SECRET environment variable is required');
+    process.exit(1);
+}
+
 const connectMongoDB = require('./config/mongodb');
 
 const authRoutes = require('./routes/auth');
@@ -11,11 +18,15 @@ const memoriesRoutes = require('./routes/memories');
 const eventsRoutes = require('./routes/events');
 const teamRoutes = require('./routes/team');
 const speakersRoutes = require('./routes/speakers');
+const reviewsRoutes = require('./routes/reviews');
 const dashboardRoutes = require('./routes/dashboard');
 const publicRoutes = require('./routes/public');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Trust the first proxy (required for correct req.ip on Vercel/Railway/etc.)
+app.set('trust proxy', 1);
 
 const allowedOrigins = [
     'https://devityclub.com',
@@ -41,17 +52,7 @@ app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
-// Rate limiting
-const limiter = rateLimit({
-    windowMs: (process.env.RATE_LIMIT_WINDOW || 15) * 60 * 1000, // 15 minutes
-    max: process.env.RATE_LIMIT_MAX || 100, // limit each IP to 100 requests per windowMs
-    message: {
-        error: 'Too many requests from this IP, please try again later.'
-    }
-});
-app.use('/api/', limiter);
-
-// CORS configuration
+// CORS configuration — must come BEFORE rate limiter so 429 responses include CORS headers
 app.use(cors({
     origin: (origin, callback) => {
         const localOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
@@ -62,9 +63,19 @@ app.use(cors({
         callback(isAllowed ? null : new Error('Not allowed by CORS'), isAllowed);
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: Number(process.env.RATE_LIMIT_WINDOW || 15) * 60 * 1000,
+    max: Number(process.env.RATE_LIMIT_MAX || 100),
+    message: {
+        error: 'Too many requests from this IP, please try again later.'
+    }
+});
+app.use('/api', limiter);
 
 // Body parsing middleware
 app.use(express.json({ limit: '25mb' }));
@@ -73,7 +84,7 @@ app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 // Static files for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Health check endpoint
+// Health check endpoint (no DB needed)
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'OK',
@@ -86,7 +97,6 @@ app.get('/api/health', (req, res) => {
 app.get('/api/db-health', async (req, res) => {
     try {
         const connection = await connectMongoDB();
-
         res.json({
             status: 'OK',
             database: connection.name,
@@ -96,12 +106,13 @@ app.get('/api/db-health', async (req, res) => {
         res.status(500).json({
             status: 'ERROR',
             error: 'MongoDB connection failed',
-            reason: error.message,
+            reason: process.env.NODE_ENV === 'production' ? 'Connection failed' : error.message,
             hint: 'Check MONGODB_URI in Vercel and allow Vercel outbound IPs in MongoDB Atlas Network Access.'
         });
     }
 });
 
+// Ensure DB connection for all /api routes
 app.use('/api', async (req, res, next) => {
     try {
         await connectMongoDB();
@@ -117,37 +128,30 @@ app.use('/api/memories', memoriesRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/speakers', speakersRoutes);
+app.use('/api/reviews', reviewsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/public', publicRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Error:', err);
-    
+
     if (err.type === 'entity.parse.failed') {
-        return res.status(400).json({
-            error: 'Invalid JSON in request body'
-        });
+        return res.status(400).json({ error: 'Invalid JSON in request body' });
     }
-    
+
     if (err.code === 'LIMIT_FILE_SIZE') {
-        return res.status(413).json({
-            error: 'File too large'
-        });
+        return res.status(413).json({ error: 'File too large' });
     }
-    
+
     res.status(err.status || 500).json({
-        error: process.env.NODE_ENV === 'production' 
-            ? 'Internal server error' 
-            : err.message
+        error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message
     });
 });
 
 // 404 handler
 app.use('*', (req, res) => {
-    res.status(404).json({
-        error: 'Route not found'
-    });
+    res.status(404).json({ error: 'Route not found' });
 });
 
 const startServer = async () => {

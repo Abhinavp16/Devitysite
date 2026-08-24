@@ -2,18 +2,34 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
+const rateLimit = require('express-rate-limit');
 const { AdminUser, ActivityLog, publicId } = require('../models');
 const { authenticateToken, logActivity } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Stricter limiter for login attempts — 10 per 15 min per IP
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: { error: 'Too many login attempts. Please try again in 15 minutes.' },
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
+// Login accepts email only (username is validated after lookup)
 const loginSchema = Joi.object({
     email: Joi.string().email().required(),
-    username: Joi.string().alphanum().min(3).max(30).required(),
+    username: Joi.string().alphanum().min(3).max(30).optional(),
     password: Joi.string().min(6).required()
 });
 
-router.post('/login', async (req, res) => {
+const changePasswordSchema = Joi.object({
+    currentPassword: Joi.string().required(),
+    newPassword: Joi.string().min(6).max(72).required()
+});
+
+router.post('/login', loginLimiter, async (req, res) => {
     try {
         const { error, value } = loginSchema.validate(req.body);
         if (error) {
@@ -24,7 +40,12 @@ router.post('/login', async (req, res) => {
         }
 
         const { email, username, password } = value;
-        const user = await AdminUser.findOne({ email: email.toLowerCase(), username, is_active: true });
+
+        // Build query: always match email; also match username if supplied
+        const query = { email: email.toLowerCase(), is_active: true };
+        if (username) query.username = username;
+
+        const user = await AdminUser.findOne(query);
 
         if (!user) {
             return res.status(401).json({ error: 'Invalid credentials' });
@@ -50,7 +71,7 @@ router.post('/login', async (req, res) => {
             legacyUserId: user.legacyId,
             action: 'LOGIN',
             table_name: 'admin_users',
-            ip_address: req.ip || req.connection.remoteAddress,
+            ip_address: req.ip || req.socket?.remoteAddress,
             user_agent: req.get('User-Agent')
         });
 
@@ -83,23 +104,17 @@ router.get('/verify', authenticateToken, (req, res) => {
 });
 
 router.post('/logout', authenticateToken, logActivity('LOGOUT', 'admin_users'), async (req, res) => {
-    res.json({
-        success: true,
-        message: 'Logout successful'
-    });
+    res.json({ success: true, message: 'Logout successful' });
 });
 
 router.post('/change-password', authenticateToken, async (req, res) => {
     try {
-        const { currentPassword, newPassword } = req.body;
-
-        if (!currentPassword || !newPassword) {
-            return res.status(400).json({ error: 'Current password and new password are required' });
+        const { error, value } = changePasswordSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
         }
 
-        if (newPassword.length < 6) {
-            return res.status(400).json({ error: 'New password must be at least 6 characters long' });
-        }
+        const { currentPassword, newPassword } = value;
 
         const isValidPassword = await bcrypt.compare(currentPassword, req.user.password_hash);
         if (!isValidPassword) {
@@ -114,13 +129,12 @@ router.post('/change-password', authenticateToken, async (req, res) => {
             legacyUserId: req.user.legacyId,
             action: 'UPDATE',
             table_name: 'admin_users',
-            record_id: publicId(req.user)
+            record_id: publicId(req.user),
+            ip_address: req.ip || req.socket?.remoteAddress,
+            user_agent: req.get('User-Agent')
         });
 
-        res.json({
-            success: true,
-            message: 'Password changed successfully'
-        });
+        res.json({ success: true, message: 'Password changed successfully' });
     } catch (error) {
         console.error('Change password error:', error);
         res.status(500).json({ error: 'Internal server error' });

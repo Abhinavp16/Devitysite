@@ -1,5 +1,10 @@
-const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+
+// Guard: only load SQLite in non-production (migration/init scripts only)
+if (process.env.NODE_ENV === 'production') {
+    module.exports = null;
+} else {
+    const sqlite3 = require('sqlite3').verbose();
 
 const dbPath = path.join(__dirname, '..', process.env.DB_PATH || './database/devityclub.db');
 
@@ -89,3 +94,4 @@ const dbHelpers = {
 Object.assign(db, dbHelpers);
 
 module.exports = db;
+}

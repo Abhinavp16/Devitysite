@@ -9,7 +9,8 @@ const useLoadingSequence = (initialDelay = 100) => {
   useEffect(() => {
     const loadingTimer = measureTotalLoadingTime();
     let stepStartTime = performance.now();
-    
+    const pendingTimeouts = [];
+
     const loadingSteps = [
       { step: 'Initializing DevityClub...', progress: 25, delay: 150 },
       { step: 'Loading components...', progress: 50, delay: 200 },
@@ -18,42 +19,44 @@ const useLoadingSequence = (initialDelay = 100) => {
     ];
 
     let stepIndex = 0;
-    
+
     const executeLoadingStep = () => {
       if (stepIndex < loadingSteps.length) {
         const { step, progress: stepProgress, delay } = loadingSteps[stepIndex];
-        
-        // Track previous step completion time
+
         if (stepIndex > 0) {
           trackLoadingSequence(stepStartTime, loadingSteps[stepIndex - 1].step);
         }
-        
+
         stepStartTime = performance.now();
         setCurrentStep(step);
         setProgress(stepProgress);
-        
-        setTimeout(() => {
+
+        const tid = setTimeout(() => {
           stepIndex++;
           if (stepIndex < loadingSteps.length) {
             executeLoadingStep();
           } else {
-            // Track final step and total time
             trackLoadingSequence(stepStartTime, step);
-            setTimeout(() => {
+            const finalTid = setTimeout(() => {
               loadingTimer.end();
               setIsLoading(false);
             }, 150);
+            pendingTimeouts.push(finalTid);
           }
         }, delay);
+        pendingTimeouts.push(tid);
       }
     };
 
-    // Start loading sequence after minimal initial delay
     const startTimeout = setTimeout(() => {
       executeLoadingStep();
     }, initialDelay);
 
-    return () => clearTimeout(startTimeout);
+    return () => {
+      clearTimeout(startTimeout);
+      pendingTimeouts.forEach(clearTimeout);
+    };
   }, [initialDelay]);
 
   return { isLoading, progress, currentStep };

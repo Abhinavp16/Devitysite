@@ -18,32 +18,33 @@ export const getViewportHeight = () => {
 };
 
 export const setViewportMeta = () => {
-  // Ensure proper viewport meta tag
   let viewport = document.querySelector('meta[name="viewport"]');
   if (!viewport) {
     viewport = document.createElement('meta');
     viewport.name = 'viewport';
     document.head.appendChild(viewport);
   }
-  viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+  // user-scalable=no removed: violates WCAG 2.1 SC 1.4.4 and is ignored by iOS 10+ anyway
+  viewport.content = 'width=device-width, initial-scale=1.0, viewport-fit=cover';
 };
 
+let _preventZoomInitialized = false;
+
 export const preventZoom = () => {
-  // Prevent zoom on input focus for mobile
+  // Guard: only attach listeners once across all calls (resize handler re-invokes this)
+  if (_preventZoomInitialized) return;
+  _preventZoomInitialized = true;
+
   document.addEventListener('touchstart', (e) => {
-    if (e.touches.length > 1) {
-      e.preventDefault();
-    }
-  });
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
 
   let lastTouchEnd = 0;
   document.addEventListener('touchend', (e) => {
-    const now = (new Date()).getTime();
-    if (now - lastTouchEnd <= 300) {
-      e.preventDefault();
-    }
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) e.preventDefault();
     lastTouchEnd = now;
-  }, false);
+  }, { passive: false, capture: false });
 };
 
 export const handleOrientationChange = (callback) => {

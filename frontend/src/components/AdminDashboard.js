@@ -31,7 +31,7 @@ const AdminDashboard = () => {
         apiService.getMemories(),
         apiService.getEvents(),
         apiService.getTeamMembers(),
-        apiService.getSpeakers()
+        apiService.getSpeakers({ is_available: 'all' })
       ]);
 
       setDashboardData({

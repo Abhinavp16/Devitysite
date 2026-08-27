@@ -35,6 +35,19 @@ const normalizeSpeakerPayload = (payload) => {
     return normalized;
 };
 
+const normalizeSpeakerDisplayOrder = async () => {
+    const speakers = await GuestSpeaker.find().sort({ display_order: 1, name: 1, created_at: 1, _id: 1 });
+    const updates = speakers.flatMap((speaker, index) => {
+        const display_order = index + 1;
+        return speaker.display_order === display_order
+            ? []
+            : [{ updateOne: { filter: { _id: speaker._id }, update: { $set: { display_order } } } }];
+    });
+
+    if (updates.length > 0) await GuestSpeaker.bulkWrite(updates);
+    return speakers;
+};
+
 router.get('/', authenticateToken, async (req, res) => {
     try {
         const { page = 1, limit = 20, search = '', is_available = 'true', expertise_area = '' } = req.query;
@@ -217,20 +230,25 @@ router.patch('/:id/reorder', authenticateToken, logActivity('UPDATE', 'guest_spe
         const speaker = await GuestSpeaker.findOne(legacyOrObjectIdQuery(req.params.id));
         if (!speaker) return res.status(404).json({ error: 'Speaker not found' });
 
-        const currentOrder = speaker.display_order ?? 0;
-        const target = await GuestSpeaker.findOne({
-            display_order: direction === 'up' ? { $lt: currentOrder } : { $gt: currentOrder }
-        }).sort(direction === 'up' ? { display_order: -1 } : { display_order: 1 });
+        // Legacy records may share the default order of zero. Repair to a dense,
+        // deterministic sequence before selecting the immediately adjacent card.
+        const speakers = await normalizeSpeakerDisplayOrder();
+        const currentIndex = speakers.findIndex((item) => String(item._id) === String(speaker._id));
+        const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+        const target = speakers[targetIndex];
 
-        if (!target) return res.json({ success: true, message: 'Already at boundary', data: mapSpeaker(speaker) });
+        if (!target) return res.json({ success: true, moved: false, message: 'Already at boundary', data: mapSpeaker(speaker) });
 
-        const tempOrder = target.display_order ?? 0;
-        speaker.display_order = tempOrder;
-        target.display_order = currentOrder;
-        await Promise.all([speaker.save(), target.save()]);
+        const currentOrder = currentIndex + 1;
+        const targetOrder = targetIndex + 1;
+        await GuestSpeaker.bulkWrite([
+            { updateOne: { filter: { _id: speaker._id }, update: { $set: { display_order: targetOrder } } } },
+            { updateOne: { filter: { _id: target._id }, update: { $set: { display_order: currentOrder } } } }
+        ]);
+
+        speaker.display_order = targetOrder;
         await speaker.populate('created_by', 'username legacyId');
-
-        res.json({ success: true, message: 'Speaker reordered successfully', data: mapSpeaker(speaker) });
+        res.json({ success: true, moved: true, message: 'Speaker reordered successfully', data: mapSpeaker(speaker) });
     } catch (error) {
         console.error('Reorder speaker error:', error);
         res.status(500).json({ error: 'Failed to reorder speaker' });

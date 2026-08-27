@@ -554,6 +554,7 @@ export const EventsTab = ({ dashboardData, setDashboardData, onDataChanged, refr
   const [showForm, setShowForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [reordering, setReordering] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -644,6 +645,8 @@ export const EventsTab = ({ dashboardData, setDashboardData, onDataChanged, refr
   };
 
   const handleReorder = async (id, direction) => {
+    if (reordering) return;
+    setReordering(true);
     try {
       const response = await apiService.reorderEvent(id, direction);
       if (response.success) {
@@ -651,9 +654,13 @@ export const EventsTab = ({ dashboardData, setDashboardData, onDataChanged, refr
         if (eventsResponse.success) {
           setDashboardData(prev => ({ ...prev, events: eventsResponse.data }));
         }
+        toast[response.moved === false ? 'info' : 'success'](response.message);
       }
     } catch (error) {
       console.error('Error reordering event:', error);
+      toast.error('Error reordering event: ' + error.message);
+    } finally {
+      setReordering(false);
     }
   };
 
@@ -869,14 +876,16 @@ export const EventsTab = ({ dashboardData, setDashboardData, onDataChanged, refr
               <div className="flex flex-col space-y-1 ml-4">
                 <button
                   onClick={() => handleReorder(event.id, 'up')}
-                  className="px-3 py-1 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-xs font-medium"
+                  disabled={reordering}
+                  className="px-3 py-1 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
                   title="Move Up"
                 >
                   ▲
                 </button>
                 <button
                   onClick={() => handleReorder(event.id, 'down')}
-                  className="px-3 py-1 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-xs font-medium"
+                  disabled={reordering}
+                  className="px-3 py-1 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
                   title="Move Down"
                 >
                   ▼
@@ -1311,6 +1320,7 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
   const [showForm, setShowForm] = useState(false);
   const [editingSpeaker, setEditingSpeaker] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [reordering, setReordering] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     title: '',
@@ -1347,7 +1357,7 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
       }
 
       if (response.success) {
-        const speakersResponse = await apiService.getSpeakers();
+        const speakersResponse = await apiService.getSpeakers({ is_available: 'all' });
         if (speakersResponse.success) {
           setDashboardData(prev => ({
             ...prev,
@@ -1389,7 +1399,7 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
       try {
         const response = await apiService.deleteSpeaker(id);
         if (response.success) {
-          const speakersResponse = await apiService.getSpeakers();
+          const speakersResponse = await apiService.getSpeakers({ is_available: 'all' });
           if (speakersResponse.success) {
             setDashboardData(prev => ({
               ...prev,
@@ -1407,16 +1417,22 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
   };
 
   const handleReorder = async (id, direction) => {
+    if (reordering) return;
+    setReordering(true);
     try {
       const response = await apiService.reorderSpeaker(id, direction);
       if (response.success) {
-        const speakersResponse = await apiService.getSpeakers();
+        const speakersResponse = await apiService.getSpeakers({ is_available: 'all' });
         if (speakersResponse.success) {
           setDashboardData(prev => ({ ...prev, speakers: speakersResponse.data }));
         }
+        toast[response.moved === false ? 'info' : 'success'](response.message);
       }
     } catch (error) {
       console.error('Error reordering speaker:', error);
+      toast.error('Error reordering speaker: ' + error.message);
+    } finally {
+      setReordering(false);
     }
   };
 
@@ -1623,13 +1639,15 @@ export const SpeakersTab = ({ dashboardData, setDashboardData, onDataChanged, re
               <div className="grid grid-cols-2 gap-2 mb-2">
                 <button
                   onClick={() => handleReorder(speaker.id, 'up')}
-                  className="bg-orange-50 text-orange-700 py-2 px-3 rounded-lg hover:bg-orange-100 transition-colors text-sm font-medium"
+                  disabled={reordering}
+                  className="bg-orange-50 text-orange-700 py-2 px-3 rounded-lg hover:bg-orange-100 transition-colors text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   ▲ Up
                 </button>
                 <button
                   onClick={() => handleReorder(speaker.id, 'down')}
-                  className="bg-orange-50 text-orange-700 py-2 px-3 rounded-lg hover:bg-orange-100 transition-colors text-sm font-medium"
+                  disabled={reordering}
+                  className="bg-orange-50 text-orange-700 py-2 px-3 rounded-lg hover:bg-orange-100 transition-colors text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   ▼ Down
                 </button>

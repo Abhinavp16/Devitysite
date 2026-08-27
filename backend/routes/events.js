@@ -33,6 +33,19 @@ const updateEventSchema = Joi.object({
     display_order: Joi.number().integer().min(0).optional()
 });
 
+const normalizeEventDisplayOrder = async () => {
+    const events = await Event.find().sort({ display_order: 1, event_date: 1, created_at: -1, _id: 1 });
+    const updates = events.flatMap((event, index) => {
+        const display_order = index + 1;
+        return event.display_order === display_order
+            ? []
+            : [{ updateOne: { filter: { _id: event._id }, update: { $set: { display_order } } } }];
+    });
+
+    if (updates.length > 0) await Event.bulkWrite(updates);
+    return events;
+};
+
 const getEventSpeakerDocs = async (event) => {
     const assignments = event.speakers || [];
     if (assignments.length === 0) return [];
@@ -224,20 +237,25 @@ router.patch('/:id/reorder', authenticateToken, logActivity('UPDATE', 'events'),
         const event = await Event.findOne(legacyOrObjectIdQuery(req.params.id));
         if (!event) return res.status(404).json({ error: 'Event not found' });
 
-        const currentOrder = event.display_order ?? 0;
-        const target = await Event.findOne({
-            display_order: direction === 'up' ? { $lt: currentOrder } : { $gt: currentOrder }
-        }).sort(direction === 'up' ? { display_order: -1 } : { display_order: 1 });
+        // Legacy records may share the default order of zero. Repair to a dense,
+        // deterministic sequence before selecting the immediately adjacent card.
+        const events = await normalizeEventDisplayOrder();
+        const currentIndex = events.findIndex((item) => String(item._id) === String(event._id));
+        const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+        const target = events[targetIndex];
 
-        if (!target) return res.json({ success: true, message: 'Already at boundary', data: mapEvent(event) });
+        if (!target) return res.json({ success: true, moved: false, message: 'Already at boundary', data: mapEvent(event) });
 
-        const tempOrder = target.display_order ?? 0;
-        event.display_order = tempOrder;
-        target.display_order = currentOrder;
-        await Promise.all([event.save(), target.save()]);
+        const currentOrder = currentIndex + 1;
+        const targetOrder = targetIndex + 1;
+        await Event.bulkWrite([
+            { updateOne: { filter: { _id: event._id }, update: { $set: { display_order: targetOrder } } } },
+            { updateOne: { filter: { _id: target._id }, update: { $set: { display_order: currentOrder } } } }
+        ]);
+
+        event.display_order = targetOrder;
         await event.populate('created_by', 'username legacyId');
-
-        res.json({ success: true, message: 'Event reordered successfully', data: mapEvent(event) });
+        res.json({ success: true, moved: true, message: 'Event reordered successfully', data: mapEvent(event) });
     } catch (error) {
         console.error('Reorder event error:', error);
         res.status(500).json({ error: 'Failed to reorder event' });

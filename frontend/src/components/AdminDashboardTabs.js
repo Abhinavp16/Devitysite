@@ -966,7 +966,7 @@ export const TeamTab = ({ dashboardData, setDashboardData, onDataChanged, refres
       }
 
       if (response.success) {
-        const teamResponse = await apiService.getTeamMembers();
+        const teamResponse = await apiService.getTeamMembers({ is_active: 'all' });
         if (teamResponse.success) {
           setDashboardData(prev => ({
             ...prev,
@@ -1009,7 +1009,7 @@ export const TeamTab = ({ dashboardData, setDashboardData, onDataChanged, refres
       try {
         const response = await apiService.deleteTeamMember(id);
         if (response.success) {
-          const teamResponse = await apiService.getTeamMembers();
+          const teamResponse = await apiService.getTeamMembers({ is_active: 'all' });
           if (teamResponse.success) {
             setDashboardData(prev => ({
               ...prev,
@@ -1030,7 +1030,7 @@ export const TeamTab = ({ dashboardData, setDashboardData, onDataChanged, refres
     try {
       const response = await apiService.reorderTeamMember(id, direction);
       if (response.success) {
-        const teamResponse = await apiService.getTeamMembers();
+        const teamResponse = await apiService.getTeamMembers({ is_active: 'all' });
         if (teamResponse.success) {
           setDashboardData(prev => ({
             ...prev,

@@ -30,7 +30,7 @@ const AdminDashboard = () => {
       const [memoriesRes, eventsRes, teamRes, speakersRes] = await Promise.all([
         apiService.getMemories(),
         apiService.getEvents(),
-        apiService.getTeamMembers(),
+        apiService.getTeamMembers({ is_active: 'all' }),
         apiService.getSpeakers({ is_available: 'all' })
       ]);
 

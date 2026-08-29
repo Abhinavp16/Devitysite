@@ -16,6 +16,7 @@ const speakerSchema = Joi.object({
     linkedin_url: Joi.string().max(500).allow('', null).optional(),
     twitter_url: Joi.string().max(500).allow('', null).optional(),
     website_url: Joi.string().max(500).allow('', null).optional(),
+    is_available: Joi.boolean().optional(),
     display_order: Joi.number().integer().min(0).optional(),
     expertise: Joi.array().items(Joi.object({
         area: Joi.string().min(1).max(100).required(),
@@ -23,9 +24,7 @@ const speakerSchema = Joi.object({
     })).optional()
 });
 
-const updateSpeakerSchema = speakerSchema.fork(['name', 'title', 'company'], (schema) => schema.optional()).append({
-    is_available: Joi.boolean().optional()
-});
+const updateSpeakerSchema = speakerSchema.fork(['name', 'title', 'company'], (schema) => schema.optional());
 
 const normalizeSpeakerPayload = (payload) => {
     const normalized = { ...payload };

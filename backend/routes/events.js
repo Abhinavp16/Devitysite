@@ -15,7 +15,7 @@ const eventSchema = Joi.object({
     location: Joi.string().min(1).max(255).required(),
     event_type: Joi.string().valid('Workshop', 'Bootcamp', 'Seminar', 'Competition', 'Hackathon').required(),
     status: Joi.string().valid('upcoming', 'completed', 'cancelled').default('upcoming'),
-    max_participants: Joi.number().integer().min(1).optional(),
+    max_participants: Joi.number().integer().min(1).allow('', null).optional(),
     registration_link: Joi.string().uri().allow('').optional(),
     display_order: Joi.number().integer().min(0).optional()
 });
@@ -28,7 +28,7 @@ const updateEventSchema = Joi.object({
     location: Joi.string().min(1).max(255).optional(),
     event_type: Joi.string().valid('Workshop', 'Bootcamp', 'Seminar', 'Competition', 'Hackathon').optional(),
     status: Joi.string().valid('upcoming', 'completed', 'cancelled').optional(),
-    max_participants: Joi.number().integer().min(1).allow(null).optional(),
+    max_participants: Joi.number().integer().min(1).allow('', null).optional(),
     registration_link: Joi.string().uri().allow('').optional(),
     display_order: Joi.number().integer().min(0).optional()
 });

@@ -48,21 +48,8 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Custom styles for logo animations injected via a real <style> tag (not jsx prop)
+  // Navbar drop-in animation, injected via a real <style> tag
   const logoKeyframes = `
-    @keyframes logoFloat {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      25% { transform: translateY(-3px) rotate(1deg); }
-      50% { transform: translateY(-6px) rotate(0deg); }
-      75% { transform: translateY(-3px) rotate(-1deg); }
-    }
-    .logo-glow {
-      filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3)) brightness(110%) contrast(110%);
-      transition: filter 0.5s ease;
-    }
-    .logo-glow:hover {
-      filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.6)) brightness(120%) contrast(120%);
-    }
     @keyframes navDrop {
       from { transform: translateY(-120%); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
@@ -94,49 +81,11 @@ const Header = () => {
 
           <div className="px-4 sm:px-6 lg:px-8 relative">
             <div className="flex justify-between items-center transition-all duration-300">
-              {/* Enhanced Animated Logo */}
-              <div className="flex items-center group cursor-pointer">
-                <div className="relative overflow-hidden">
-                  {/* Animated background ring */}
-                  <div className="absolute -inset-2 sm:-inset-3 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 rounded-full opacity-0 group-hover:opacity-30 blur-md transition-all duration-700 animate-pulse"></div>
-
-                  {/* Rotating border ring */}
-                  <div className="absolute -inset-1.5 sm:-inset-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <div className="w-full h-full rounded-full border-2 border-blue-300/50 animate-spin" style={{ animationDuration: '3s' }}></div>
-                  </div>
-
-                  {/* Main logo container */}
-                  <div className="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-full p-1.5 sm:p-2 border border-white/20 group-hover:border-white/40 transition-all duration-500 group-hover:shadow-2xl">
-                    <img
-                      src={devityLogo}
-                      alt="DevityClub Logo"
-                      className="h-10 sm:h-12 w-auto transform transition-all duration-700 ease-out group-hover:scale-125 cursor-pointer logo-glow"
-                      style={{ animation: 'logoFloat 3s ease-in-out infinite' }}
-                    />
-
-                    {/* Shimmer effect overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out rounded-full"></div>
-
-                    {/* Floating particles */}
-                    <div className="absolute -top-1 -right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-300 rounded-full opacity-0 group-hover:opacity-100 animate-ping transition-opacity duration-300"></div>
-                    <div className="absolute -bottom-1 -left-1 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-cyan-300 rounded-full opacity-0 group-hover:opacity-100 animate-pulse transition-opacity duration-300" style={{ animationDelay: '0.5s' }}></div>
-                    <div className="absolute top-1/2 -right-2 w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100 animate-bounce transition-opacity duration-300" style={{ animationDelay: '0.3s' }}></div>
-                  </div>
-
-                  {/* Ripple effect */}
-                  <div className="absolute inset-0 rounded-full border-2 border-blue-300/50 opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-1000 ease-out"></div>
-                  <div className="absolute inset-0 rounded-full border border-cyan-300/30 opacity-0 group-hover:opacity-100 group-hover:scale-200 transition-all duration-1500 ease-out" style={{ transitionDelay: '0.2s' }}></div>
-                </div>
-
-                {/* Logo text with gradient animation */}
-                <div className="ml-2 sm:ml-3 relative overflow-hidden">
-                  <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-200 via-white to-cyan-200 bg-clip-text text-transparent transition-all duration-500 group-hover:scale-105">
-                    <span className="inline-block animate-pulse">DevityClub</span>
-                  </h1>
-                  {/* Text glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 opacity-0 group-hover:opacity-20 blur-sm transition-opacity duration-500"></div>
-                </div>
-              </div>
+              {/* Logo — plain, no hover effects */}
+              <a href="#home" className="flex items-center gap-2.5 sm:gap-3" aria-label="Devity Club — back to top">
+                <img src={devityLogo} alt="" className="h-9 w-auto sm:h-10" />
+                <span className="text-xl font-bold tracking-tight text-white sm:text-2xl">DevityClub</span>
+              </a>
 
               {/* Desktop Navigation */}
               <nav className="hidden md:flex space-x-1 lg:space-x-2">

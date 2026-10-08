@@ -87,7 +87,7 @@ const JoinCard = () => {
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gold-dark dark:text-gold">Get involved</p>
         <span className="mx-auto mt-2 block h-0.5 w-11 bg-gold" aria-hidden="true" />
         <h3 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-navy-ink dark:text-white">
-          Join us <em className="italic text-navy dark:text-gold">or help us grow</em>
+          Join us <span className="text-navy dark:text-gold">or help us grow</span>
         </h3>
       </div>
 

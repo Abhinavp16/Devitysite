@@ -108,7 +108,7 @@ const Hero = () => {
           <>
             <h1 className="mx-auto mt-6 max-w-4xl font-display text-[2.6rem] font-extrabold leading-[1.08] tracking-tight text-navy-ink dark:text-white sm:text-6xl lg:text-[4.25rem]">
               {content.headline}{' '}
-              <em className="italic text-navy dark:text-gold">{content.headline_highlight}</em>
+              <span className="text-navy dark:text-gold">{content.headline_highlight}</span>
             </h1>
 
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-slate-600 dark:text-gray-300">

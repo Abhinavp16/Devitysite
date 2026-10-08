@@ -2135,7 +2135,7 @@ export const ReviewsTab = ({ openNewSignal, initialSearch }) => {
                       {review.is_active ? 'Active' : 'Hidden'}
                     </span>
                   </div>
-                  <p className="text-gray-600 text-sm line-clamp-3 italic">"{review.review}"</p>
+                  <p className="text-gray-600 text-sm line-clamp-3">"{review.review}"</p>
                 </div>
                 {/* Actions */}
                 <div className="flex flex-col gap-2 flex-shrink-0">

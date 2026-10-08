@@ -139,7 +139,7 @@ const Events = () => {
         <div className="text-center mb-16">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gold">Events</p>
           <span className="mx-auto mt-2 block h-0.5 w-11 bg-gold" aria-hidden="true" />
-          <h2 className="mt-6 mb-5 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">Upcoming <em className="italic text-gold">events</em></h2>
+          <h2 className="mt-6 mb-5 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">Upcoming <span className="text-gold">events</span></h2>
           <p className="text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed sm:text-xl">Join our exciting events and workshops to enhance your skills and connect with fellow tech enthusiasts.</p>
         </div>
 
@@ -150,7 +150,7 @@ const Events = () => {
         {featuredEvents.length > 0 && <div className="grid md:grid-cols-2 gap-8 mb-12">{featuredEvents.map((event, index) => renderEventCard(event, index))}</div>}
         {pastEvents.length > 0 && (
           <div className="mt-16">
-            <h3 className="mb-6 text-center font-display text-3xl font-extrabold tracking-tight text-white">Past <em className="italic text-gold">events</em></h3>
+            <h3 className="mb-6 text-center font-display text-3xl font-extrabold tracking-tight text-white">Past <span className="text-gold">events</span></h3>
             <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">{pastEvents.map((event, index) => renderEventCard(event, index, true))}</div>
           </div>
         )}

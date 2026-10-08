@@ -100,7 +100,7 @@ const About = () => {
           <p className="about-reveal text-xs font-semibold uppercase tracking-[0.14em] text-gold">About us</p>
           <span className="about-reveal mx-auto mt-2 block h-0.5 w-11 bg-gold" style={delay(0.05)} aria-hidden="true" />
           <h2 className="about-reveal mt-6 font-display text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl" style={delay(0.1)}>
-            Building the future <em className="italic text-gold">with Devity Club</em>
+            Building the future <span className="text-gold">with Devity Club</span>
           </h2>
           <p className="about-reveal mt-5 text-base leading-relaxed text-slate-300 sm:text-lg" style={delay(0.2)}>
             A student-led initiative, founded 15 February 2023, empowering students with hands-on skills in AI,

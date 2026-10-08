@@ -169,7 +169,7 @@ const Contact = () => {
         {/* Follow Us Section */}
         <div className="mt-16 mx-4 overflow-hidden rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-[0_22px_70px_rgba(0,0,0,0.28)] transition-colors duration-300 sm:p-8">
           <div className="mx-auto mb-8 max-w-2xl text-center">
-            <h2 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Follow <em className="italic text-gold">us</em></h2>
+            <h2 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Follow <span className="text-gold">us</span></h2>
             <p className="mt-3 text-base leading-relaxed text-slate-300 sm:text-lg">
               Stay connected with us on social media for the latest updates, tech news, and community highlights.
             </p>

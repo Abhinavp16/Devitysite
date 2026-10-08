@@ -246,7 +246,7 @@ const HomeTab = () => {
         </a>
       </div>
 
-      <Card title="Headline and text" description="The highlighted part is shown in italics after the headline.">
+      <Card title="Headline and text" description="The highlighted part is shown in colour after the headline.">
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">Headline</label>
@@ -254,7 +254,7 @@ const HomeTab = () => {
           </div>
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">Highlighted part</label>
-            <input type="text" value={form.headline_highlight} onChange={(e) => setField('headline_highlight', e.target.value)} maxLength={80} className={`${inputClass} italic`} placeholder={HOME_DEFAULTS.headline_highlight} />
+            <input type="text" value={form.headline_highlight} onChange={(e) => setField('headline_highlight', e.target.value)} maxLength={80} className={inputClass} placeholder={HOME_DEFAULTS.headline_highlight} />
           </div>
         </div>
         <div className="mt-4">
@@ -267,7 +267,7 @@ const HomeTab = () => {
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-gold-dark">Preview</p>
           <p className="font-display text-3xl font-extrabold leading-tight text-navy-ink">
             {form.headline || HOME_DEFAULTS.headline}{' '}
-            <em className="italic text-navy">{form.headline_highlight || HOME_DEFAULTS.headline_highlight}</em>
+            <span className="text-navy">{form.headline_highlight || HOME_DEFAULTS.headline_highlight}</span>
           </p>
           <p className="mx-auto mt-3 max-w-lg text-slate-600">{form.subtitle || HOME_DEFAULTS.subtitle}</p>
         </div>

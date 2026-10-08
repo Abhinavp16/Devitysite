@@ -1,6 +1,9 @@
 // API Service for DevityClub Admin Dashboard
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
+// Fired on window when an authenticated request is rejected (expired/invalid token)
+export const SESSION_EXPIRED_EVENT = 'admin-session-expired';
+
 class ApiService {
     constructor() {
         this.token = localStorage.getItem('adminToken');
@@ -40,9 +43,11 @@ class ApiService {
     // Generic API request method
     async request(endpoint, options = {}) {
         const url = `${API_BASE_URL}${endpoint}`;
+        // Merge headers so callers can override Content-Type (file uploads) without losing auth
+        const { headers, ...rest } = options;
         const config = {
-            headers: this.getHeaders(),
-            ...options,
+            ...rest,
+            headers: { ...this.getHeaders(), ...headers },
         };
 
         try {
@@ -53,9 +58,18 @@ class ApiService {
                 // Handle authentication errors specifically
                 if (response.status === 401 || response.status === 403) {
                     this.setToken(null);
-                    throw new Error(data.error || 'Authentication failed');
+                    // A rejected login is just bad credentials; anything else means the session is gone
+                    if (endpoint !== '/auth/login') {
+                        localStorage.removeItem('adminUser');
+                        window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
+                    }
+                    const authError = new Error(data.error || 'Authentication failed');
+                    authError.status = response.status;
+                    throw authError;
                 }
-                throw new Error(data.details || data.error || `HTTP error! status: ${response.status}`);
+                const httpError = new Error(data.details || data.error || `HTTP error! status: ${response.status}`);
+                httpError.status = response.status;
+                throw httpError;
             }
 
             return data;
@@ -98,6 +112,13 @@ class ApiService {
 
     async verifyToken() {
         return this.request('/auth/verify');
+    }
+
+    async changePassword(currentPassword, newPassword) {
+        return this.request('/auth/change-password', {
+            method: 'POST',
+            body: JSON.stringify({ currentPassword, newPassword }),
+        });
     }
 
     // Dashboard methods
@@ -313,10 +334,54 @@ class ApiService {
         });
     }
 
+    async reorderReview(id, direction) {
+        return this.request(`/reviews/${id}/reorder`, {
+            method: 'PATCH',
+            body: JSON.stringify({ direction }),
+        });
+    }
+
     async toggleReviewStatus(id) {
         return this.request(`/reviews/${id}/toggle-status`, {
             method: 'PATCH',
         });
+    }
+
+    // Home page (hero) content
+    async getHomeContent() {
+        return this.request('/home');
+    }
+
+    async updateHomeContent(content) {
+        return this.request('/home', {
+            method: 'PUT',
+            body: JSON.stringify(content),
+        });
+    }
+
+    // Uploads send the raw file (not base64 JSON); the server checks type and size
+    async uploadHomePhoto(slot, file) {
+        return this.request(`/home/photos/${slot}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': file.type },
+            body: file,
+        });
+    }
+
+    async resetHomePhoto(slot) {
+        return this.request(`/home/photos/${slot}`, { method: 'DELETE' });
+    }
+
+    async uploadHomeVideo(file) {
+        return this.request('/home/video', {
+            method: 'PUT',
+            headers: { 'Content-Type': file.type },
+            body: file,
+        });
+    }
+
+    async resetHomeVideo() {
+        return this.request('/home/video', { method: 'DELETE' });
     }
 
     // Utility methods

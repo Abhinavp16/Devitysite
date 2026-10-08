@@ -1,0 +1,79 @@
+/* About section "spotlight" cards: a gold light follows the cursor (--x/--y set in About.js) */
+
+.spotlight-card {
+  --x: -500px;
+  --y: -500px;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Border that lights up near the cursor */
+.spotlight-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(260px circle at var(--x) var(--y), rgba(201, 162, 39, 0.9), rgba(255, 255, 255, 0.12) 45%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Soft glow inside the card */
+.spotlight-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(380px circle at var(--x) var(--y), rgba(201, 162, 39, 0.13), transparent 45%);
+  pointer-events: none;
+}
+
+/* Slowly drifting background glows */
+.about-aurora {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(110px);
+  opacity: 0.18;
+  pointer-events: none;
+  animation: about-drift 18s ease-in-out infinite alternate;
+}
+
+@keyframes about-drift {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(80px, -40px) scale(1.15); }
+  100% { transform: translate(-60px, 50px) scale(0.95); }
+}
+
+/* Faint grid that fades out towards the edges */
+.about-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+}
+
+/* Scroll reveal: elements rise in when the section becomes visible */
+.about-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.about-visible .about-reveal {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-aurora { animation: none; }
+  .about-reveal { opacity: 1; transform: none; transition: none; }
+}

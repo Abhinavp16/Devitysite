@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="a">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DevityClub — admin panel redesign</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" rel="stylesheet" />
+<style>
+  /* One layout, three looks */
+  [data-theme="a"] { --page:#f6f7f9; --side:#ffffff; --side-text:#475467; --side-active-bg:#eef2ff; --side-active:#3b5bdb; --card:#fff; --text:#101828; --muted:#667085; --line:#e4e7ec; --accent:#3b5bdb; --accent-text:#fff; --accent-soft:#eef2ff; --head-font:'Inter'; --brand:#101828; }
+  [data-theme="b"] { --page:#f6f3ec; --side:#0b1d3a; --side-text:#b8c3d9; --side-active-bg:rgba(201,162,39,.14); --side-active:#c9a227; --card:#fff; --text:#0b1d3a; --muted:#5b6474; --line:#e4e0d6; --accent:#0b2a5b; --accent-text:#fff; --accent-soft:#f3ead2; --head-font:'Playfair Display'; --brand:#fff; }
+  [data-theme="c"] { --page:#0b1220; --side:#0f172a; --side-text:#94a3b8; --side-active-bg:rgba(201,162,39,.12); --side-active:#c9a227; --card:#111a2e; --text:#e2e8f0; --muted:#8b9ab4; --line:#1f2a40; --accent:#c9a227; --accent-text:#0b1d3a; --accent-soft:rgba(201,162,39,.12); --head-font:'Inter'; --brand:#fff; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: var(--page); color: var(--text); transition: background .3s, color .3s; }
+  button, input, select, textarea { font: inherit; }
+  .switcher { position: sticky; top: 0; z-index: 200; background: #111; color: #fff; font-size: 13px; display: flex; gap: 8px; align-items: center; padding: 10px 20px; flex-wrap: wrap; }
+  .switcher button { border: 1px solid #444; background: transparent; color: #ddd; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+  .switcher button.on { background: #fff; color: #111; }
+  .switcher span { color: #aaa; margin-left: auto; }
+
+  .app { display: grid; grid-template-columns: 248px 1fr; min-height: calc(100vh - 45px); }
+  /* Sidebar */
+  .side { background: var(--side); border-right: 1px solid var(--line); padding: 20px 14px; display: flex; flex-direction: column; position: sticky; top: 45px; height: calc(100vh - 45px); }
+  [data-theme="b"] .side, [data-theme="c"] .side { border-right-color: transparent; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 4px 10px 20px; color: var(--brand); font-weight: 700; }
+  .brand .logo { width: 34px; height: 34px; border-radius: 9px; background: var(--side-active); color: var(--side); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; }
+  [data-theme="a"] .brand .logo { color: #fff; }
+  .brand small { display: block; font-weight: 500; font-size: 11.5px; color: var(--side-text); }
+  .group { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--side-text); opacity: .7; padding: 14px 12px 6px; }
+  .nav a { position: relative; display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: 9px; color: var(--side-text); text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; transition: background .2s, color .2s; }
+  .nav a i { font-size: 19px; }
+  .nav a:hover { background: var(--side-active-bg); }
+  .nav a.on { background: var(--side-active-bg); color: var(--side-active); font-weight: 600; }
+  [data-theme="b"] .nav a.on::before, [data-theme="c"] .nav a.on::before { content: ''; position: absolute; left: -14px; top: 8px; bottom: 8px; width: 3px; border-radius: 0 3px 3px 0; background: var(--side-active); }
+  .nav .count { margin-left: auto; font-size: 11.5px; font-weight: 600; background: var(--side-active-bg); color: var(--side-text); padding: 1px 8px; border-radius: 999px; }
+  .side-foot { margin-top: auto; border-top: 1px solid var(--line); padding-top: 14px; }
+  [data-theme="b"] .side-foot { border-top-color: rgba(255,255,255,.1); }
+  .user { display: flex; align-items: center; gap: 10px; padding: 6px 8px; color: var(--brand); font-size: 13.5px; font-weight: 600; }
+  .user .av { width: 32px; height: 32px; border-radius: 50%; background: var(--side-active-bg); color: var(--side-active); display: flex; align-items: center; justify-content: center; font-weight: 700; }
+  .user small { display: block; color: var(--side-text); font-weight: 400; font-size: 12px; }
+  .user button { margin-left: auto; border: 0; background: none; color: var(--side-text); cursor: pointer; font-size: 18px; }
+
+  /* Top bar */
+  .main { min-width: 0; }
+  .top { display: flex; align-items: center; gap: 14px; padding: 16px 32px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--page) 85%, transparent); backdrop-filter: blur(8px); position: sticky; top: 45px; z-index: 50; }
+  .search { flex: 1; max-width: 420px; display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; color: var(--muted); font-size: 14px; }
+  .search kbd { margin-left: auto; font-size: 11px; border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; }
+  .btn { display: inline-flex; align-items: center; gap: 7px; border-radius: 9px; padding: 9px 14px; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid var(--line); background: var(--card); color: var(--text); transition: transform .15s, background .2s; }
+  .btn:hover { transform: translateY(-1px); }
+  .btn.primary { background: var(--accent); color: var(--accent-text); border-color: transparent; }
+  .btn.ghost { background: transparent; }
+  .btn i { font-size: 17px; }
+
+  .content { padding: 28px 32px 60px; }
+  h1 { font-family: var(--head-font), 'Inter', sans-serif; font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -.01em; }
+  .sub { color: var(--muted); margin: 6px 0 0; font-size: 14.5px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+
+  /* Overview */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px; }
+  .stat { padding: 18px 20px; cursor: pointer; transition: border-color .2s, transform .2s; }
+  .stat:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .stat .k { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 13.5px; font-weight: 500; }
+  .stat .k i { font-size: 20px; color: var(--accent); background: var(--accent-soft); width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+  [data-theme="b"] .stat .k i { color: #8a6d12; }
+  .stat .v { font-size: 30px; font-weight: 700; margin-top: 10px; }
+  .stat .h { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .two { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-top: 16px; }
+  .panel { padding: 20px 22px; }
+  .panel h3 { margin: 0 0 14px; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
+  .panel h3 a { font-size: 13px; color: var(--accent); font-weight: 600; cursor: pointer; }
+  [data-theme="b"] .panel h3 a { color: #8a6d12; }
+  .todo { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--line); font-size: 14px; }
+  .todo:first-of-type { border-top: 0; padding-top: 0; }
+  .todo i { font-size: 19px; color: #d97706; margin-top: 1px; }
+  .todo .act { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--accent); white-space: nowrap; cursor: pointer; }
+  [data-theme="b"] .todo .act { color: #8a6d12; }
+  .feed { list-style: none; margin: 0; padding: 0; }
+  .feed li { display: flex; gap: 12px; padding: 10px 0; font-size: 14px; }
+  .feed .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+  .feed small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .quick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .quick button { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px; border-radius: 11px; border: 1px dashed var(--line); background: transparent; color: var(--text); cursor: pointer; font-weight: 600; font-size: 13.5px; transition: border-color .2s, background .2s; }
+  .quick button:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .quick i { font-size: 20px; color: var(--accent); }
+  [data-theme="b"] .quick i { color: #8a6d12; }
+
+  /* Events list */
+  .bar { display: flex; align-items: center; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+  .tabs { display: inline-flex; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
+  .tabs button { border: 0; background: none; padding: 7px 14px; border-radius: 8px; color: var(--muted); font-weight: 600; font-size: 13.5px; cursor: pointer; }
+  .tabs button.on { background: var(--accent-soft); color: var(--accent); }
+  [data-theme="b"] .tabs button.on { color: #0b2a5b; }
+  .filter { display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 7px 12px; color: var(--muted); font-size: 14px; min-width: 240px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .table { overflow: hidden; margin-top: 14px; }
+  th { text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  td { padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 14px; vertical-align: middle; }
+  tr:last-child td { border-bottom: 0; }
+  tbody tr { transition: background .15s; }
+  tbody tr:hover { background: var(--accent-soft); }
+  .grip { color: var(--muted); cursor: grab; font-size: 18px; }
+  .ev-title { font-weight: 600; }
+  .ev-title small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .date { display: inline-flex; flex-direction: column; align-items: center; width: 46px; border: 1px solid var(--line); border-radius: 9px; padding: 4px 0; line-height: 1.1; }
+  .date b { font-size: 16px; }
+  .date small { font-size: 10.5px; font-weight: 700; color: var(--accent); letter-spacing: .05em; }
+  [data-theme="b"] .date small { color: #8a6d12; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .pill.up { background: #dcfce7; color: #166534; }
+  .pill.done { background: #e0e7ff; color: #3730a3; }
+  .pill.warn { background: #fef3c7; color: #92400e; }
+  .pill.type { background: var(--accent-soft); color: var(--text); }
+  [data-theme="c"] .pill.up { background: rgba(34,197,94,.15); color: #86efac; }
+  [data-theme="c"] .pill.done { background: rgba(99,102,241,.18); color: #c7d2fe; }
+  [data-theme="c"] .pill.warn { background: rgba(245,158,11,.15); color: #fcd34d; }
+  .row-act { display: flex; gap: 4px; justify-content: flex-end; }
+  .icon-btn { width: 32px; height: 32px; border-radius: 8px; border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 17px; display: flex; align-items: center; justify-content: center; }
+  .icon-btn:hover { background: var(--accent-soft); color: var(--text); }
+  .icon-btn.danger:hover { background: #fee2e2; color: #b91c1c; }
+
+  /* Drawer */
+  .scrim { position: fixed; inset: 0; background: rgba(2,6,23,.45); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 300; }
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 480px; max-width: 100%; background: var(--card); z-index: 301; transform: translateX(100%); transition: transform .4s cubic-bezier(.22,1,.36,1); display: flex; flex-direction: column; box-shadow: -20px 0 50px rgba(0,0,0,.15); }
+  .open .scrim { opacity: 1; pointer-events: auto; }
+  .open .drawer { transform: none; }
+  .drawer header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--line); }
+  .drawer header h2 { margin: 0; font-size: 18px; font-family: var(--head-font), 'Inter', sans-serif; }
+  .drawer .body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+  .drawer footer { display: flex; gap: 10px; justify-content: flex-end; padding: 16px 24px; border-top: 1px solid var(--line); }
+  .f { margin-bottom: 16px; }
+  .f label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .f input, .f select, .f textarea { width: 100%; border: 1px solid var(--line); background: var(--page); color: var(--text); border-radius: 9px; padding: 10px 12px; font-size: 14px; outline: none; transition: border-color .2s, box-shadow .2s; }
+  .f input:focus, .f select:focus, .f textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .f .hint { font-size: 12px; color: var(--muted); margin-top: 5px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 20px); opacity: 0; background: #101828; color: #fff; padding: 11px 16px; border-radius: 10px; font-size: 14px; display: flex; gap: 8px; align-items: center; transition: all .3s; z-index: 400; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .toast button { border: 0; background: none; color: #93c5fd; font-weight: 600; cursor: pointer; margin-left: 8px; }
+  .view { display: none; }
+  .view.on { display: block; animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<div class="switcher">
+  <strong>Style:</strong>
+  <button data-pick="a" class="on">A · Clean light</button>
+  <button data-pick="b">B · Navy &amp; gold (matches site)</button>
+  <button data-pick="c">C · Dark slate</button>
+  <span>Click the sidebar (Overview / Events), "New event", a row's edit icon, or delete. Esc closes the drawer.</span>
+</div>
+
+<div class="app" id="app">
+  <aside class="side">
+    <div class="brand"><div class="logo">DC</div><div>Devity Admin<small>Content dashboard</small></div></div>
+    <nav class="nav">
+      <a class="on" data-view="overview"><i class="ti ti-layout-dashboard"></i>Overview</a>
+      <div class="group">Website</div>
+      <a data-view="events"><i class="ti ti-home"></i>Home page</a>
+      <a data-view="events"><i class="ti ti-photo"></i>Club memories <span class="count">7</span></a>
+      <a data-view="events" id="nav-events"><i class="ti ti-calendar-event"></i>Events <span class="count">10</span></a>
+      <a data-view="events"><i class="ti ti-users"></i>Team <span class="count">26</span></a>
+      <a data-view="events"><i class="ti ti-microphone"></i>Speakers <span class="count">19</span></a>
+      <a data-view="events"><i class="ti ti-message-2"></i>Speaker reviews <span class="count">4</span></a>
+      <div class="group">Account</div>
+      <a data-view="overview"><i class="ti ti-history"></i>Activity log</a>
+      <a data-view="overview"><i class="ti ti-settings"></i>Settings</a>
+    </nav>
+    <div class="side-foot">
+      <div class="user"><div class="av">A</div><div>Admin<small>Last login · 2 days ago</small></div><button title="Log out"><i class="ti ti-logout"></i></button></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="top">
+      <div class="search"><i class="ti ti-search"></i>Search events, members, speakers… <kbd>⌘K</kbd></div>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <a class="btn ghost" style="text-decoration:none"><i class="ti ti-external-link"></i>View site</a>
+        <button class="btn"><i class="ti ti-download"></i>Export</button>
+        <button class="btn primary" data-new><i class="ti ti-plus"></i>New</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Overview -->
+      <section class="view on" id="v-overview">
+        <h1>Good evening, Admin</h1>
+        <p class="sub">Here's what's happening on devityclub.com.</p>
+        <div class="stats">
+          <div class="card stat" data-go="events"><div class="k">Club memories<i class="ti ti-photo"></i></div><div class="v">7</div><div class="h">7 with photos</div></div>
+          <div class="card stat" data-go="events"><div class="k">Upcoming events<i class="ti ti-calendar-event"></i></div><div class="v">0</div><div class="h">10 events in total</div></div>
+          <div class="card stat" data-go="events"><div class="k">Team members<i class="ti ti-users"></i></div><div class="v">26</div><div class="h">12 leadership · 14 core</div></div>
+          <div class="card stat" data-go="events"><div class="k">Guest speakers<i class="ti ti-microphone"></i></div><div class="v">19</div><div class="h">all visible on site</div></div>
+        </div>
+        <div class="two">
+          <div class="card panel">
+            <h3>Needs attention <span class="pill warn">3</span></h3>
+            <div class="todo"><i class="ti ti-alert-triangle"></i><div><b>2 events are marked "upcoming" but their date has passed</b><br /><span style="color:var(--muted);font-size:13px">Devity Summit 2025 · ENVISION-X 2.0 — the site still shows "Register now".</span></div><span class="act" data-go="events">Review →</span></div>
+            <div class="todo"><i class="ti ti-photo-off"></i><div><b>26 team members have no photo</b><br /><span style="color:var(--muted);font-size:13px">They show an initial instead of a picture.</span></div><span class="act" data-go="events">Add photos →</span></div>
+            <div class="todo"><i class="ti ti-calendar-plus"></i><div><b>No upcoming events</b><br /><span style="color:var(--muted);font-size:13px">The "Upcoming events" section on the site is empty.</span></div><span class="act" data-new>Create one →</span></div>
+          </div>
+          <div class="card panel">
+            <h3>Recent activity <a data-go="overview">View all</a></h3>
+            <ul class="feed">
+              <li><span class="dot" style="background:#3b82f6"></span><div>You updated the <b>home page</b><small>Today, 4:12 PM</small></div></li>
+              <li><span class="dot" style="background:#22c55e"></span><div>You added <b>NetCamp</b> memory<small>Yesterday, 11:30 AM</small></div></li>
+              <li><span class="dot" style="background:#ef4444"></span><div>You deleted a <b>speaker review</b><small>Oct 5, 9:02 PM</small></div></li>
+              <li><span class="dot" style="background:#a855f7"></span><div>You logged in<small>Oct 5, 8:58 PM</small></div></li>
+            </ul>
+          </div>
+        </div>
+        <div class="card panel" style="margin-top:16px">
+          <h3>Quick actions</h3>
+          <div class="quick">
+            <button data-new><i class="ti ti-calendar-plus"></i>New event</button>
+            <button data-go="events"><i class="ti ti-user-plus"></i>Add team member</button>
+            <button data-go="events"><i class="ti ti-photo-plus"></i>Upload memory</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Events list -->
+      <section class="view" id="v-events">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div><h1>Events</h1><p class="sub">Drag rows to change the order on the site.</p></div>
+          <button class="btn primary" data-new><i class="ti ti-plus"></i>New event</button>
+        </div>
+        <div class="bar">
+          <div class="tabs"><button class="on">All 10</button><button>Upcoming 0</button><button>Past 10</button><button>Cancelled 0</button></div>
+          <div class="filter"><i class="ti ti-search"></i>Search events</div>
+          <button class="btn" style="margin-left:auto"><i class="ti ti-filter"></i>Type</button>
+        </div>
+        <div class="card table">
+          <table>
+            <thead><tr><th style="width:36px"></th><th style="width:70px">Date</th><th>Event</th><th>Type</th><th>Status</th><th style="width:120px"></th></tr></thead>
+            <tbody id="rows">
+              <tr><td><i class="ti ti-grip-vertical grip"></i></td><td><span class="date"><b>09</b><small>FEB</small></span></td><td class="ev-title">ENVISION-X 2.0: Transform Ideas into Reality<small>10:00 AM · Auditorium (AUC) &amp; Virtual</small></td><td><span class="pill type">Competition</span></td><td><span class="pill warn" title="Date has passed"><i class="ti ti-alert-triangle"></i>Past · still "upcoming"</span></td><td><div class="row-act"><button class="icon-btn" data-edit title="Edit"><i class="ti ti-pencil"></i></button><button class="icon-btn" title="Duplicate"><i class="ti ti-copy"></i></button><button class="icon-btn danger" data-del title="Delete"><i class="ti ti-trash"></i></button></div></td></tr>
+              <tr><td><i class="ti ti-grip-vertical grip"></i></td><td><span class="date"><b>01</b><small>SEP</small></span></td><td class="ev-title">Devity Summit 2025<small>09:00 AM - 04:30 PM · Auditorium</small></td><td><span class="pill type">Seminar</span></td><td><span class="pill warn"><i class="ti ti-alert-triangle"></i>Past · still "upcoming"</span></td><td><div class="row-act"><button class="icon-btn" data-edit><i class="ti ti-pencil"></i></button><button class="icon-btn"><i class="ti ti-copy"></i></button><button class="icon-btn danger" data-del><i class="ti ti-trash"></i></button></div></td></tr>
+              <tr><td><i class="ti ti-grip-vertical grip"></i></td><td><span class="date"><b>12</b><small>SEP</small></span></td><td class="ev-title">Legacy Connect 1.0<small>Virtual Session</small></td><td><span class="pill type">Seminar</span></td><td><span class="pill done">Completed</span></td><td><div class="row-act"><button class="icon-btn" data-edit><i class="ti ti-pencil"></i></button><button class="icon-btn"><i class="ti ti-copy"></i></button><button class="icon-btn danger" data-del><i class="ti ti-trash"></i></button></div></td></tr>
+              <tr><td><i class="ti ti-grip-vertical grip"></i></td><td><span class="date"><b>04</b><small>AUG</small></span></td><td class="ev-title">NetCamp<small>Auditorium AUC</small></td><td><span class="pill type">Bootcamp</span></td><td><span class="pill done">Completed</span></td><td><div class="row-act"><button class="icon-btn" data-edit><i class="ti ti-pencil"></i></button><button class="icon-btn"><i class="ti ti-copy"></i></button><button class="icon-btn danger" data-del><i class="ti ti-trash"></i></button></div></td></tr>
+              <tr><td><i class="ti ti-grip-vertical grip"></i></td><td><span class="date"><b>06</b><small>MAY</small></span></td><td class="ev-title">Jumpstart Your Tech Career<small>Auditorium</small></td><td><span class="pill type">Seminar</span></td><td><span class="pill done">Completed</span></td><td><div class="row-act"><button class="icon-btn" data-edit><i class="ti ti-pencil"></i></button><button class="icon-btn"><i class="ti ti-copy"></i></button><button class="icon-btn danger" data-del><i class="ti ti-trash"></i></button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Slide-over drawer (replaces centred pop-up forms) -->
+<div class="scrim" data-close></div>
+<aside class="drawer" aria-label="Edit event">
+  <header><h2 id="drawer-title">New event</h2><button class="icon-btn" data-close title="Close (Esc)"><i class="ti ti-x"></i></button></header>
+  <div class="body">
+    <div class="f"><label>Title</label><input value="" placeholder="ENVISION-X 3.0" /></div>
+    <div class="grid2">
+      <div class="f"><label>Type</label><select><option>Competition</option><option>Workshop</option><option>Seminar</option><option>Bootcamp</option><option>Hackathon</option></select></div>
+      <div class="f"><label>Status</label><select><option>Automatic (from date)</option><option>Upcoming</option><option>Completed</option><option>Cancelled</option></select><div class="hint">Switches to "Completed" after the date.</div></div>
+    </div>
+    <div class="grid2">
+      <div class="f"><label>Date</label><input type="date" /></div>
+      <div class="f"><label>Time</label><input placeholder="10:00 AM - 12:00 PM" /></div>
+    </div>
+    <div class="f"><label>Location</label><input placeholder="Auditorium, AUC" /></div>
+    <div class="f"><label>Description</label><textarea rows="4" placeholder="What is it, who is it for?"></textarea><div class="hint">0 / 2000</div></div>
+    <div class="f"><label>Registration link</label><input placeholder="https://…" /></div>
+  </div>
+  <footer><span style="margin-right:auto;font-size:12.5px;color:var(--muted);align-self:center">Unsaved changes</span><button class="btn" data-close>Cancel</button><button class="btn primary" data-close data-save>Save event</button></footer>
+</aside>
+
+<div class="toast" id="toast"><i class="ti ti-check"></i><span id="toast-text">Saved</span></div>
+
+<script>
+  const root = document.documentElement;
+  document.querySelectorAll('[data-pick]').forEach((b) => b.addEventListener('click', () => {
+    root.dataset.theme = b.dataset.pick;
+    document.querySelectorAll('[data-pick]').forEach((x) => x.classList.toggle('on', x === b));
+  }));
+
+  const show = (view) => {
+    document.querySelectorAll('.view').forEach((v) => v.classList.toggle('on', v.id === 'v-' + view));
+    document.querySelectorAll('.nav a').forEach((a) => a.classList.remove('on'));
+    (view === 'events' ? document.getElementById('nav-events') : document.querySelector('.nav a[data-view="overview"]')).classList.add('on');
+    scrollTo(0, 0);
+  };
+  document.querySelectorAll('.nav a').forEach((a) => a.addEventListener('click', () => show(a.dataset.view)));
+  document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', () => show(el.dataset.go)));
+
+  const toast = (text, undo) => {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-text').innerHTML = text + (undo ? ' <button>Undo</button>' : '');
+    t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 3200);
+  };
+  const open = (title) => { document.getElementById('drawer-title').textContent = title; document.body.classList.add('open'); };
+  const close = () => document.body.classList.remove('open');
+  document.querySelectorAll('[data-new]').forEach((b) => b.addEventListener('click', () => open('New event')));
+  document.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => open('Edit event')));
+  document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => { if (b.hasAttribute('data-save')) toast('Event saved'); close(); }));
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  document.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => {
+    const row = b.closest('tr'); row.style.transition = 'opacity .3s'; row.style.opacity = '0';
+    setTimeout(() => row.remove(), 300); toast('Event deleted', true);
+  }));
+</script>
+</body>
+</html>

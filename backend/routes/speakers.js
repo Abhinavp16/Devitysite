@@ -208,7 +208,7 @@ router.delete('/:id', authenticateToken, logActivity('DELETE', 'guest_speakers')
             $or: [{ 'speakers.speaker': speaker._id }, { 'speakers.legacySpeakerId': speaker.legacyId }]
         });
         if (eventCount > 0) {
-            return res.status(409).json({ error: 'Cannot delete speaker who is assigned to events. Remove from events first.' });
+            return res.status(409).json({ error: 'This speaker is linked to an event. Open Events → Edit → Speakers to remove them first.' });
         }
 
         await speaker.deleteOne();

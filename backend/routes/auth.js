@@ -20,7 +20,7 @@ const loginLimiter = rateLimit({
 // Login accepts email only (username is validated after lookup)
 const loginSchema = Joi.object({
     email: Joi.string().email().required(),
-    username: Joi.string().alphanum().min(3).max(30).optional(),
+    username: Joi.string().trim().min(1).max(50).optional(), // any characters, e.g. abhinav_p
     password: Joi.string().min(6).required()
 });
 
@@ -35,7 +35,7 @@ router.post('/login', loginLimiter, async (req, res) => {
         if (error) {
             return res.status(400).json({
                 error: 'Invalid input',
-                details: error.details[0].message
+                details: 'Enter a valid email address and a password of at least 6 characters.'
             });
         }
 
@@ -118,7 +118,8 @@ router.post('/change-password', authenticateToken, async (req, res) => {
 
         const isValidPassword = await bcrypt.compare(currentPassword, req.user.password_hash);
         if (!isValidPassword) {
-            return res.status(401).json({ error: 'Current password is incorrect' });
+            // 400, not 401: a typo shouldn't look like an expired session (the frontend logs out on 401)
+            return res.status(400).json({ error: 'Current password is incorrect' });
         }
 
         req.user.password_hash = await bcrypt.hash(newPassword, 12);

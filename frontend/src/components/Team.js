@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { TeamAnimatedBackground } from './AnimatedBackground';
 import publicApiService from '../services/publicApiService';
 
+// Seed data used '#' as a placeholder link; only show icons for real web addresses
+const isLink = (url) => /^https?:\/\//i.test(url || '');
+
 const getDisplayInitial = (name = '') => {
   const parts = name.replace(/^(Mr\.|Ms\.|Mrs\.|Dr\.|Prof\.|Er\.)\s+/i, '').trim().split(/\s+/);
   return (parts[0] || name || '?').charAt(0).toUpperCase();
@@ -110,22 +113,22 @@ const Team = () => {
 
           <div className="mt-2 border-t border-gray-200/80 pt-3">
             <div className="flex items-center justify-center gap-3">
-              {member.github_url && (
+              {isLink(member.github_url) && (
                 <a href={member.github_url} target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-gray-700 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100" aria-label={`${member.name} GitHub`}>
                   <GitHubIcon className="h-4 w-4" />
                 </a>
               )}
-              {member.twitter_url && (
+              {isLink(member.twitter_url) && (
                 <a href={member.twitter_url} target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-sky-500 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100" aria-label={`${member.name} X`}>
                   <XIcon className="h-4 w-4" />
                 </a>
               )}
-              {member.linkedin_url && (
+              {isLink(member.linkedin_url) && (
                 <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-sky-700 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100" aria-label={`${member.name} LinkedIn`}>
                   <LinkedInIcon className="h-4 w-4" />
                 </a>
               )}
-              {!member.github_url && !member.twitter_url && !member.linkedin_url && (
+              {!isLink(member.github_url) && !isLink(member.twitter_url) && !isLink(member.linkedin_url) && (
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-gray-400 shadow-[0_8px_20px_rgba(15,23,42,0.12)] ring-1 ring-slate-100">
                   <GlobeIcon className="h-4 w-4" />
                 </span>
@@ -157,22 +160,22 @@ const Team = () => {
 
         <div className="border-t border-gray-200/80 pt-2">
           <div className="flex items-center justify-center gap-3">
-            {member.github_url && (
+            {isLink(member.github_url) && (
               <a href={member.github_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-orange-50 text-orange-500 shadow-sm" aria-label={`${member.name} GitHub`}>
                 <GitHubIcon className="h-3 w-3" />
               </a>
             )}
-            {member.twitter_url && (
+            {isLink(member.twitter_url) && (
               <a href={member.twitter_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-sky-50 text-sky-500 shadow-sm" aria-label={`${member.name} X`}>
                 <XIcon className="h-3 w-3" />
               </a>
             )}
-            {member.linkedin_url && (
+            {isLink(member.linkedin_url) && (
               <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-blue-50 text-blue-600 shadow-sm" aria-label={`${member.name} LinkedIn`}>
                 <LinkedInIcon className="h-3 w-3" />
               </a>
             )}
-            {!member.github_url && !member.twitter_url && !member.linkedin_url && (
+            {!isLink(member.github_url) && !isLink(member.twitter_url) && !isLink(member.linkedin_url) && (
               <span className="flex h-5 w-5 items-center justify-center rounded bg-gray-50 text-gray-400 shadow-sm">
                 <GlobeIcon className="h-3 w-3" />
               </span>
@@ -184,7 +187,7 @@ const Team = () => {
   };
 
   return (
-    <section id="team" className="py-20 bg-gradient-to-br from-slate-50/60 via-blue-50/60 to-indigo-100/60 dark:from-gray-900/60 dark:via-gray-800/60 dark:to-gray-700/60 backdrop-blur-sm relative overflow-hidden transition-colors duration-300">
+    <section id="team" className="py-20 bg-gradient-to-br from-slate-50/60 via-blue-50/60 to-indigo-100/60 dark:bg-none dark:bg-slate-900 backdrop-blur-sm relative overflow-hidden transition-colors duration-300">
       <TeamAnimatedBackground />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">

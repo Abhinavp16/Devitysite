@@ -2,7 +2,7 @@ import ThemeToggle from './ThemeToggle';
 
 const Footer = () => {
   return (
-    <footer className="relative bg-gray-900 text-white">
+    <footer className="relative bg-slate-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Footer content grid — add columns here when needed */}
         <div className="relative border-t border-gray-800 mt-8 pt-8 text-center">

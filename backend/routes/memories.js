@@ -27,8 +27,15 @@ const updateMemorySchema = Joi.object({
 const normalizeMemoryPayload = (payload) => {
     const normalized = { ...payload };
     if (normalized.image_urls) {
-        normalized.image_urls = normalized.image_urls.map((image) => image || null).filter(Boolean).slice(0, MAX_MEMORY_IMAGES);
+        // Drop empty slots, keeping each title paired with its image so labels don't shift
+        const titles = normalized.image_titles || [];
+        const slots = normalized.image_urls
+            .map((image, index) => ({ image, title: titles[index] || '' }))
+            .filter((slot) => slot.image)
+            .slice(0, MAX_MEMORY_IMAGES);
+        normalized.image_urls = slots.map((slot) => slot.image);
         normalized.image_url = normalized.image_urls[0] || null;
+        if (normalized.image_titles) normalized.image_titles = slots.map((slot) => slot.title);
     } else if (normalized.image_url !== undefined) {
         // image_url updated alone — keep image_urls in sync
         if (normalized.image_url === '') normalized.image_url = null;

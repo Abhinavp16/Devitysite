@@ -90,7 +90,27 @@ const skillDocs = (skills) => (skills || []).map((skill) => ({ skill_name: skill
 const expertiseDocs = (expertise) => (expertise || []).map((area) => ({ area, years_experience: 0 }));
 
 async function seed() {
-    await connectMongoDB();
+    const connection = await connectMongoDB();
+
+    // This script REPLACES all website content. Refuse to run over existing data
+    // unless explicitly forced, so it can't silently wipe production content.
+    const existing = {
+        teamMembers: await TeamMember.countDocuments(),
+        guestSpeakers: await GuestSpeaker.countDocuments(),
+        events: await Event.countDocuments(),
+        clubMemories: await ClubMemory.countDocuments(),
+        speakerReviews: await SpeakerReview.countDocuments()
+    };
+    const hasExistingData = Object.values(existing).some((count) => count > 0);
+
+    if (hasExistingData && !process.argv.includes('--force')) {
+        console.error(`Refusing to seed database "${connection.name}": it already contains content`, existing);
+        console.error('Seeding DELETES all team members, speakers, events, memories and reviews (including uploaded images).');
+        console.error('If you are sure, re-run with: npm run seed:website -- --force');
+        process.exitCode = 1;
+        return;
+    }
+
     const admin = await AdminUser.findOne({ username: process.env.ADMIN_USERNAME || 'admin' });
 
     await Promise.all([

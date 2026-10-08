@@ -1,15 +1,50 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import devityLogo from '../img/devity logo.png';
+
+const ALWAYS_SHOW_ABOVE = 120; // px from top where the navbar never hides
+const SCROLL_THRESHOLD = 12;   // ignore tiny scroll jitter
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  const menuOpenRef = useRef(false);
 
+  // Never hide while the mobile menu is open
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+    menuOpenRef.current = isMenuOpen;
+    if (isMenuOpen) setIsHidden(false);
+  }, [isMenuOpen]);
+
+  // Hide on scroll down, reveal on scroll up
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let ticking = false;
+
+    const update = () => {
+      const y = window.scrollY;
+      const delta = y - lastY;
+
+      setIsScrolled(y > 20);
+      if (y < ALWAYS_SHOW_ABOVE || menuOpenRef.current) setIsHidden(false);
+      else if (delta > SCROLL_THRESHOLD) setIsHidden(true);
+      else if (delta < -SCROLL_THRESHOLD) setIsHidden(false);
+
+      // Only move the baseline once past the threshold so slow scrolls still accumulate
+      if (Math.abs(delta) > SCROLL_THRESHOLD || y < ALWAYS_SHOW_ABOVE) lastY = y;
+
+      ticking = false;
     };
-    window.addEventListener('scroll', handleScroll);
+
+    const handleScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    update();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -28,22 +63,32 @@ const Header = () => {
     .logo-glow:hover {
       filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.6)) brightness(120%) contrast(120%);
     }
+    @keyframes navDrop {
+      from { transform: translateY(-120%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .nav-drop-in { animation: navDrop 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
+    @media (prefers-reduced-motion: reduce) {
+      .nav-drop-in { animation: none; }
+    }
   `;
 
   return (
     <>
       <style>{logoKeyframes}</style>
 
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out flex justify-center items-start pointer-events-none ${isScrolled ? 'pt-1 sm:pt-2' : 'pt-2 sm:pt-4 md:pt-6'}`}>
-        <div className={`relative w-[98%] sm:w-[95%] max-w-7xl pointer-events-auto transition-all duration-500 ease-in-out rounded-2xl border border-white/20 shadow-2xl ${isScrolled
-          ? 'bg-gradient-to-r from-blue-800/95 via-blue-900/95 to-indigo-900/95 backdrop-blur-xl py-1.5 sm:py-2'
-          : 'bg-gradient-to-r from-blue-600/90 via-blue-700/90 to-blue-800/90 backdrop-blur-lg py-2 sm:py-3'
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-[transform,opacity,padding] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none flex justify-center items-start pointer-events-none ${isScrolled ? 'pt-1 sm:pt-2' : 'pt-2 sm:pt-4 md:pt-6'} ${isHidden ? '-translate-y-[130%] opacity-0' : 'translate-y-0 opacity-100'}`}>
+        <div className={`nav-drop-in relative w-[98%] sm:w-[95%] max-w-7xl pointer-events-auto transition-[background-color,padding,box-shadow] duration-500 ease-in-out rounded-2xl border border-gold/30 shadow-2xl backdrop-blur-xl ${isScrolled
+          ? 'bg-navy-ink/95 py-1.5 sm:py-2'
+          : 'bg-navy/95 py-2 sm:py-3'
           }`}>
+          {/* Both states use solid background-color (not a gradient) so the scroll color change can
+              cross-fade — swapping gradient <-> color snaps to transparent first and flickers */}
           {/* Animated background particles */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-2xl">
-            <div className="absolute -top-2 -left-2 w-4 h-4 bg-blue-300/20 rounded-full animate-pulse"></div>
+            <div className="absolute -top-2 -left-2 w-4 h-4 bg-gold/20 rounded-full animate-pulse"></div>
             <div className="absolute top-1/2 left-1/4 w-2 h-2 bg-white/30 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
-            <div className="absolute top-3 right-1/3 w-3 h-3 bg-blue-200/25 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute top-3 right-1/3 w-3 h-3 bg-gold/25 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
             <div className="absolute bottom-2 right-10 w-2 h-2 bg-white/20 rounded-full animate-bounce" style={{ animationDelay: '1.5s' }}></div>
           </div>
 
@@ -201,7 +246,7 @@ const Header = () => {
             {/* Mobile Navigation */}
             <div className={`md:hidden overflow-hidden transition-all duration-700 ease-out ${isMenuOpen ? 'max-h-96 opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4'
               }`}>
-              <div className="py-6 border-t border-blue-400/30 bg-gradient-to-b from-blue-700/50 to-blue-800/50 backdrop-blur-sm rounded-b-2xl mt-2">
+              <div className="py-6 border-t border-gold/30 bg-navy-ink/60 backdrop-blur-sm rounded-b-2xl mt-2">
                 <div className="flex flex-col space-y-3">
                   {['Home', 'Events', 'About', 'Team', 'Speakers', 'Contact'].map((item, index) => (
                     <a

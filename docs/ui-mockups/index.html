@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="a">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DevityClub — UI direction mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,600&family=Space+Grotesk:wght@500;700&family=Playfair+Display:wght@600;800&display=swap" rel="stylesheet" />
+<style>
+  /* ---------- Theme tokens: one structure, three directions ---------- */
+  [data-theme="a"] {
+    --bg: #ffffff; --alt: #f6f8fb; --surface: #ffffff; --text: #0f172a; --muted: #5b6b82;
+    --accent: #0891b2; --accent-soft: #e0f5fa; --accent-text: #0e7490; --border: #e3e8ef;
+    --nav-bg: rgba(255,255,255,.85); --nav-text: #0f172a; --radius: 14px; --shadow: none;
+    --label-font: 'Inter', sans-serif; --btn-text: #fff;
+  }
+  [data-theme="b"] {
+    --bg: #0a0f1c; --alt: #0e1526; --surface: #111a2e; --text: #e6edf7; --muted: #8c9bb5;
+    --accent: #22d3ee; --accent-soft: rgba(34,211,238,.1); --accent-text: #67e8f9; --border: #1f2a42;
+    --nav-bg: rgba(10,15,28,.85); --nav-text: #e6edf7; --radius: 10px; --shadow: none;
+    --label-font: 'JetBrains Mono', monospace; --btn-text: #04131a;
+  }
+  [data-theme="c"] {
+    --bg: #f8fafc; --alt: #eef2ff; --surface: #ffffff; --text: #111827; --muted: #5b6474;
+    --accent: #4f46e5; --accent-2: #2563eb; --accent-soft: #eef2ff; --accent-text: #4338ca; --border: #e5e7f0;
+    --nav-bg: linear-gradient(90deg, #2563eb, #4f46e5); --nav-text: #ffffff; --radius: 20px;
+    --shadow: 0 10px 30px rgba(30, 41, 99, .10);
+    --label-font: 'Inter', sans-serif; --btn-text: #fff;
+  }
+
+  [data-theme="d"] {
+    --bg: #fdf8f3; --alt: #fbefe4; --surface: #ffffff; --text: #1f1a17; --muted: #6b5d52;
+    --accent: #ec3750; --accent-soft: #fde4e7; --accent-text: #c02138; --border: #eadfd4;
+    --nav-bg: rgba(253,248,243,.9); --nav-text: #1f1a17; --radius: 18px; --shadow: none;
+    --label-font: 'Inter', sans-serif; --btn-text: #fff; --heading-font: 'Fraunces', serif;
+  }
+  [data-theme="e"] {
+    --bg: #050507; --alt: #0a0a0d; --surface: #0e0e12; --text: #f4f4f5; --muted: #8a8a94;
+    --accent: #a78bfa; --accent-soft: rgba(167,139,250,.12); --accent-text: #c4b5fd; --border: rgba(255,255,255,.09);
+    --nav-bg: rgba(5,5,7,.8); --nav-text: #f4f4f5; --radius: 12px; --shadow: none;
+    --label-font: 'Inter', sans-serif; --btn-text: #0a0a0a;
+  }
+  [data-theme="f"] {
+    --bg: #fffdf5; --alt: #fff1c2; --surface: #ffffff; --text: #111111; --muted: #3a3a3a;
+    --accent: #ffd23f; --accent-soft: #c9f2fb; --accent-text: #111111; --border: #111111;
+    --nav-bg: #fffdf5; --nav-text: #111111; --radius: 8px; --shadow: 5px 5px 0 #111;
+    --label-font: 'Space Grotesk', sans-serif; --btn-text: #111; --heading-font: 'Space Grotesk', sans-serif; --bw: 2px;
+  }
+  [data-theme="g"] {
+    --bg: #ffffff; --alt: #f6f3ec; --surface: #ffffff; --text: #0b1d3a; --muted: #55607a;
+    --accent: #0b2a5b; --accent-soft: #f3ead2; --accent-text: #8a6d12; --gold: #c9a227; --border: #e4e0d6;
+    --nav-bg: #0b2a5b; --nav-text: #ffffff; --radius: 6px; --shadow: none;
+    --label-font: 'Inter', sans-serif; --btn-text: #fff; --heading-font: 'Playfair Display', serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; transition: background .3s, color .3s; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 88px 0; }
+  section.alt { background: var(--alt); }
+
+  /* ---------- Mockup switcher (not part of the site) ---------- */
+  .switcher { position: sticky; top: 0; z-index: 100; background: #111; color: #fff; font: 500 13px/1.4 'Inter', sans-serif; }
+  .switcher .wrap { display: flex; align-items: center; gap: 12px; padding-top: 10px; padding-bottom: 10px; flex-wrap: wrap; }
+  .switcher button { font: inherit; border: 1px solid #444; background: transparent; color: #ddd; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+  .switcher button.on { background: #fff; color: #111; border-color: #fff; }
+  .switcher .note { color: #aaa; margin-left: auto; }
+
+  /* ---------- Nav ---------- */
+  .nav { position: sticky; top: var(--sw, 49px); z-index: 50; background: var(--nav-bg); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+  [data-theme="c"] .nav { border: 0; margin: 12px auto 0; max-width: 1160px; border-radius: 18px; top: calc(var(--sw, 49px) + 12px); box-shadow: var(--shadow); }
+  .nav .wrap { display: flex; align-items: center; height: 68px; gap: 28px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: var(--nav-text); }
+  .brand img { height: 34px; width: auto; }
+  [data-theme="b"] .brand span::after { content: '_'; color: var(--accent); animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .links { display: flex; gap: 22px; margin-left: auto; font-size: 14px; font-weight: 500; color: var(--nav-text); }
+  .links a { opacity: .75; }
+  .links a:hover, .links a.active { opacity: 1; }
+  .links a.active { color: var(--accent); }
+  [data-theme="c"] .links a.active { color: #fff; text-decoration: underline; text-underline-offset: 6px; }
+
+  /* ---------- Buttons, labels, headings ---------- */
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 15px; border: 1px solid transparent; cursor: pointer; }
+  .btn.primary { background: var(--accent); color: var(--btn-text); }
+  [data-theme="c"] .btn.primary { background: linear-gradient(90deg, var(--accent-2), var(--accent)); border-radius: 12px; box-shadow: var(--shadow); }
+  [data-theme="c"] .nav .btn.primary { background: #fff; color: var(--accent); }
+  .btn.ghost { border-color: var(--border); color: var(--text); background: var(--surface); }
+  .btn.sm { padding: 8px 14px; font-size: 13px; }
+  .eyebrow { font-family: var(--label-font); font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-text); margin: 0 0 10px; }
+  [data-theme="b"] .eyebrow { text-transform: none; letter-spacing: 0; font-size: 13px; }
+  [data-theme="b"] .eyebrow::before { content: '// '; color: var(--muted); }
+  h1, h2, h3 { font-family: var(--heading-font, inherit); }
+  h1, h2, h3 { margin: 0; line-height: 1.15; letter-spacing: -.02em; }
+  h2 { font-size: 36px; font-weight: 800; }
+  [data-theme="c"] h2, [data-theme="c"] h1 .hl { background: linear-gradient(90deg, var(--accent-2), var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--muted); font-size: 17px; max-width: 620px; margin: 12px 0 0; }
+  .head { margin-bottom: 40px; display: flex; align-items: end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .head .more { color: var(--accent-text); font-weight: 600; font-size: 14px; }
+
+  /* ---------- Cards ---------- */
+  .card { background: var(--surface); border: var(--bw, 1px) solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  [data-theme="c"] .card { border-color: transparent; }
+  .grid { display: grid; gap: 20px; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 80px 0 64px; }
+  .hero .top { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: center; }
+  .hero h1 { font-size: 56px; font-weight: 800; }
+  [data-theme="a"] .hero h1 .hl, [data-theme="b"] .hero h1 .hl { color: var(--accent); }
+  [data-theme="b"] .hero h1 { font-size: 52px; }
+  .hero .cta { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .collage { display: grid; grid-template-columns: 1.3fr 1fr; grid-template-rows: 180px 180px; gap: 12px; }
+  .collage img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius); }
+  .collage img:first-child { grid-row: span 2; }
+  [data-theme="b"] .collage img { border: 1px solid var(--border); filter: saturate(.9); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 56px; }
+  .stat { padding: 20px 22px; }
+  .stat b { display: block; font-size: 30px; font-weight: 800; color: var(--text); }
+  [data-theme="b"] .stat b { font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+  .stat span { color: var(--muted); font-size: 14px; }
+
+  /* ---------- Events ---------- */
+  .featured { display: grid; grid-template-columns: 1.2fr 1fr; }
+  .featured .img { min-height: 280px; background: center/cover; }
+  .featured .body { padding: 32px; display: flex; flex-direction: column; gap: 12px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-family: var(--label-font); font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-text); width: fit-content; }
+  .pill.muted { background: var(--alt); color: var(--muted); }
+  .meta { color: var(--muted); font-size: 14px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .meta span::before { margin-right: 6px; }
+  .events-grid { grid-template-columns: repeat(3, 1fr); margin-top: 28px; }
+  .ev .thumb { height: 150px; background: center/cover; position: relative; }
+  .ev .thumb.fallback { display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 40px; color: var(--accent); background: var(--accent-soft); }
+  .date { position: absolute; left: 14px; top: 14px; background: var(--surface); color: var(--text); border-radius: 10px; padding: 6px 10px; text-align: center; font-family: var(--label-font); line-height: 1.1; border: 1px solid var(--border); }
+  .date b { display: block; font-size: 18px; }
+  .date small { font-size: 11px; font-weight: 700; color: var(--accent-text); letter-spacing: .08em; }
+  .ev .body { padding: 18px 20px 20px; }
+  .ev h3 { font-size: 17px; font-weight: 700; margin: 6px 0 6px; }
+  .ev p { color: var(--muted); font-size: 14px; margin: 0; }
+
+  /* ---------- Memories ---------- */
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .chip { padding: 8px 16px; border-radius: 999px; border: 1px solid var(--border); font-size: 14px; font-weight: 500; color: var(--muted); background: var(--surface); cursor: pointer; }
+  .chip.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+  [data-theme="b"] .chip.on { background: var(--accent); color: var(--btn-text); border-color: var(--accent); }
+  [data-theme="c"] .chip.on { background: linear-gradient(90deg, var(--accent-2), var(--accent)); color: #fff; border-color: transparent; }
+  .bento { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 200px 200px; gap: 12px; }
+  .bento figure { margin: 0; position: relative; border-radius: var(--radius); overflow: hidden; }
+  .bento figure:first-child { grid-row: span 2; }
+  .bento img { width: 100%; height: 100%; object-fit: cover; }
+  .bento figcaption { position: absolute; left: 12px; bottom: 12px; background: rgba(15,23,42,.72); color: #fff; font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 8px; font-family: var(--label-font); }
+
+  /* ---------- Voices ---------- */
+  .quotes { grid-template-columns: repeat(3, 1fr); }
+  .quote { padding: 26px; display: flex; flex-direction: column; gap: 18px; }
+  .quote blockquote { margin: 0; font-size: 15px; color: var(--text); }
+  [data-theme="b"] .quote blockquote::before { content: '> '; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+  .person { display: flex; align-items: center; gap: 12px; margin-top: auto; }
+  .person img, .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+  .person b { display: block; font-size: 14px; }
+  .person span { color: var(--muted); font-size: 13px; }
+
+  /* ---------- Team & speakers ---------- */
+  .people { grid-template-columns: repeat(4, 1fr); }
+  .member { padding: 22px; text-align: center; }
+  .member .ph { width: 96px; height: 96px; margin: 0 auto 14px; border-radius: 50%; object-fit: cover; }
+  .initials { display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: var(--accent-text); background: var(--accent-soft); }
+  .member b { display: block; font-size: 15px; line-height: 1.3; }
+  .member .role { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .member .co { color: var(--accent-text); font-size: 13px; font-weight: 600; font-family: var(--label-font); }
+  .socials { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
+  .socials a { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--muted); }
+  .subhead { font-size: 15px; font-weight: 700; color: var(--muted); margin: 0 0 16px; font-family: var(--label-font); }
+  .speakers { grid-template-columns: repeat(6, 1fr); }
+  .speakers .member .ph { width: 84px; height: 84px; }
+
+  /* ---------- CTA band & footer ---------- */
+  .band { padding: 48px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: center; }
+  [data-theme="a"] .band { background: var(--text); color: #fff; border: 0; }
+  [data-theme="a"] .band .sub { color: #b6c2d4; }
+  [data-theme="a"] .band .btn.ghost { background: transparent; color: #fff; border-color: #475569; }
+  [data-theme="b"] .band { border-color: var(--accent); background: var(--accent-soft); }
+  [data-theme="c"] .band { background: linear-gradient(110deg, var(--accent-2), var(--accent)); color: #fff; }
+  [data-theme="c"] .band .sub { color: #e0e7ff; }
+  [data-theme="c"] .band h2 { color: #fff; background: none; }
+  [data-theme="c"] .band .btn.primary { background: #fff; color: var(--accent); }
+  [data-theme="c"] .band .btn.ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,.5); }
+  .band .actions { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  footer { border-top: 1px solid var(--border); padding: 32px 0; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+
+  /* ---------- D · Playful editorial ---------- */
+  [data-theme="d"] h1, [data-theme="d"] h2 { font-weight: 800; letter-spacing: -.01em; }
+  [data-theme="d"] .hero h1 .hl { color: var(--accent); font-style: italic; text-decoration: underline wavy var(--accent); text-decoration-thickness: 3px; text-underline-offset: 10px; }
+  [data-theme="d"] .btn, [data-theme="d"] .chip { border-radius: 999px; }
+  [data-theme="d"] .pill { transform: rotate(-2deg); background: var(--accent); color: #fff; }
+  [data-theme="d"] .pill.muted { background: #fff3c4; color: #7a5a00; transform: rotate(2deg); }
+  [data-theme="d"] .eyebrow { color: var(--accent); }
+  [data-theme="d"] .stat b { font-family: 'Fraunces', serif; color: var(--accent); }
+  [data-theme="d"] .card { transition: transform .2s; }
+  [data-theme="d"] .card:hover { transform: rotate(-1deg) translateY(-4px); }
+  [data-theme="d"] .collage img:nth-child(2) { transform: rotate(3deg); }
+  [data-theme="d"] .collage img:nth-child(3) { transform: rotate(-2deg); }
+  [data-theme="d"] .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  [data-theme="d"] .band { background: var(--accent); color: #fff; border: 0; }
+  [data-theme="d"] .band .sub, [data-theme="d"] .band .eyebrow { color: #ffe1e6; }
+  [data-theme="d"] .band .btn.primary { background: #fff; color: var(--accent); }
+  [data-theme="d"] .band .btn.ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,.6); }
+
+  /* ---------- E · Premium dark ---------- */
+  [data-theme="e"] .hero { background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px); background-size: 48px 48px; }
+  [data-theme="e"] .hero h1 .hl { background: linear-gradient(90deg, #a78bfa, #22d3ee); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  [data-theme="e"] .btn.primary { background: #fff; color: #0a0a0a; }
+  [data-theme="e"] .btn.ghost { background: transparent; }
+  [data-theme="e"] .eyebrow { color: var(--muted); letter-spacing: .18em; }
+  [data-theme="e"] h2 { font-weight: 700; }
+  [data-theme="e"] .card { background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.01)); }
+  [data-theme="e"] .stat b { font-weight: 700; }
+  [data-theme="e"] .chip.on { background: #fff; color: #0a0a0a; border-color: #fff; }
+  [data-theme="e"] .band { background: radial-gradient(ellipse at top left, rgba(167,139,250,.25), transparent 60%), radial-gradient(ellipse at bottom right, rgba(34,211,238,.18), transparent 60%), var(--surface); }
+  [data-theme="e"] .date { background: rgba(5,5,7,.8); }
+
+  /* ---------- F · Neo-brutalist ---------- */
+  [data-theme="f"] .nav { border-bottom: 2px solid #111; }
+  [data-theme="f"] h1, [data-theme="f"] h2 { font-weight: 700; letter-spacing: -.03em; }
+  [data-theme="f"] .hero h1 .hl { background: var(--accent); padding: 0 8px; border: 2px solid #111; box-shadow: 4px 4px 0 #111; display: inline-block; transform: rotate(-1deg); }
+  [data-theme="f"] .btn { border: 2px solid #111; box-shadow: 4px 4px 0 #111; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; transition: transform .1s, box-shadow .1s; }
+  [data-theme="f"] .btn:hover { transform: translate(2px,2px); box-shadow: 2px 2px 0 #111; }
+  [data-theme="f"] .btn.ghost { background: #c9f2fb; }
+  [data-theme="f"] .eyebrow { color: #111; background: var(--accent); display: inline-block; padding: 3px 8px; border: 2px solid #111; }
+  [data-theme="f"] .collage img, [data-theme="f"] .bento figure, [data-theme="f"] .member .ph { border: 2px solid #111; box-shadow: 5px 5px 0 #111; }
+  [data-theme="f"] .stat:nth-child(1) { background: #ffd23f; } [data-theme="f"] .stat:nth-child(2) { background: #c9f2fb; }
+  [data-theme="f"] .stat:nth-child(3) { background: #ffc9d9; } [data-theme="f"] .stat:nth-child(4) { background: #c8f7c5; }
+  [data-theme="f"] .pill { border: 2px solid #111; background: var(--accent); color: #111; }
+  [data-theme="f"] .pill.muted { background: #fff; color: #111; }
+  [data-theme="f"] .chip { border: 2px solid #111; color: #111; }
+  [data-theme="f"] .chip.on { background: #111; color: #ffd23f; }
+  [data-theme="f"] .date { border: 2px solid #111; }
+  [data-theme="f"] .socials a { border: 2px solid #111; color: #111; }
+  [data-theme="f"] .band { background: #c9f2fb; }
+  [data-theme="f"] footer { border-top: 2px solid #111; }
+
+  /* ---------- G · Academic navy & gold ---------- */
+  [data-theme="g"] .nav { border: 0; }
+  [data-theme="g"] .nav .btn.primary { background: var(--gold); color: #0b1d3a; }
+  [data-theme="g"] .links a.active { color: var(--gold); }
+  [data-theme="g"] h1, [data-theme="g"] h2 { font-weight: 800; letter-spacing: -.01em; }
+  [data-theme="g"] .hero h1 .hl { color: var(--accent); border-bottom: 4px solid var(--gold); }
+  [data-theme="g"] .eyebrow { color: #8a6d12; }
+  [data-theme="g"] .eyebrow::after { content: ''; display: block; width: 40px; height: 2px; background: var(--gold); margin-top: 8px; }
+  [data-theme="g"] .stat { border-top: 3px solid var(--gold); }
+  [data-theme="g"] .stat b { font-family: 'Playfair Display', serif; color: var(--accent); }
+  [data-theme="g"] .card { border-radius: 6px; }
+  [data-theme="g"] .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  [data-theme="g"] .band { background: var(--accent); color: #fff; border: 0; }
+  [data-theme="g"] .band .sub { color: #c7d2e8; } [data-theme="g"] .band .eyebrow { color: var(--gold); }
+  [data-theme="g"] .band .btn.primary { background: var(--gold); color: #0b1d3a; }
+  [data-theme="g"] .band .btn.ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,.4); }
+  [data-theme="g"] .initials { background: #f3ead2; color: #0b2a5b; font-family: 'Playfair Display', serif; }
+
+  @media (max-width: 860px) {
+    .hero .top, .featured, .band { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 40px; }
+    .stats, .people { grid-template-columns: repeat(2, 1fr); }
+    .events-grid, .quotes { grid-template-columns: 1fr; }
+    .speakers { grid-template-columns: repeat(3, 1fr); }
+    .links { display: none; }
+    .nav .btn { margin-left: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Mockup switcher (only for choosing a direction) -->
+<div class="switcher">
+  <div class="wrap">
+    <strong>Direction:</strong>
+    <button data-pick="a">A · Clean &amp; light</button>
+    <button data-pick="b">B · Dark dev-club</button>
+    <button data-pick="c">C · Current look, tamed</button>
+    <button data-pick="d">D · Playful editorial</button>
+    <button data-pick="e">E · Premium dark</button>
+    <button data-pick="f">F · Neo-brutalist</button>
+    <button data-pick="g">G · Academic navy &amp; gold</button>
+    <span class="note" id="note"></span>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="#home"><img src="../../frontend/src/img/devity%20logo.png" alt="" /><span>DevityClub</span></a>
+    <div class="links">
+      <a href="#home" class="active">Home</a><a href="#events">Events</a><a href="#memories">Memories</a>
+      <a href="#team">Team</a><a href="#speakers">Speakers</a><a href="#contact">Contact</a>
+    </div>
+    <a class="btn primary sm" href="#contact">Join the club</a>
+  </div>
+</nav>
+
+<!-- Hero: real photos instead of logo video + emoji bubbles -->
+<header class="hero" id="home">
+  <div class="wrap top">
+    <div>
+      <p class="eyebrow">Amity University Chhattisgarh · Tech club</p>
+      <h1>Learn, build and ship with <span class="hl">Devity Club</span></h1>
+      <p class="sub">A student-led community bridging academic learning and industry — through workshops, hackathons, and sessions with engineers from Microsoft, Adobe, MongoDB and more.</p>
+      <div class="cta">
+        <a class="btn primary" href="#contact">Join the club →</a>
+        <a class="btn ghost" href="#events">See upcoming events</a>
+      </div>
+    </div>
+    <div class="collage">
+      <img src="../../frontend/src/img/club%20memoriess/DevitySummit25/DS2.jpeg" alt="Devity Summit 2025" />
+      <img src="../../frontend/src/img/club%20memoriess/Tech%20Elevate/2.JPG" alt="Tech Elevate" />
+      <img src="../../frontend/src/img/club%20memoriess/Envision%20X/IMG20250325112216.jpg" alt="Envision X" />
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="stats">
+      <div class="card stat"><b>200+</b><span>Community members</span></div>
+      <div class="card stat"><b>10+</b><span>Events hosted</span></div>
+      <div class="card stat"><b>19</b><span>Industry speakers</span></div>
+      <div class="card stat"><b>25+</b><span>Team members</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- Events: date-first cards, honest "upcoming" vs "past" -->
+<section class="alt" id="events">
+  <div class="wrap">
+    <div class="head">
+      <div><p class="eyebrow">Events</p><h2>What's coming up</h2></div>
+      <a class="more" href="#events">View all events →</a>
+    </div>
+    <div class="card featured">
+      <div class="img" style="background-image:url('../../frontend/src/img/club%20memoriess/Envision%20X/IMG20250325113648.jpg')"></div>
+      <div class="body">
+        <span class="pill">● Registrations open · Competition</span>
+        <h3 style="font-size:26px;font-weight:800">ENVISION-X 2.0: Transform Ideas into Reality</h3>
+        <p class="sub" style="font-size:15px;margin:0">A 45-day online, project-based innovation challenge. Build, innovate, and compete with the best minds in tech.</p>
+        <div class="meta"><span>📅 9 Feb 2026</span><span>🕙 10:00 AM</span><span>📍 Auditorium (AUC) & Virtual</span></div>
+        <div><a class="btn primary" href="#">Register now →</a></div>
+      </div>
+    </div>
+
+    <p class="subhead" style="margin-top:48px">Past events</p>
+    <div class="grid events-grid">
+      <div class="card ev"><div class="thumb" style="background-image:url('../../frontend/src/img/club%20memoriess/DevitySummit25/DS3.jpeg')"><div class="date"><b>01</b><small>SEP</small></div></div>
+        <div class="body"><span class="pill muted">Seminar</span><h3>Devity Summit 2025</h3><p>Learn from leaders, build for industries. · Auditorium</p></div></div>
+      <div class="card ev"><div class="thumb" style="background-image:url('../../frontend/src/img/club%20memoriess/Jumpstart%20Event/ASET%20GUEST%20TALK%20(3).jpg')"><div class="date"><b>06</b><small>MAY</small></div></div>
+        <div class="body"><span class="pill muted">Seminar</span><h3>Jumpstart Your Tech Career</h3><p>Career guidance from industry engineers. · Auditorium</p></div></div>
+      <div class="card ev"><div class="thumb fallback">N<div class="date"><b>04</b><small>AUG</small></div></div>
+        <div class="body"><span class="pill muted">Bootcamp</span><h3>NetCamp</h3><p>Networking bootcamp, hands-on labs. · Auditorium AUC</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Memories: one event at a time, bento grid, no fake filler cards -->
+<section id="memories">
+  <div class="wrap">
+    <div class="head"><div><p class="eyebrow">Club memories</p><h2>Moments from our events</h2></div></div>
+    <div class="chips">
+      <span class="chip on">Devity Summit 2025</span><span class="chip">NetCamp</span><span class="chip">Jumpstart</span>
+      <span class="chip">Envision X 2025</span><span class="chip">Code Fusion</span><span class="chip">Net Secure</span><span class="chip">Tech Elevate</span>
+    </div>
+    <div class="bento">
+      <figure><img src="../../frontend/src/img/club%20memoriess/DevitySummit25/DS1.jpg" alt="" /><figcaption>Opening keynote</figcaption></figure>
+      <figure><img src="../../frontend/src/img/club%20memoriess/DevitySummit25/DS4.jpeg" alt="" /><figcaption>Hands-on training</figcaption></figure>
+      <figure><img src="../../frontend/src/img/club%20memoriess/DevitySummit25/DS6.jpeg" alt="" /><figcaption>AI/ML engineering</figcaption></figure>
+      <figure><img src="../../frontend/src/img/club%20memoriess/DevitySummit25/DS3.jpeg" alt="" /><figcaption>Speaker panel</figcaption></figure>
+      <figure><img src="../../frontend/src/img/club%20memoriess/DevitySummit25/DS2.jpeg" alt="" /><figcaption>Team</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- Voices: static grid, no scroll-trapping auto carousel -->
+<section class="alt">
+  <div class="wrap">
+    <div class="head"><div><p class="eyebrow">Voices from our speakers</p><h2>What industry speakers say</h2></div></div>
+    <div class="grid quotes">
+      <div class="card quote"><blockquote>Students showed strong ownership and curiosity. Devity Club provides a structured, industry-aligned environment for real-world projects.</blockquote>
+        <div class="person"><img src="../../frontend/src/img/speakers/Meeta%20Rathore.png" alt="" /><div><b>Meeta Rathore</b><span>Sr. Big Data Engineer, Optum</span></div></div></div>
+      <div class="card quote"><blockquote>An incredible experience — well-organized, with an enthusiastic team and inspiring participants.</blockquote>
+        <div class="person"><img src="../../frontend/src/img/speakers/rohit%20agrawal.jpeg" alt="" /><div><b>Rohit Agarwal</b><span>Senior Manager, Procter &amp; Gamble</span></div></div></div>
+      <div class="card quote"><blockquote>Exceptionally well-organized. The curiosity and engagement of the students was truly rewarding.</blockquote>
+        <div class="person"><img src="../../frontend/src/img/speakers/amol%20rangari.jpeg" alt="" /><div><b>Amol Rangari</b><span>Cybersecurity Consultant, Cognizant</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Team: one card style, full names wrap instead of truncating -->
+<section id="team">
+  <div class="wrap">
+    <div class="head"><div><p class="eyebrow">Team</p><h2>The people behind Devity</h2></div><a class="more" href="#team">Meet the full team →</a></div>
+    <p class="subhead">Leadership &amp; mentors</p>
+    <div class="grid people">
+      <div class="card member"><div class="ph initials">W</div><b>Dr. W. Selvamurthy</b><div class="role">Chancellor, Amity University Chhattisgarh</div><div class="socials"><a>in</a></div></div>
+      <div class="card member"><div class="ph initials">P</div><b>Prof. Dr. Piyush Kant Pandey</b><div class="role">Vice Chancellor</div><div class="socials"><a>in</a></div></div>
+      <div class="card member"><div class="ph initials">N</div><b>Er. Nisha Rathore</b><div class="role">Club Mentor, Assistant Professor, ASET</div><div class="socials"><a>in</a></div></div>
+      <div class="card member"><div class="ph initials">S</div><b>Dr. Shikha Tiwari</b><div class="role">Club Mentor, Assistant Professor, ASET</div><div class="socials"><a>in</a></div></div>
+    </div>
+    <p class="subhead" style="margin-top:36px">Core team</p>
+    <div class="grid people">
+      <div class="card member"><div class="ph initials">P</div><b>Ms. Pari Jain</b><div class="role">President</div><div class="socials"><a>gh</a><a>in</a></div></div>
+      <div class="card member"><div class="ph initials">H</div><b>Ms. Harsha Hariyani</b><div class="role">Vice President</div><div class="socials"><a>in</a></div></div>
+      <div class="card member"><div class="ph initials">R</div><b>Ms. Ritika Jiwnani</b><div class="role">Event Management Lead</div><div class="socials"><a>gh</a><a>in</a></div></div>
+      <div class="card member"><div class="ph initials">A</div><b>Mr. Aarekh Verma</b><div class="role">Club Advisor</div><div class="socials"><a>gh</a><a>in</a></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="speakers">
+  <div class="wrap">
+    <div class="head"><div><p class="eyebrow">Guest speakers</p><h2>Learn from people who build</h2></div><a class="more" href="#speakers">All 19 speakers →</a></div>
+    <div class="grid speakers">
+      <div class="card member"><img class="ph" src="../../frontend/src/img/speakers/Saurabh%20Mudgal.png" alt="" /><b>Saurabh Mudgal</b><div class="co">Microsoft</div></div>
+      <div class="card member"><img class="ph" src="../../frontend/src/img/speakers/Arushi%20Garg.jpeg" alt="" /><b>Arushi Garg</b><div class="co">Adobe</div></div>
+      <div class="card member"><img class="ph" src="../../frontend/src/img/speakers/Mahima%20Saran.png" alt="" /><b>Mahima Saran</b><div class="co">MongoDB</div></div>
+      <div class="card member"><img class="ph" src="../../frontend/src/img/speakers/Vikash%20Shrivastava.jpeg" alt="" /><b>Vikas Shrivastava</b><div class="co">DELL</div></div>
+      <div class="card member"><img class="ph" src="../../frontend/src/img/speakers/Rohit%20Singhal.png" alt="" /><b>Rohit Singhal</b><div class="co">Auger</div></div>
+      <div class="card member"><img class="ph" src="../../frontend/src/img/speakers/Meeta%20Rathore.png" alt="" /><b>Meeta Rathore</b><div class="co">Optum</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact: one clear CTA band instead of six rainbow cards -->
+<section id="contact">
+  <div class="wrap">
+    <div class="card band">
+      <div>
+        <p class="eyebrow">Get involved</p>
+        <h2>Want to join, speak or collaborate?</h2>
+        <p class="sub">Students can join the club. Industry folks can propose a seminar, workshop, bootcamp, talk or hackathon — we'll handle the rest.</p>
+      </div>
+      <div class="actions">
+        <a class="btn primary" href="#">Join as a student →</a>
+        <a class="btn ghost" href="#">Propose a session</a>
+        <span style="font-size:14px;opacity:.8">or email club.devity@gmail.com</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Devity Club · Amity University Chhattisgarh</span>
+    <span>Instagram · LinkedIn · GitHub · Theme ◐</span>
+  </div>
+</footer>
+
+<script>
+  const notes = {
+    a: 'White + soft gray, one cyan accent from the logo, photos do the work.',
+    b: 'Navy/near-black, one cyan accent, monospace labels, // and > dev motifs.',
+    c: 'Your current blue→indigo gradient kept, but only 2 colors and no clutter.',
+    d: 'Hack Club style: warm cream, red accent, serif headlines, tilted stickers.',
+    e: 'Linear/Vercel style: near-black, faint grid, violet→cyan headline, white buttons.',
+    f: 'Neo-brutalist: thick black borders, hard shadows, bold color blocks.',
+    g: 'University feel: navy nav, gold accents, classic serif headings.'
+  };
+  const pick = (t) => {
+    document.documentElement.dataset.theme = t;
+    document.querySelectorAll('[data-pick]').forEach((b) => b.classList.toggle('on', b.dataset.pick === t));
+    document.getElementById('note').textContent = notes[t];
+    history.replaceState(null, '', '#' + t);
+  };
+  document.querySelectorAll('[data-pick]').forEach((b) => b.addEventListener('click', () => pick(b.dataset.pick)));
+  const syncSwitcher = () => document.documentElement.style.setProperty('--sw', document.querySelector('.switcher').offsetHeight + 'px');
+  addEventListener('resize', syncSwitcher); syncSwitcher();
+  pick(['a', 'b', 'c', 'd', 'e', 'f', 'g'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'a');
+</script>
+</body>
+</html>

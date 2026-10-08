@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import apiService from '../services/apiService';
 import { navigate } from '../App';
 
@@ -11,7 +11,14 @@ const AdminLogin = ({ onLoginSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState('');
-  const [loginError, setLoginError] = useState('');
+  // Flag is set by AdminProtectedRoute when the dashboard's session expired
+  const [loginError, setLoginError] = useState(() =>
+    sessionStorage.getItem('adminSessionExpired') ? 'Your session has expired. Please sign in again.' : ''
+  );
+
+  useEffect(() => {
+    sessionStorage.removeItem('adminSessionExpired');
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

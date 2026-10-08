@@ -1,6 +1,6 @@
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
-const request = async (endpoint) => {
+const request = async (endpoint, fallback = []) => {
   const response = await fetch(`${API_BASE_URL}/public${endpoint}`);
 
   if (!response.ok) {
@@ -13,15 +13,19 @@ const request = async (endpoint) => {
   }
 
   const data = await response.json();
-  return data.data || [];
+  return data.data ?? fallback;
 };
+
+// Uploaded files (home photos/video) are served by the API, not the frontend
+export const mediaUrl = (id) => `${API_BASE_URL}/public/media/${id}`;
 
 const publicApiService = {
   getMemories: () => request('/memories'),
   getEvents: () => request('/events'),
   getTeamMembers: () => request('/team'),
   getSpeakers: () => request('/speakers'),
-  getReviews: () => request('/reviews')
+  getReviews: () => request('/reviews'),
+  getHome: () => request('/home', null) // null = nothing customised yet
 };
 
 export default publicApiService;

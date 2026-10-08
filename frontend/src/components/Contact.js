@@ -1,55 +1,9 @@
-import { useState } from 'react';
 import { ContactAnimatedBackground } from './AnimatedBackground';
+import JoinCard from './JoinCard';
 
 const Contact = () => {
-  const [studentForm, setStudentForm] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
-
-  const [mentorForm, setMentorForm] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
-
-  const handleStudentChange = (e) => {
-    setStudentForm({
-      ...studentForm,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleMentorChange = (e) => {
-    setMentorForm({
-      ...mentorForm,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleStudentSubmit = (e) => {
-    e.preventDefault();
-    const subject = encodeURIComponent('Student Inquiry');
-    const body = encodeURIComponent(
-      `Name: ${studentForm.name}\nEmail: ${studentForm.email}\n\nMessage:\n${studentForm.message}`
-    );
-    window.location.href = `mailto:club.devity@gmail.com?subject=${subject}&body=${body}`;
-    setStudentForm({ name: '', email: '', message: '' });
-  };
-
-  const handleMentorSubmit = (e) => {
-    e.preventDefault();
-    const subject = encodeURIComponent('Mentorship Application');
-    const body = encodeURIComponent(
-      `Name: ${mentorForm.name}\nEmail: ${mentorForm.email}\n\nMessage:\n${mentorForm.message}`
-    );
-    window.location.href = `mailto:club.devity@gmail.com?subject=${subject}&body=${body}`;
-    setMentorForm({ name: '', email: '', message: '' });
-  };
-
   return (
-    <section id="contact" className="py-16 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm relative overflow-hidden transition-colors duration-300">
+    <section id="contact" className="py-16 bg-white/90 dark:bg-slate-900 backdrop-blur-sm relative overflow-hidden transition-colors duration-300">
       <ContactAnimatedBackground />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12">
@@ -209,134 +163,13 @@ const Contact = () => {
           </div>
         </div>
 
-        <div className="mt-20 grid lg:grid-cols-2 gap-6 mb-12">
-          {/* Student Inquiries Form */}
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200 dark:border-gray-600 shadow-lg transition-colors duration-300">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">Student Inquiries</h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm transition-colors duration-300">
-              Are you a student eager to join our community?
-            </p>
-            <form onSubmit={handleStudentSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-300">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={studentForm.name}
-                  onChange={handleStudentChange}
-                  placeholder="Your full name"
-                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-colors duration-300"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-300">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={studentForm.email}
-                  onChange={handleStudentChange}
-                  placeholder="your.email@example.com"
-                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-colors duration-300"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-300">
-                  Message
-                </label>
-                <textarea
-                  name="message"
-                  value={studentForm.message}
-                  onChange={handleStudentChange}
-                  rows={3}
-                  placeholder="Tell us about your interests and why you want to join..."
-                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm transition-colors duration-300"
-                  required
-                ></textarea>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm"
-              >
-                Submit Inquiry
-              </button>
-            </form>
-          </div>
-
-          {/* Mentorship Opportunities Form */}
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200 dark:border-gray-600 shadow-lg transition-colors duration-300">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">Mentorship Opportunities</h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm transition-colors duration-300">
-              Interested in mentoring our students or speaking at events?
-            </p>
-            <form onSubmit={handleMentorSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-300">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={mentorForm.name}
-                  onChange={handleMentorChange}
-                  placeholder="Your full name"
-                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-colors duration-300"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-300">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={mentorForm.email}
-                  onChange={handleMentorChange}
-                  placeholder="your.email@company.com"
-                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-colors duration-300"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors duration-300">
-                  Message
-                </label>
-                <textarea
-                  name="message"
-                  value={mentorForm.message}
-                  onChange={handleMentorChange}
-                  rows={3}
-                  placeholder="Tell us about your expertise and how you'd like to contribute..."
-                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm transition-colors duration-300"
-                  required
-                ></textarea>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors font-semibold text-sm"
-              >
-                Offer Mentorship
-              </button>
-            </form>
-          </div>
-        </div>
+        {/* Student / mentor sign-up card */}
+        <JoinCard />
 
         {/* Follow Us Section */}
-        <div className="mt-16 mx-4 overflow-hidden rounded-3xl border border-white/10 bg-slate-900/55 p-6 shadow-[0_22px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl transition-colors duration-300 sm:p-8">
+        <div className="mt-16 mx-4 overflow-hidden rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-[0_22px_70px_rgba(0,0,0,0.28)] transition-colors duration-300 sm:p-8">
           <div className="mx-auto mb-8 max-w-2xl text-center">
-            <h2 className="text-3xl font-black tracking-tight text-white sm:text-4xl">Follow Us</h2>
+            <h2 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Follow <em className="italic text-gold">us</em></h2>
             <p className="mt-3 text-base leading-relaxed text-slate-300 sm:text-lg">
               Stay connected with us on social media for the latest updates, tech news, and community highlights.
             </p>

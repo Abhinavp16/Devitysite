@@ -1,12 +1,56 @@
-import { useEffect, useRef, useState } from 'react';
-import { SpeakerReviewAnimatedBackground } from './AnimatedBackground';
+import { useEffect, useState } from 'react';
 import publicApiService from '../services/publicApiService';
+import SectionHeading from './SectionHeading';
+import SkeletonBone from './SkeletonBone';
+
+const PREVIEW_COUNT = 6;      // reviews shown before "Show all"
+const LONG_REVIEW_CHARS = 260; // longer reviews are clamped with "Read more"
+
+const ReviewCard = ({ review }) => {
+  const [expanded, setExpanded] = useState(false);
+  const isLong = (review.review || '').length > LONG_REVIEW_CHARS;
+
+  return (
+    <figure className="m-0 flex h-full flex-col rounded-md border border-cream-line bg-white p-6 dark:border-white/10 dark:bg-slate-900">
+      {review.highlight && (
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-gold-dark dark:text-gold">
+          {review.highlight}
+        </p>
+      )}
+      <blockquote className={`m-0 text-[15px] leading-relaxed text-navy-ink dark:text-gray-100 ${isLong && !expanded ? 'line-clamp-5' : ''}`}>
+        {review.review}
+      </blockquote>
+      {isLong && (
+        <button
+          type="button"
+          onClick={() => setExpanded((value) => !value)}
+          className="mt-2 self-start text-sm font-semibold text-navy hover:underline dark:text-gold"
+        >
+          {expanded ? 'Show less' : 'Read more'}
+        </button>
+      )}
+      <figcaption className="mt-auto flex items-center gap-3 pt-6">
+        {review.image_url ? (
+          <img src={review.image_url} alt="" loading="lazy" className="h-11 w-11 flex-shrink-0 rounded-full object-cover" />
+        ) : (
+          <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-gold-soft font-display text-lg font-bold text-navy" aria-hidden="true">
+            {(review.name || '?').charAt(0)}
+          </span>
+        )}
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-navy-ink dark:text-white">{review.name}</p>
+          <p className="text-[13px] leading-snug text-slate-600 dark:text-gray-400">{review.role}</p>
+        </div>
+      </figcaption>
+    </figure>
+  );
+};
 
 export default function SpeakerReview() {
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const carouselRef = useRef(null);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -27,80 +71,51 @@ export default function SpeakerReview() {
     };
   }, []);
 
-  useEffect(() => {
-    const carousel = carouselRef.current;
-    if (!carousel || reviews.length === 0) return undefined;
-
-    let animationFrame;
-    let lastTimestamp;
-
-    const scroll = (timestamp) => {
-      if (!lastTimestamp) lastTimestamp = timestamp;
-      const elapsed = Math.min(timestamp - lastTimestamp, 16);
-      // Recompute loopWidth on every frame so resize doesn't cause drift
-      const loopWidth = carousel.scrollWidth / 3;
-
-      carousel.scrollLeft += elapsed * 0.055;
-
-      if (carousel.scrollLeft >= loopWidth) {
-        carousel.scrollLeft -= loopWidth;
-      }
-
-      lastTimestamp = timestamp;
-      animationFrame = requestAnimationFrame(scroll);
-    };
-
-    animationFrame = requestAnimationFrame(scroll);
-
-    return () => cancelAnimationFrame(animationFrame);
-  }, [reviews.length]);
-
+  // Testimonials are optional — hide the whole section rather than show an error or empty state
   if (!isLoading && (error || reviews.length === 0)) {
     return null;
   }
 
+  const visibleReviews = showAll ? reviews : reviews.slice(0, PREVIEW_COUNT);
+
   return (
-    <section className="relative py-12 overflow-hidden bg-gradient-to-br from-[#0B1426] via-[#0E1A33] to-[#1A2332]">
-      <SpeakerReviewAnimatedBackground />
-      <div className="relative max-w-7xl mx-auto px-6 z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white via-blue-200 to-cyan-300 bg-clip-text text-transparent mb-6">Voices from Our Speakers</h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto font-medium">Real feedback from industry leaders and academicians who've experienced our community.</p>
-        </div>
-      </div>
+    <section className="bg-cream py-20 transition-colors duration-300 dark:bg-slate-950 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="Voices from our speakers" title="What industry speakers say" />
 
-      {isLoading && <p className="relative z-10 text-center text-gray-300">Loading speaker voices from database...</p>}
-      {error && <p className="relative z-10 text-center text-red-400">Unable to load speaker voices: {error}</p>}
-
-      <div ref={carouselRef} className="hide-scrollbar relative w-full overflow-x-auto z-20">
-        <div className="flex w-fit">
-          {[...Array(3)].map((_, loopIndex) => (
-            <div key={loopIndex} className="flex gap-8 py-10 pr-8">
-              {reviews.map((item, index) => (
-                <div key={`${item.id ?? item._id ?? index}-${loopIndex}`} className="group relative w-[320px] md:w-[380px] flex-shrink-0 snap-center transition-all duration-700 hover:-translate-y-3 hover:scale-[1.02] min-h-[360px]">
-                  <div className="relative h-full rounded-3xl overflow-hidden bg-gradient-to-br from-slate-800/90 via-slate-900/80 to-gray-900/90 border border-slate-700/50 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] group-hover:shadow-[0_20px_60px_rgba(59,130,246,0.4)] group-hover:border-blue-400/50">
-                    <div className="relative z-10 p-6 h-full flex flex-col">
-                      <div className="flex items-center gap-2 mb-4">
-                        <span className="inline-block text-xs px-3 py-1.5 rounded-full font-bold tracking-wide uppercase bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 text-white shadow-lg">{item.highlight || 'Speaker Feedback'}</span>
-                      </div>
-                      <blockquote className="hide-scrollbar text-gray-100 text-sm leading-relaxed font-medium flex-1 mb-6 italic max-h-[180px] overflow-y-auto pr-2">"{item.review}"</blockquote>
-                      <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent mb-4"></div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 p-0.5 overflow-hidden flex items-center justify-center text-white font-bold">
-                          {item.image_url ? <img src={item.image_url} alt={item.name} className="w-full h-full rounded-full object-cover" /> : (item.name || '?').charAt(0)}
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="text-white font-bold text-base mb-0.5 group-hover:text-blue-300 transition-colors duration-300">{item.name}</h4>
-                          <p className="text-gray-400 text-xs leading-tight max-w-[220px] line-clamp-2">{item.role}</p>
-                        </div>
-                      </div>
-                    </div>
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {isLoading
+            ? [0, 1, 2].map((item) => (
+              <div key={item} className="flex flex-col gap-3 rounded-md border border-cream-line bg-white p-6 dark:border-white/10 dark:bg-slate-900" aria-hidden="true">
+                <SkeletonBone delay={item * 0.1} className="h-3 w-24 rounded-full" />
+                <SkeletonBone delay={item * 0.1 + 0.05} className="h-4 w-full rounded-full" />
+                <SkeletonBone delay={item * 0.1 + 0.1} className="h-4 w-full rounded-full" />
+                <SkeletonBone delay={item * 0.1 + 0.15} className="h-4 w-2/3 rounded-full" />
+                <div className="mt-4 flex items-center gap-3">
+                  <SkeletonBone delay={item * 0.1 + 0.2} className="h-11 w-11 rounded-full" />
+                  <div className="flex flex-1 flex-col gap-2">
+                    <SkeletonBone delay={item * 0.1 + 0.25} className="h-3.5 w-28 rounded-full" />
+                    <SkeletonBone delay={item * 0.1 + 0.3} className="h-3 w-40 rounded-full" />
                   </div>
                 </div>
-              ))}
-            </div>
-          ))}
+              </div>
+            ))
+            : visibleReviews.map((review, index) => (
+              <ReviewCard key={review.id ?? review._id ?? index} review={review} />
+            ))}
         </div>
+
+        {!isLoading && reviews.length > PREVIEW_COUNT && (
+          <div className="mt-8 text-center">
+            <button
+              type="button"
+              onClick={() => setShowAll((value) => !value)}
+              className="rounded-md border border-navy px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy hover:text-white dark:border-gold dark:text-gold dark:hover:bg-gold dark:hover:text-navy-ink"
+            >
+              {showAll ? 'Show fewer' : `Show all ${reviews.length} reviews`}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

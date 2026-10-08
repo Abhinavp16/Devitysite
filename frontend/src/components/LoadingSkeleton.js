@@ -1,201 +1,77 @@
-import React from 'react';
+import devityLogo from '../img/devity logo.png';
+import Bone from './SkeletonBone';
 
-const LoadingSkeleton = ({ progress = 0, currentStep = 'Loading...' }) => {
-  return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
-      {/* Header Skeleton */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center items-start pt-2 sm:pt-4 md:pt-6">
-        <div className="relative w-[98%] sm:w-[95%] max-w-7xl rounded-2xl border border-white/20 shadow-2xl bg-gradient-to-r from-blue-600/90 via-blue-700/90 to-blue-800/90 backdrop-blur-lg py-2 sm:py-3">
-          <div className="px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center">
-              {/* Logo Skeleton */}
-              <div className="flex items-center">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-full animate-pulse"></div>
-                <div className="ml-2 sm:ml-3">
-                  <div className="w-32 h-6 sm:h-8 bg-white/20 rounded animate-pulse"></div>
-                </div>
-              </div>
-              
-              {/* Desktop Nav Skeleton */}
-              <div className="hidden md:flex space-x-1 lg:space-x-2">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="w-16 lg:w-20 h-8 lg:h-10 bg-white/20 rounded-xl animate-pulse" style={{ animationDelay: `${i * 50}ms` }}></div>
-                ))}
-              </div>
-              
-              {/* Mobile buttons skeleton */}
-              <div className="md:hidden flex items-center space-x-2">
-                <div className="w-8 h-8 bg-white/20 rounded-xl animate-pulse"></div>
-                <div className="w-8 h-8 bg-white/20 rounded-xl animate-pulse"></div>
-              </div>
-            </div>
+// Mirrors the real Header + Hero layout so the swap to real content doesn't shift anything.
+const LoadingSkeleton = ({ progress = 0, currentStep = 'Loading…' }) => (
+  <div className="min-h-screen bg-cream transition-colors duration-300 dark:bg-slate-900" role="status" aria-live="polite">
+    <span className="sr-only">{currentStep}</span>
+
+    {/* Real loading progress */}
+    <div className="fixed inset-x-0 top-0 z-[60] h-[3px] bg-transparent">
+      <div className="h-full bg-gold transition-[width] duration-300 ease-out" style={{ width: `${progress}%` }} />
+    </div>
+
+    {/* Navbar */}
+    <div className="fixed left-0 right-0 top-0 z-50 flex justify-center pt-2 sm:pt-4 md:pt-6">
+      <div className="w-[98%] max-w-7xl rounded-2xl border border-gold/30 bg-navy/95 py-2 shadow-2xl sm:w-[95%] sm:py-3">
+        <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="rounded-full border border-white/20 bg-white/5 p-1.5 sm:p-2">
+            <img src={devityLogo} alt="" className="h-10 w-auto sm:h-12" />
           </div>
+          <div className="hidden gap-2 md:flex">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <Bone key={i} onNavy delay={i * 0.08} className="h-9 w-16 rounded-xl lg:h-10 lg:w-20" />
+            ))}
+          </div>
+          <Bone onNavy className="h-9 w-9 rounded-xl md:hidden" />
         </div>
-      </div>
-
-      {/* Hero Section Skeleton */}
-      <div className="relative min-h-screen flex items-center justify-center pt-20">
-        {/* Reduced animated background particles */}
-        <div className="absolute inset-0 overflow-hidden">
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-blue-400/20 rounded-full animate-pulse"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 1}s`,
-                animationDuration: `1.5s`
-              }}
-            ></div>
-          ))}
-        </div>
-        
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          {/* Main title skeleton */}
-          <div className="space-y-4 mb-8">
-            <div className="w-80 h-12 sm:h-16 bg-gradient-to-r from-blue-200/30 to-purple-200/30 rounded-lg mx-auto animate-pulse"></div>
-            <div className="w-96 h-8 sm:h-12 bg-gradient-to-r from-purple-200/30 to-pink-200/30 rounded-lg mx-auto animate-pulse" style={{ animationDelay: '100ms' }}></div>
-          </div>
-          
-          {/* Subtitle skeleton */}
-          <div className="space-y-3 mb-12">
-            <div className="w-full max-w-2xl h-6 bg-gray-300/30 dark:bg-gray-600/30 rounded mx-auto animate-pulse" style={{ animationDelay: '200ms' }}></div>
-            <div className="w-3/4 h-6 bg-gray-300/30 dark:bg-gray-600/30 rounded mx-auto animate-pulse" style={{ animationDelay: '300ms' }}></div>
-          </div>
-          
-          {/* CTA buttons skeleton */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <div className="w-40 h-12 bg-gradient-to-r from-blue-500/40 to-purple-500/40 rounded-xl animate-pulse"></div>
-            <div className="w-40 h-12 bg-white/20 border border-white/30 rounded-xl animate-pulse" style={{ animationDelay: '100ms' }}></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Simplified Content Sections Skeleton */}
-      <div className="relative">
-        {/* Minimal animated background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-purple-50/30 to-pink-50/50 dark:from-gray-800/50 dark:via-gray-900/30 dark:to-gray-800/50">
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-blue-300/20 dark:bg-blue-400/20 rounded-full animate-pulse"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${i * 200}ms`,
-                animationDuration: `2s`
-              }}
-            ></div>
-          ))}
-        </div>
-
-        <div className="relative z-10 space-y-16 py-16">
-          {/* About Section Skeleton */}
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-12">
-              <div className="w-48 h-12 bg-gradient-to-r from-blue-300/40 to-purple-300/40 rounded-lg mx-auto mb-4 animate-pulse"></div>
-              <div className="w-96 h-6 bg-gray-300/30 dark:bg-gray-600/30 rounded mx-auto animate-pulse" style={{ animationDelay: '100ms' }}></div>
-            </div>
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="w-full h-4 bg-gray-300/30 dark:bg-gray-600/30 rounded animate-pulse" style={{ animationDelay: `${i * 50}ms` }}></div>
-                ))}
-                <div className="w-3/4 h-4 bg-gray-300/30 dark:bg-gray-600/30 rounded animate-pulse" style={{ animationDelay: '150ms' }}></div>
-              </div>
-              <div className="w-full h-64 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-2xl animate-pulse" style={{ animationDelay: '200ms' }}></div>
-            </div>
-          </div>
-
-          {/* Events Section Skeleton */}
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-12">
-              <div className="w-40 h-12 bg-gradient-to-r from-purple-300/40 to-pink-300/40 rounded-lg mx-auto mb-4 animate-pulse"></div>
-              <div className="w-80 h-6 bg-gray-300/30 dark:bg-gray-600/30 rounded mx-auto animate-pulse" style={{ animationDelay: '100ms' }}></div>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-white/10 dark:bg-gray-800/30 backdrop-blur-sm rounded-2xl p-6 border border-white/20 animate-pulse" style={{ animationDelay: `${i * 50}ms` }}>
-                  <div className="w-full h-48 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-xl mb-4"></div>
-                  <div className="w-3/4 h-6 bg-gray-300/30 dark:bg-gray-600/30 rounded mb-2"></div>
-                  <div className="w-full h-4 bg-gray-300/20 dark:bg-gray-600/20 rounded mb-1"></div>
-                  <div className="w-2/3 h-4 bg-gray-300/20 dark:bg-gray-600/20 rounded"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Team Section Skeleton */}
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-12">
-              <div className="w-32 h-12 bg-gradient-to-r from-green-300/40 to-blue-300/40 rounded-lg mx-auto mb-4 animate-pulse"></div>
-              <div className="w-72 h-6 bg-gray-300/30 dark:bg-gray-600/30 rounded mx-auto animate-pulse" style={{ animationDelay: '100ms' }}></div>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="text-center animate-pulse" style={{ animationDelay: `${i * 50}ms` }}>
-                  <div className="w-32 h-32 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full mx-auto mb-4"></div>
-                  <div className="w-24 h-5 bg-gray-300/30 dark:bg-gray-600/30 rounded mx-auto mb-2"></div>
-                  <div className="w-20 h-4 bg-gray-300/20 dark:bg-gray-600/20 rounded mx-auto"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Optimized Loading Progress Indicator */}
-      <div className="fixed bottom-8 right-8 z-50">
-        <div className="bg-white/10 dark:bg-gray-800/30 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-2xl">
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              {/* Single spinning ring */}
-              <div className="w-10 h-10 border-2 border-blue-300/30 border-t-blue-500 rounded-full animate-spin"></div>
-              
-              {/* Center dot */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              </div>
-            </div>
-            
-            <div className="text-left">
-              <div className="text-sm text-blue-100 font-medium mb-1">
-                {currentStep}
-              </div>
-              <div className="text-xs text-blue-200/70">
-                {progress}%
-              </div>
-              
-              {/* Progress bar */}
-              <div className="w-24 bg-blue-900/30 rounded-full h-1 mt-2 overflow-hidden">
-                <div 
-                  className="bg-gradient-to-r from-blue-400 to-purple-500 h-full rounded-full transition-all duration-300 ease-out"
-                  style={{ width: `${progress}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Minimal floating particles */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {[...Array(10)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-blue-400/10 rounded-full animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${i * 200}ms`,
-              animationDuration: `2s`
-            }}
-          ></div>
-        ))}
       </div>
     </div>
-  );
-};
+
+    {/* Hero */}
+    <section className="pb-16 pt-32 sm:pt-36 md:pb-20">
+      <div className="mx-auto flex max-w-5xl flex-col items-center px-4 sm:px-6 lg:px-8">
+        <Bone className="h-3 w-64 rounded-full" />
+        <span className="mt-2 block h-0.5 w-11 bg-gold" aria-hidden="true" />
+
+        <div className="mt-6 flex w-full flex-col items-center gap-3">
+          <Bone delay={0.1} className="h-11 w-[90%] max-w-[760px] rounded-lg sm:h-14 lg:h-[4.25rem]" />
+          <Bone delay={0.2} className="h-11 w-[65%] max-w-[520px] rounded-lg sm:h-14 lg:h-[4.25rem]" />
+        </div>
+
+        <div className="mt-6 flex w-full flex-col items-center gap-2">
+          <Bone delay={0.3} className="h-4 w-[80%] max-w-[520px] rounded-full" />
+          <Bone delay={0.35} className="h-4 w-[45%] max-w-[260px] rounded-full" />
+        </div>
+
+        <div className="mt-8 flex gap-3">
+          <div className="sk h-12 w-40 rounded-md !bg-navy/80 dark:!bg-gold/40" style={{ '--sk-delay': '0.4s' }} aria-hidden="true" />
+          <Bone delay={0.45} className="h-12 w-40 rounded-md border border-cream-line dark:border-gray-700" />
+        </div>
+      </div>
+
+      {/* Photo strip with the logo tile in the centre */}
+      <div className="mx-auto mt-14 grid max-w-[1400px] grid-cols-3 items-center gap-3 px-4 sm:px-8 md:grid-cols-[1fr_1.15fr_1.3fr_1.15fr_1fr] md:gap-4">
+        <Bone delay={0.15} className="hidden h-[170px] rounded-md md:block md:h-[200px]" />
+        <Bone delay={0.25} className="h-[170px] rounded-md md:h-[250px]" />
+        <div className="flex h-[210px] items-center justify-center rounded-md border-2 border-gold bg-white dark:bg-gray-800 md:h-[300px]">
+          <img src={devityLogo} alt="" className="sk-breathe h-1/3 w-auto object-contain" />
+        </div>
+        <Bone delay={0.35} className="h-[170px] rounded-md md:h-[250px]" />
+        <Bone delay={0.45} className="hidden h-[170px] rounded-md md:block md:h-[200px]" />
+      </div>
+
+      {/* "Our speakers come from" row */}
+      <div className="mx-auto mt-12 flex max-w-5xl flex-col items-center px-4">
+        <Bone className="h-3 w-36 rounded-full" />
+        <div className="mt-5 flex flex-wrap justify-center gap-x-8 gap-y-3">
+          {[80, 60, 84, 52, 92, 64, 70].map((width, i) => (
+            <Bone key={i} delay={i * 0.06} className="h-5 rounded-full" style={{ width }} />
+          ))}
+        </div>
+      </div>
+    </section>
+  </div>
+);
 
 export default LoadingSkeleton;

@@ -1,232 +1,195 @@
 import { useEffect, useRef, useState } from 'react';
 import { initMobileOptimizations } from '../utils/mobileUtils';
+import publicApiService, { mediaUrl } from '../services/publicApiService';
+import HOME_DEFAULTS from '../config/homeDefaults';
+import SkeletonBone from './SkeletonBone';
+import devityLogo from '../img/devity logo.png';
+
+const CONTENT_TIMEOUT_MS = 3000; // after this, show the built-in defaults instead of waiting
+
+// Strip layout per photo slot (outer-left, inner-left, inner-right, outer-right); the video sits in the middle
+const SLOT_STYLES = [
+  { height: 'md:h-[200px]', mobileHidden: true },
+  { height: 'md:h-[250px]' },
+  { height: 'md:h-[250px]' },
+  { height: 'md:h-[200px]', mobileHidden: true }
+];
+
+// Admin-edited values win; anything not customised falls back to the built-in default
+const resolveContent = (data) => ({
+  headline: data?.headline || HOME_DEFAULTS.headline,
+  headline_highlight: data?.headline_highlight || HOME_DEFAULTS.headline_highlight,
+  subtitle: data?.subtitle || HOME_DEFAULTS.subtitle,
+  photos: HOME_DEFAULTS.photos.map((fallback, index) => {
+    const photo = data?.photos?.[index];
+    return {
+      src: photo?.media_id ? mediaUrl(photo.media_id) : fallback.src,
+      fallbackSrc: fallback.src,
+      alt: photo?.alt || fallback.alt
+    };
+  }),
+  video: data?.video_id ? mediaUrl(data.video_id) : HOME_DEFAULTS.video,
+  speaker_companies: data?.speaker_companies?.length ? data.speaker_companies : HOME_DEFAULTS.speaker_companies
+});
+
+const withTimeout = (promise, ms) => Promise.race([
+  promise,
+  new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))
+]);
+
+const slotClass = (index) => {
+  const { height, mobileHidden } = SLOT_STYLES[index];
+  return `h-[170px] w-full rounded-md ${height} ${mobileHidden ? 'hidden md:block' : ''}`;
+};
 
 const Hero = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-  const [videoError, setVideoError] = useState(false);
-  const [showFallback, setShowFallback] = useState(false);
   const videoRef = useRef(null);
-
-  // Play the rendered <video> element once it signals it can play
-  useEffect(() => {
-    if (!videoRef.current || !videoLoaded || videoError) return;
-    const controller = new AbortController();
-    videoRef.current.play().catch(() => {
-      document.addEventListener(
-        'click',
-        () => videoRef.current?.play().catch(() => {}),
-        { once: true, signal: controller.signal }
-      );
-    });
-    return () => controller.abort();
-  }, [videoLoaded, videoError]);
+  const [content, setContent] = useState(null); // null while loading
+  const [videoSrc, setVideoSrc] = useState(null);
+  const [videoFailed, setVideoFailed] = useState(false);
 
   useEffect(() => {
-    setIsVisible(true);
     initMobileOptimizations();
 
-    const video = document.createElement('video');
-    video.src = process.env.PUBLIC_URL + '/assets/videos/devity_logo.mp4';
-    video.preload = 'auto';
-    video.muted = true;
-    video.playsInline = true;
-
-    // Closure boolean — avoids relying on a custom DOM property
-    let loaded = false;
-
-    const handleCanPlay = () => {
-      loaded = true;
-      setVideoLoaded(true);
-      video.play().catch(() => {});
-      cleanup();
-    };
-
-    const handleError = () => {
-      cleanup();
-      setVideoError(true);
-    };
-
-    const cleanup = () => {
-      video.removeEventListener('canplaythrough', handleCanPlay);
-      video.removeEventListener('error', handleError);
-    };
-
-    video.addEventListener('canplaythrough', handleCanPlay);
-    video.addEventListener('error', handleError);
-    video.load();
-
-    // Show fallback after 2 s only if video hasn't loaded yet
-    const fallbackTimer = setTimeout(() => {
-      if (!loaded) setShowFallback(true);
-    }, 2000);
-
-    // Hard timeout after 10 s
-    const errorTimer = setTimeout(() => {
-      if (!loaded) {
-        setVideoError(true);
-        cleanup();
-      }
-    }, 10000);
+    let isMounted = true;
+    withTimeout(publicApiService.getHome(), CONTENT_TIMEOUT_MS)
+      .then((data) => resolveContent(data))
+      .catch(() => resolveContent(null))
+      .then((resolved) => {
+        if (!isMounted) return;
+        setContent(resolved);
+        setVideoSrc(resolved.video);
+      });
 
     return () => {
-      cleanup();
-      clearTimeout(fallbackTimer);
-      clearTimeout(errorTimer);
+      isMounted = false;
     };
-  }, []); // mount-only — no videoLoaded/videoError deps to avoid infinite loop
+  }, []);
 
+  // Some mobile browsers ignore autoPlay until the first interaction — retry then
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return undefined;
+    // React sets `muted` only as a property; iOS Safari also needs the attribute to allow autoplay
+    video.muted = true;
+    video.setAttribute('muted', '');
+    const controller = new AbortController();
+    video.play().catch(() => {
+      document.addEventListener('click', () => video.play().catch(() => {}), { once: true, signal: controller.signal });
+    });
+    return () => controller.abort();
+  }, [videoSrc]);
+
+  // A broken custom video falls back to the built-in one, then to the static logo
+  const handleVideoError = () => {
+    if (videoSrc !== HOME_DEFAULTS.video) setVideoSrc(HOME_DEFAULTS.video);
+    else setVideoFailed(true);
+  };
+
+  const isLoading = content === null;
+
+  // z-10 keeps the hero above the page-wide fixed AnimatedBackground layer, which otherwise washes it out
   return (
-    <section id="home" className="relative min-h-screen hero-mobile hero-mobile-landscape bg-white dark:bg-gray-900 overflow-hidden transition-colors duration-300 pt-20 sm:pt-24 md:pt-28">
-      {/* Hero background elements - responsive positioning */}
-      <div className="absolute inset-0">
-        <div className="absolute top-10 sm:top-20 left-4 sm:left-10 w-32 h-32 sm:w-70 sm:h-70 bg-blue-400/10 dark:bg-blue-500/20 rounded-full animate-float"></div>
-        <div className="absolute top-20 sm:top-40 right-4 sm:right-10 w-28 h-28 sm:w-52 sm:h-52 bg-purple-400/10 dark:bg-purple-500/20 rounded-full animate-float-reverse"></div>
-        <div className="absolute -bottom-4 sm:-bottom-8 left-8 sm:left-20 w-24 h-24 sm:w-42 sm:h-42 bg-pink-400/10 dark:bg-pink-500/20 rounded-full animate-float-diagonal"></div>
-      </div>
+    <section id="home" className="relative z-10 overflow-hidden bg-cream pb-16 pt-32 transition-colors duration-300 dark:bg-slate-900 sm:pt-36 md:pb-20">
+      <div className="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gold-dark dark:text-gold">
+          Devity Club · Amity University Chhattisgarh
+        </p>
+        <span className="mx-auto mt-2 block h-0.5 w-11 bg-gold" aria-hidden="true" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-10 sm:pt-12 sm:pb-20 lg:pt-12 lg:pb-24 hero-content hero-content-landscape">
-        <div className="grid lg:grid-cols-2 gap-5 sm:gap-8 lg:gap-12 items-center">
-          {/* Hero Content */}
-          <div className={`text-center lg:text-left ${isVisible ? 'animate-fadeInLeft' : 'opacity-0'}`}>
-            <div className="mb-2 sm:mb-6">
-              <span
-                onDoubleClick={() => window.location.href = '/login'}
-                className="hero-badge inline-block px-4 py-2 sm:px-4 sm:py-2 bg-blue-100 dark:bg-blue-500/30 text-blue-700 dark:text-blue-100 rounded-full text-sm sm:text-sm font-bold mb-1 sm:mb-4 animate-slideInFromBottom transition-colors duration-300 shadow-lg border border-blue-200 dark:border-blue-400/30 cursor-pointer select-none"
-              >
-                🚀 Welcome to the Future of Tech
-              </span>
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-6 leading-tight transition-colors duration-300">
-              Welcome to{' '}
-              <span className="gradient-text animate-pulse-slow block sm:inline">Devity Club</span>
+        {isLoading ? (
+          <div className="mt-6 flex flex-col items-center gap-3" role="status" aria-label="Loading">
+            <SkeletonBone className="h-11 w-[90%] max-w-[760px] rounded-lg sm:h-14 lg:h-[4.25rem]" />
+            <SkeletonBone delay={0.1} className="h-11 w-[65%] max-w-[520px] rounded-lg sm:h-14 lg:h-[4.25rem]" />
+            <SkeletonBone delay={0.2} className="mt-3 h-4 w-[80%] max-w-[520px] rounded-full" />
+            <SkeletonBone delay={0.25} className="h-4 w-[45%] max-w-[260px] rounded-full" />
+          </div>
+        ) : (
+          <>
+            <h1 className="mx-auto mt-6 max-w-4xl font-display text-[2.6rem] font-extrabold leading-[1.08] tracking-tight text-navy-ink dark:text-white sm:text-6xl lg:text-[4.25rem]">
+              {content.headline}{' '}
+              <em className="italic text-navy dark:text-gold">{content.headline_highlight}</em>
             </h1>
 
-            <p className="text-sm sm:text-lg md:text-xl lg:text-2xl text-gray-700 dark:text-white mb-4 sm:mb-8 leading-relaxed animate-fadeInUp delay-200 font-medium transition-colors duration-300 px-2 sm:px-0">
-              Empowering the next generation of tech innovators through community,
-              learning, and collaboration. Join us in shaping the future of technology.
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-slate-600 dark:text-gray-300">
+              {content.subtitle}
             </p>
+          </>
+        )}
 
-
-
-            {/* Stats - Mobile optimized */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-6 lg:gap-8 mt-4 sm:mt-12 animate-fadeInUp delay-600 px-1 sm:px-0">
-              <div className="text-center bg-white/80 dark:bg-black/80 rounded-xl p-2.5 sm:p-3 lg:p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-                <div className="text-xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">25+</div>
-                <div className="text-gray-700 dark:text-gray-300 text-[10px] leading-tight sm:text-sm font-semibold transition-colors duration-300">Team Members</div>
-              </div>
-              <div className="text-center bg-white/80 dark:bg-black/80 rounded-xl p-2.5 sm:p-3 lg:p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-                <div className="text-xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400 mb-1">7+</div>
-                <div className="text-gray-700 dark:text-gray-300 text-[10px] leading-tight sm:text-sm font-semibold transition-colors duration-300">Events</div>
-              </div>
-              <div className="text-center bg-white/80 dark:bg-black/80 rounded-xl p-2.5 sm:p-3 lg:p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-                <div className="text-xl sm:text-3xl font-bold text-green-600 dark:text-green-400 mb-1">10+</div>
-                <div className="text-gray-700 dark:text-gray-300 text-[10px] leading-tight sm:text-sm font-semibold transition-colors duration-300">Projects</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Hero Visual - Mobile responsive */}
-          <div className={`flex justify-center lg:justify-end mt-4 sm:mt-8 lg:mt-0 ${isVisible ? 'animate-fadeInRight delay-300' : 'opacity-0'}`}>
-            <div className="relative">
-              {/* Main circle with video logo - responsive sizing */}
-              <div className="hero-video-container w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full flex items-center justify-center shadow-2xl hover-scale overflow-hidden relative p-2 sm:p-3 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600">
-                {/* Video container filling most of the circle */}
-                <div
-                  className="relative w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-white cursor-pointer"
-                  onClick={() => {
-                    const video = document.querySelector('.hero-video');
-                    if (video) {
-                      video.play().catch(e => console.warn('Manual play failed:', e));
-                    }
-                  }}
-                >
-                  {/* Loading placeholder */}
-                  {!videoLoaded && !videoError && !showFallback && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
-                      <div className="text-center">
-                        <div className="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
-                        <p className="text-blue-600 font-semibold">Loading...</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Video Logo */}
-                  <video
-                    ref={videoRef}
-                    className={`hero-video w-full h-full object-contain transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    preload="auto"
-                    style={{ filter: 'contrast(1.1) brightness(1.05) saturate(1.2)' }}
-                    onCanPlay={() => setVideoLoaded(true)}
-                    onError={() => { setVideoError(true); setVideoLoaded(false); }}
-                  >
-                    <source src={process.env.PUBLIC_URL + '/assets/videos/devity_logo.mp4'} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
-
-                  {/* Fallback content if video doesn't load */}
-                  <div className={`text-center text-gray-800 transition-opacity duration-500 ${(videoError || showFallback) && !videoLoaded ? 'opacity-100' : 'opacity-0 pointer-events-none'} ${(videoError || showFallback) && !videoLoaded ? 'block' : 'absolute inset-0 flex items-center justify-center'}`}>
-                    <div className="animate-rotateIn delay-500">
-                      {/* Custom Devity Logo SVG */}
-                      <div className="w-32 h-32 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl shadow-lg">
-                        <div className="text-white font-bold text-4xl tracking-wider">
-                          <span className="text-white">DE</span>
-                          <span className="text-cyan-200">V</span>
-                        </div>
-                      </div>
-                    </div>
-                    <h3 className="text-2xl font-bold mb-2 text-gray-800">Devity Club</h3>
-                    <p className="text-blue-600 text-sm font-semibold">Tech Innovation Hub</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating elements with enhanced animations - mobile responsive */}
-              <div className="absolute -top-3 sm:-top-6 -right-3 sm:-right-6 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-full flex items-center justify-center shadow-2xl animate-float hover-rotate border-2 border-white/20">
-                <span className="text-lg sm:text-2xl lg:text-3xl drop-shadow-lg">💡</span>
-              </div>
-
-              <div className="absolute -bottom-3 sm:-bottom-6 -left-3 sm:-left-6 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-2xl animate-float delay-200 hover-rotate border-2 border-white/20">
-                <span className="text-lg sm:text-2xl lg:text-3xl drop-shadow-lg">🚀</span>
-              </div>
-
-              <div className="absolute top-1/2 -left-4 sm:-left-6 lg:-left-8 w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full flex items-center justify-center shadow-xl animate-float delay-400 hover-rotate border-2 border-white/20">
-                <span className="text-sm sm:text-lg lg:text-2xl drop-shadow-lg">⚡</span>
-              </div>
-
-              <div className="absolute top-1/4 -right-2 sm:-right-3 lg:-right-4 w-8 h-8 sm:w-10 sm:h-10 lg:w-14 lg:h-14 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full flex items-center justify-center shadow-xl animate-float delay-600 hover-rotate border-2 border-white/20">
-                <span className="text-xs sm:text-sm lg:text-xl drop-shadow-lg">🔥</span>
-              </div>
-
-              {/* Orbiting elements - mobile responsive */}
-              <div className="absolute inset-0 animate-spin" style={{ animationDuration: '20s' }}>
-                <div className="absolute -top-1 sm:-top-2 left-1/2 w-2 h-2 sm:w-3 sm:h-3 lg:w-4 lg:h-4 bg-blue-500 rounded-full transform -translate-x-1/2 shadow-lg"></div>
-              </div>
-
-              <div className="absolute inset-0 animate-spin" style={{ animationDuration: '15s', animationDirection: 'reverse' }}>
-                <div className="absolute top-1/2 -right-1 sm:-right-2 w-2 h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3 bg-purple-500 rounded-full transform -translate-y-1/2 shadow-lg"></div>
-              </div>
-
-              <div className="absolute inset-0 animate-spin" style={{ animationDuration: '25s' }}>
-                <div className="absolute bottom-2 sm:bottom-4 left-1/4 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-pink-500 rounded-full shadow-lg"></div>
-              </div>
-            </div>
-          </div>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <a href="#contact" className="rounded-md bg-navy px-6 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-navy-ink dark:bg-gold dark:text-navy-ink dark:hover:bg-gold/90">
+            Join the club →
+          </a>
+          <a href="#events" className="rounded-md border border-cream-line bg-white px-6 py-3 text-[15px] font-semibold text-navy-ink transition-colors hover:border-navy/40 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:border-gold/60">
+            Upcoming events
+          </a>
         </div>
+      </div>
 
-        {/* Scroll indicator - mobile responsive */}
-        <div className="pointer-events-none absolute bottom-2 left-1/2 hidden -translate-x-1/2 transform animate-fadeInUp delay-1000 xl:block">
-          <div className="flex flex-col items-center text-gray-700 dark:text-gray-300 transition-colors duration-300">
-            <span className="text-xs sm:text-sm mb-1 sm:mb-2 font-semibold">Scroll to explore</span>
-            <div className="w-5 h-8 sm:w-6 sm:h-10 border-2 border-gray-700 dark:border-gray-400 rounded-full flex justify-center transition-colors duration-300">
-              <div className="w-0.5 h-2 sm:w-1 sm:h-3 bg-gray-700 dark:bg-gray-400 rounded-full mt-1.5 sm:mt-2 animate-bounce transition-colors duration-300"></div>
-            </div>
-          </div>
+      {/* Photo strip with the looping logo video in the centre */}
+      <div className="mx-auto mt-14 grid max-w-[1400px] grid-cols-3 items-center gap-3 px-4 sm:px-8 md:grid-cols-[1fr_1.15fr_1.3fr_1.15fr_1fr] md:gap-4">
+        {[0, 1, 2, 3].map((index) => {
+          const photo = content?.photos[index];
+          const tile = isLoading ? (
+            <SkeletonBone key={index} delay={index * 0.1} className={slotClass(index)} />
+          ) : (
+            <img
+              key={index}
+              src={photo.src}
+              alt={photo.alt}
+              className={`${slotClass(index)} object-cover`}
+              onError={(e) => {
+                // Custom photo missing/broken → show the built-in photo instead (once, so it can't loop)
+                if (!e.currentTarget.dataset.usedFallback) {
+                  e.currentTarget.dataset.usedFallback = 'true';
+                  e.currentTarget.src = photo.fallbackSrc;
+                }
+              }}
+            />
+          );
+
+          // Video tile goes between the two inner photos
+          if (index !== 2) return tile;
+          return [
+            <div key="video" className="flex h-[210px] items-center justify-center overflow-hidden rounded-md border-2 border-gold bg-white dark:bg-gray-800 md:h-[300px]">
+              {isLoading || videoFailed ? (
+                <img src={devityLogo} alt="Devity Club logo" className={`h-1/3 w-auto object-contain ${isLoading ? 'sk-breathe' : ''}`} />
+              ) : (
+                <video
+                  ref={videoRef}
+                  key={videoSrc}
+                  src={videoSrc}
+                  className="h-full w-full bg-white object-contain"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="auto"
+                  aria-label="Devity Club animated logo"
+                  onError={handleVideoError}
+                />
+              )}
+            </div>,
+            tile
+          ];
+        })}
+      </div>
+
+      <div className="mx-auto mt-12 max-w-5xl px-4 text-center sm:px-6 lg:px-8">
+        {/* Double-click is the hidden entry to the admin login */}
+        <p
+          onDoubleClick={() => { window.location.href = '/login'; }}
+          className="cursor-default select-none text-[13px] text-slate-500 dark:text-gray-400"
+        >
+          Our speakers come from
+        </p>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-lg font-bold tracking-tight text-slate-400 dark:text-gray-500">
+          {isLoading
+            ? [80, 60, 84, 52, 92, 64, 70].map((width, i) => (
+              <SkeletonBone key={i} delay={i * 0.06} className="h-5 rounded-full" style={{ width }} />
+            ))
+            : content.speaker_companies.map((company) => <span key={company}>{company}</span>)}
         </div>
       </div>
     </section>

@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { SpeakersAnimatedBackground } from './AnimatedBackground';
 import publicApiService from '../services/publicApiService';
 
+// Seed data used '#' as a placeholder link; only show icons for real web addresses
+const isLink = (url) => /^https?:\/\//i.test(url || '');
+
 const getDisplayInitial = (name = '') => {
   const parts = name.replace(/^(Mr\.|Ms\.|Mrs\.|Dr\.|Prof\.|Er\.)\s+/i, '').trim().split(/\s+/);
   return (parts[0] || name || '?').charAt(0).toUpperCase();
@@ -51,7 +54,7 @@ const Speakers = () => {
   }, []);
 
   return (
-    <section id="speakers" className="py-20 bg-gradient-to-br from-slate-50/60 via-purple-50/60 to-pink-100/60 dark:from-gray-900/60 dark:via-gray-800/60 dark:to-gray-700/60 backdrop-blur-sm relative overflow-hidden transition-colors duration-300">
+    <section id="speakers" className="py-20 bg-gradient-to-br from-slate-50/60 via-purple-50/60 to-pink-100/60 dark:bg-none dark:bg-slate-900 backdrop-blur-sm relative overflow-hidden transition-colors duration-300">
       <SpeakersAnimatedBackground />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
@@ -87,22 +90,22 @@ const Speakers = () => {
 
                 <div className="border-t border-gray-200/80 pt-2">
                   <div className="flex items-center justify-center gap-3">
-                    {speaker.website_url && (
+                    {isLink(speaker.website_url) && (
                       <a href={speaker.website_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-orange-50 text-orange-500 shadow-sm" aria-label={`${speaker.name} website`}>
                         <GlobeIcon className="h-3 w-3" />
                       </a>
                     )}
-                    {speaker.twitter_url && (
+                    {isLink(speaker.twitter_url) && (
                       <a href={speaker.twitter_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-sky-50 text-sky-500 shadow-sm" aria-label={`${speaker.name} X`}>
                         <XIcon className="h-3 w-3" />
                       </a>
                     )}
-                    {speaker.linkedin_url && (
+                    {isLink(speaker.linkedin_url) && (
                       <a href={speaker.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex h-5 w-5 items-center justify-center rounded bg-blue-50 text-blue-600 shadow-sm" aria-label={`${speaker.name} LinkedIn`}>
                         <LinkedInIcon className="h-3 w-3" />
                       </a>
                     )}
-                    {!speaker.website_url && !speaker.twitter_url && !speaker.linkedin_url && (
+                    {!isLink(speaker.website_url) && !isLink(speaker.twitter_url) && !isLink(speaker.linkedin_url) && (
                       <span className="flex h-5 w-5 items-center justify-center rounded bg-gray-50 text-gray-400 shadow-sm">
                         <GlobeIcon className="h-3 w-3" />
                       </span>

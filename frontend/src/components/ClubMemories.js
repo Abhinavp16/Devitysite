@@ -1,39 +1,62 @@
-import { useEffect, useRef, useState } from 'react';
-import { ClubMemoriesAnimatedBackground } from './AnimatedBackground';
+import { useEffect, useState } from 'react';
 import publicApiService from '../services/publicApiService';
+import SectionHeading from './SectionHeading';
+import SkeletonBone from './SkeletonBone';
 
-const gradients = [
-  'from-red-500 to-pink-600',
-  'from-blue-500 to-indigo-600',
-  'from-green-500 to-emerald-600',
-  'from-purple-500 to-violet-600',
-  'from-orange-500 to-amber-600',
-  'from-cyan-500 to-blue-600',
-  'from-pink-500 to-rose-600'
-];
+const BENTO_SIZE = 5; // photos shown in the feature grid; the rest go in a row below
 
-const placeholderTitles = [
-  'Opening Ceremony',
-  'Interactive Session',
-  'Team Collaboration',
-  'Problem Solving',
-  'Award Ceremony',
-  'Networking Session',
-  'Project Showcase',
-  'Hands-on Training',
-  'Team Presentation',
-  'Closing Ceremony'
-];
+const formatDate = (date) => date
+  ? new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+  : '';
 
-const MAX_MEMORY_IMAGES = 10;
+const getMemoryId = (memory) => memory?.id ?? memory?._id ?? '';
+
+// Pair each photo with its label, dropping empty slots
+const getPhotos = (memory) => {
+  const urls = memory?.image_urls?.length ? memory.image_urls : [memory?.image_url];
+  const titles = memory?.image_titles || [];
+  return urls
+    .map((src, index) => ({ src, caption: titles[index] || '' }))
+    .filter((photo) => photo.src);
+};
+
+// Grid layout adapts to how many photos an event has. The first photo is the large feature tile.
+const bentoGridClass = (count) => {
+  if (count === 1) return 'md:grid-cols-1 md:grid-rows-[420px]';
+  if (count === 2) return 'md:grid-cols-2 md:grid-rows-[340px]';
+  if (count === 3) return 'md:grid-cols-[2fr_1fr] md:grid-rows-[200px_200px]';
+  return 'md:grid-cols-[2fr_1fr_1fr] md:grid-rows-[200px_200px]';
+};
+
+const bentoTileClass = (index, count) => {
+  // Mobile: 2 columns, feature tile full width; an odd leftover tile spans the row
+  const mobile = index === 0
+    ? 'col-span-2 row-span-2'
+    : index === count - 1 && (count - 1) % 2 === 1 ? 'col-span-2' : 'col-span-1';
+
+  let desktop = 'md:col-span-1 md:row-span-1';
+  if (index === 0 && count >= 3) desktop = 'md:col-span-1 md:row-span-2';
+  if (index === 3 && count === 4) desktop = 'md:col-span-2 md:row-span-1';
+
+  return `${mobile} ${desktop}`;
+};
+
+const PhotoTile = ({ photo, alt, className = '' }) => (
+  <figure className={`relative m-0 overflow-hidden rounded-md bg-cream dark:bg-gray-800 ${className}`}>
+    <img src={photo.src} alt={alt} loading="lazy" className="h-full w-full object-cover" />
+    {photo.caption && (
+      <figcaption className="absolute bottom-3 left-3 rounded-md bg-slate-900/75 px-2.5 py-1 text-xs font-semibold text-white">
+        {photo.caption}
+      </figcaption>
+    )}
+  </figure>
+);
 
 const ClubMemories = () => {
   const [memories, setMemories] = useState([]);
   const [activeMemoryId, setActiveMemoryId] = useState('');
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const carouselRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -42,8 +65,7 @@ const ClubMemories = () => {
       .then((data) => {
         if (isMounted) {
           setMemories(data);
-          // Handle both string id (from mapMemory) and _id fallback
-          setActiveMemoryId(data[0]?.id ?? data[0]?._id ?? '');
+          setActiveMemoryId(getMemoryId(data[0]));
         }
       })
       .catch((err) => {
@@ -58,132 +80,98 @@ const ClubMemories = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const carousel = carouselRef.current;
-    if (!carousel || memories.length === 0) return undefined;
-
-    const interval = setInterval(() => {
-      if (window.innerWidth >= 768) return;
-
-      const nextScroll = carousel.scrollLeft + carousel.clientWidth * 0.86;
-      const atEnd = nextScroll >= carousel.scrollWidth - carousel.clientWidth - 8;
-
-      carousel.scrollTo({
-        left: atEnd ? 0 : nextScroll,
-        behavior: 'smooth'
-      });
-    }, 2500);
-
-    return () => clearInterval(interval);
-  }, [memories.length]); // removed activeMemoryId — interval restarts unnecessarily on every tab switch
-
-  const getMemoryId = (m) => m?.id ?? m?._id ?? '';
-
-  const activeIndex = memories.findIndex((memory) => getMemoryId(memory) === activeMemoryId);
-  const activeMemory = memories[activeIndex] || memories[0];
-  const activeGradient = gradients[(activeIndex >= 0 ? activeIndex : 0) % gradients.length];
-  const memoryImages = activeMemory && activeMemory.image_urls && activeMemory.image_urls.length ? activeMemory.image_urls : [activeMemory?.image_url || ''];
-  const memoryTitles = activeMemory && activeMemory.image_titles && activeMemory.image_titles.length ? activeMemory.image_titles : placeholderTitles;
-  const activeCardCount = activeMemory ? Math.max(5, Math.min(MAX_MEMORY_IMAGES, memoryImages.filter(Boolean).length || 1)) : 0;
-  const activeImages = activeMemory ? [...memoryImages, ...Array(activeCardCount).fill('')].slice(0, activeCardCount) : [];
-  const activeImageTitles = activeMemory ? [...memoryTitles, ...Array(activeCardCount).fill('')].slice(0, activeCardCount) : [];
-
-  const handleMemoryChange = (memoryId) => {
-    if (memoryId === activeMemoryId) return;
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setActiveMemoryId(memoryId);
-      setIsTransitioning(false);
-    }, 120);
-  };
-
-  // helper for comparing and keying memories
-  const memoryButtonActive = (memory) => getMemoryId(activeMemory) === getMemoryId(memory);
+  const activeMemory = memories.find((memory) => getMemoryId(memory) === activeMemoryId) || memories[0];
+  const photos = getPhotos(activeMemory);
+  const featured = photos.slice(0, BENTO_SIZE);
+  const extra = photos.slice(BENTO_SIZE);
+  const date = formatDate(activeMemory?.event_date);
 
   return (
-    <section id="memories" className="py-20 bg-gradient-to-br from-slate-900 via-gray-900 to-black relative overflow-hidden">
-      <ClubMemoriesAnimatedBackground />
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-2 h-2 bg-blue-400/30 rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-3 h-3 bg-purple-400/20 rounded-full animate-bounce"></div>
-        <div className="absolute bottom-32 left-1/4 w-1 h-1 bg-cyan-400/40 rounded-full animate-ping"></div>
-      </div>
+    <section id="memories" className="bg-white py-20 transition-colors duration-300 dark:bg-slate-900 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="Club memories" title="Moments from our events" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-6">Club Memories</h2>
-          <p className="text-xl text-gray-300 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed transition-colors duration-300">Capturing moments of innovation, learning, and friendship that define our journey together.</p>
-        </div>
-
-        {isLoading && <p className="text-center text-gray-300">Loading memories from database...</p>}
-        {error && <p className="text-center text-red-400">Unable to load memories: {error}</p>}
-        {!isLoading && !error && memories.length === 0 && <p className="text-center text-gray-300">No club memories available yet.</p>}
+        {isLoading && (
+          <div role="status" aria-label="Loading memories">
+            <div className="mb-6 flex flex-wrap gap-2">
+              {[132, 96, 120, 112, 104].map((width, i) => (
+                <SkeletonBone key={i} delay={i * 0.08} className="h-9 rounded-full" style={{ width }} />
+              ))}
+            </div>
+            <SkeletonBone className="mb-6 h-4 w-full max-w-xl rounded-full" />
+            <div className={`grid auto-rows-[150px] grid-cols-2 gap-3 ${bentoGridClass(BENTO_SIZE)}`}>
+              {[0, 1, 2, 3, 4].map((i) => (
+                <SkeletonBone key={i} delay={i * 0.1} className={`rounded-md ${bentoTileClass(i, BENTO_SIZE)}`} />
+              ))}
+            </div>
+          </div>
+        )}
+        {error && <p className="text-red-600 dark:text-red-400">Unable to load memories: {error}</p>}
+        {!isLoading && !error && memories.length === 0 && (
+          <p className="text-slate-600 dark:text-gray-400">Photos from our events will appear here soon.</p>
+        )}
 
         {activeMemory && (
           <>
-            <div className="flex flex-wrap justify-center gap-4 mb-12">
-              {memories.map((memory, index) => {
-                const gradient = gradients[index % gradients.length];
+            <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Choose an event">
+              {memories.map((memory) => {
+                const isActive = getMemoryId(memory) === getMemoryId(activeMemory);
                 return (
                   <button
                     key={getMemoryId(memory) || memory.title}
-                    onClick={() => handleMemoryChange(getMemoryId(memory))}
-                    disabled={isTransitioning}
-                    className={`relative px-6 py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 group overflow-hidden ${memoryButtonActive(memory)
-                      ? `bg-gradient-to-r ${gradient} text-white shadow-xl`
-                      : 'bg-gray-800/50 text-gray-300 hover:text-white border border-gray-700/50 hover:border-gray-600/50'
-                      } ${isTransitioning ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    type="button"
+                    aria-pressed={isActive}
+                    onClick={() => setActiveMemoryId(getMemoryId(memory))}
+                    className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${isActive
+                      ? 'border-navy bg-navy text-white dark:border-gold dark:bg-gold dark:text-navy-ink'
+                      : 'border-cream-line bg-white text-slate-600 hover:border-navy/40 hover:text-navy-ink dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-gold/60 dark:hover:text-white'
+                      }`}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
-                    <span className="relative z-10">{memory.title}</span>
+                    {memory.title}
                   </button>
                 );
               })}
             </div>
 
-            <div className={`mb-8 transition-all duration-300 ${isTransitioning ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
-              <div className="text-center mb-8">
-                <h3 className={`text-3xl font-bold bg-gradient-to-r ${activeGradient} bg-clip-text text-transparent mb-3`}>
-                  {activeMemory.title}
-                </h3>
-                <p className="text-gray-400 text-lg max-w-5xl mx-auto leading-relaxed">
-                  {activeMemory.description}
-                </p>
-                {activeMemory.event_date && (
-                  <p className="text-gray-500 text-sm mt-4">
-                    {new Date(activeMemory.event_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                  </p>
-                )}
-              </div>
+            {(date || activeMemory.description) && (
+              <p className="mb-6 max-w-3xl text-sm leading-relaxed text-slate-600 line-clamp-2 dark:text-gray-400">
+                {date && <span className="font-semibold text-navy-ink dark:text-gray-200">{date}</span>}
+                {date && activeMemory.description && ' · '}
+                {activeMemory.description}
+              </p>
+            )}
 
-              <div ref={carouselRef} key={getMemoryId(activeMemory)} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:pb-0 lg:grid-cols-3 xl:grid-cols-5 hide-scrollbar">
-                {activeImages.map((imageUrl, index) => {
-                  const fallbackTitle = placeholderTitles[index] || `Memory ${index + 1}`;
-                  const title = activeImageTitles[index] || fallbackTitle;
+            {/* key re-mounts the grid so each event's photos fade in */}
+            <div key={getMemoryId(activeMemory)} className="animate-fadeInUp">
+              {featured.length > 0 ? (
+                <div className={`grid auto-rows-[150px] grid-cols-2 gap-3 ${bentoGridClass(featured.length)}`}>
+                  {featured.map((photo, index) => (
+                    <PhotoTile
+                      key={index}
+                      photo={photo}
+                      alt={photo.caption ? `${activeMemory.title} — ${photo.caption}` : activeMemory.title}
+                      className={bentoTileClass(index, featured.length)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-md border border-dashed border-cream-line py-16 text-center text-sm text-slate-500 dark:border-gray-700 dark:text-gray-400">
+                  Photos from this event are coming soon.
+                </div>
+              )}
 
-                  return (
-                  <div
-                    key={`${activeMemory.id}-${index}`}
-                    className="group relative min-w-[82vw] max-w-[82vw] snap-center overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-xl md:min-w-0 md:max-w-none"
-                    style={{ animationDelay: `${index * 0.05}s`, animation: 'fadeInUp 0.4s ease-out forwards' }}
-                  >
-                    <div className="relative h-64 overflow-hidden rounded-2xl">
-                      {imageUrl ? (
-                        <img src={imageUrl} alt={`${activeMemory.title} ${title}`} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className={`absolute inset-0 bg-gradient-to-br ${activeGradient} flex flex-col items-center justify-center text-white`}>
-                          <div className="text-5xl font-black mb-3">{title.charAt(0)}</div>
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-black/10"></div>
-                      <div className="absolute right-3 top-3 rounded-full bg-pink-500 px-4 py-2 text-sm font-bold text-white shadow-lg">
-                        {title}
-                      </div>
-                    </div>
-                  </div>
-                  );
-                })}
-              </div>
+              {extra.length > 0 && (
+                <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+                  {extra.map((photo, index) => (
+                    <PhotoTile
+                      key={index}
+                      photo={photo}
+                      alt={photo.caption ? `${activeMemory.title} — ${photo.caption}` : activeMemory.title}
+                      className="h-40 md:h-48"
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </>
         )}

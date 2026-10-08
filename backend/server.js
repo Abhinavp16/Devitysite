@@ -21,6 +21,7 @@ const speakersRoutes = require('./routes/speakers');
 const reviewsRoutes = require('./routes/reviews');
 const dashboardRoutes = require('./routes/dashboard');
 const publicRoutes = require('./routes/public');
+const homeRoutes = require('./routes/home');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -67,10 +68,14 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Rate limiting
+// Rate limiting for admin/API routes. Public read routes have their own limiter
+// (routes/public.js) so campus visitors sharing one IP don't consume the admin budget.
 const limiter = rateLimit({
     windowMs: Number(process.env.RATE_LIMIT_WINDOW || 15) * 60 * 1000,
-    max: Number(process.env.RATE_LIMIT_MAX || 100),
+    max: Number(process.env.RATE_LIMIT_MAX || 1000),
+    skip: (req) => req.path.startsWith('/public/') || req.path === '/health',
+    standardHeaders: true,
+    legacyHeaders: false,
     message: {
         error: 'Too many requests from this IP, please try again later.'
     }
@@ -131,6 +136,7 @@ app.use('/api/speakers', speakersRoutes);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/public', publicRoutes);
+app.use('/api/home', homeRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -140,7 +146,7 @@ app.use((err, req, res, next) => {
         return res.status(400).json({ error: 'Invalid JSON in request body' });
     }
 
-    if (err.code === 'LIMIT_FILE_SIZE') {
+    if (err.type === 'entity.too.large' || err.code === 'LIMIT_FILE_SIZE') {
         return res.status(413).json({ error: 'File too large' });
     }
 

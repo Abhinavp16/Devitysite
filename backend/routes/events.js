@@ -1,6 +1,6 @@
 const express = require('express');
 const Joi = require('joi');
-const { Event, GuestSpeaker, legacyOrObjectIdQuery, mapEvent, mapSpeaker } = require('../models');
+const { Event, GuestSpeaker, legacyOrObjectIdQuery, mapEvent, mapSpeaker, startOfTodayUTC } = require('../models');
 const { authenticateToken, logActivity } = require('../middleware/auth');
 
 const router = express.Router();
@@ -65,22 +65,24 @@ router.get('/', authenticateToken, async (req, res) => {
     try {
         const { page = 1, limit = 10, search = '', status = '', event_type = '', start_date = '', end_date = '' } = req.query;
         const skip = (Number(page) - 1) * Number(limit);
-        const filter = {};
+        const conditions = [];
 
         if (search) {
-            filter.$or = [
+            conditions.push({ $or: [
                 { title: { $regex: search, $options: 'i' } },
                 { description: { $regex: search, $options: 'i' } },
                 { location: { $regex: search, $options: 'i' } }
-            ];
+            ] });
         }
-        if (status) filter.status = status;
-        if (event_type) filter.event_type = event_type;
-        if (start_date || end_date) {
-            filter.event_date = {};
-            if (start_date) filter.event_date.$gte = new Date(start_date);
-            if (end_date) filter.event_date.$lte = new Date(end_date);
-        }
+        // Status filters use the effective status: an "upcoming" event whose date has passed counts as completed
+        const today = startOfTodayUTC();
+        if (status === 'upcoming') conditions.push({ status: 'upcoming', event_date: { $gte: today } });
+        else if (status === 'completed') conditions.push({ $or: [{ status: 'completed' }, { status: 'upcoming', event_date: { $lt: today } }] });
+        else if (status) conditions.push({ status });
+        if (event_type) conditions.push({ event_type });
+        if (start_date) conditions.push({ event_date: { $gte: new Date(start_date) } });
+        if (end_date) conditions.push({ event_date: { $lte: new Date(end_date) } });
+        const filter = conditions.length ? { $and: conditions } : {};
 
         const [events, total] = await Promise.all([
             Event.find(filter).populate('created_by', 'username legacyId')

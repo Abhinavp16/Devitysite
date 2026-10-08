@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { ClubMemory, Event, TeamMember, GuestSpeaker, ActivityLog, mapMemory, mapEvent, mapTeamMember, mapSpeaker } = require('../models');
+const { ClubMemory, Event, TeamMember, GuestSpeaker, ActivityLog, mapMemory, mapEvent, mapTeamMember, mapSpeaker, startOfTodayUTC } = require('../models');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
@@ -8,6 +8,7 @@ const router = express.Router();
 router.get('/stats', authenticateToken, async (req, res) => {
     try {
         const now = new Date();
+        const today = startOfTodayUTC(); // past-dated "upcoming" events don't count as upcoming
         const [
             memoriesCount,
             eventsCount,
@@ -25,13 +26,13 @@ router.get('/stats', authenticateToken, async (req, res) => {
         ] = await Promise.all([
             ClubMemory.countDocuments(),
             Event.countDocuments(),
-            Event.countDocuments({ status: 'upcoming' }),
+            Event.countDocuments({ status: 'upcoming', event_date: { $gte: today } }),
             TeamMember.countDocuments(),
             TeamMember.countDocuments({ is_active: true }),
             GuestSpeaker.countDocuments(),
             GuestSpeaker.countDocuments({ is_available: true }),
             ActivityLog.find().populate('user_id', 'username legacyId').sort({ created_at: -1 }).limit(10),
-            Event.find({ status: 'upcoming', event_date: { $gte: now } }).sort({ event_date: 1 }).limit(5),
+            Event.find({ status: 'upcoming', event_date: { $gte: today } }).sort({ event_date: 1 }).limit(5),
             ClubMemory.find().sort({ created_at: -1 }).limit(5),
             TeamMember.aggregate([{ $match: { is_active: true } }, { $group: { _id: '$team_type', count: { $sum: 1 } } }]),
             Event.aggregate([{ $group: { _id: '$event_type', count: { $sum: 1 } } }, { $sort: { count: -1 } }]),

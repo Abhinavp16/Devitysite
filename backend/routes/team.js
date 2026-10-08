@@ -48,15 +48,17 @@ const normalizeTeamPayload = (payload) => {
     return normalized;
 };
 
-const ensureTeamDisplayOrder = async () => {
-    const unorderedCount = await TeamMember.countDocuments({ $or: [{ display_order: { $exists: false } }, { display_order: 0 }] });
-    if (unorderedCount === 0) return;
+const normalizeTeamDisplayOrder = async () => {
+    const members = await TeamMember.find().sort({ display_order: 1, created_at: 1, _id: 1 });
+    const updates = members.flatMap((member, index) => {
+        const display_order = index + 1;
+        return member.display_order === display_order
+            ? []
+            : [{ updateOne: { filter: { _id: member._id }, update: { $set: { display_order } } } }];
+    });
 
-    const members = await TeamMember.find().sort({ created_at: 1, _id: 1 });
-    await Promise.all(members.map((member, index) => {
-        member.display_order = index + 1;
-        return member.save();
-    }));
+    if (updates.length > 0) await TeamMember.bulkWrite(updates);
+    return members;
 };
 
 router.get('/', authenticateToken, async (req, res) => {
@@ -167,22 +169,28 @@ router.patch('/:id/reorder', authenticateToken, logActivity('UPDATE', 'team_memb
         const member = await TeamMember.findOne(legacyOrObjectIdQuery(req.params.id));
         if (!member) return res.status(404).json({ error: 'Team member not found' });
 
-        const currentOrder = member.display_order || 0;
-        const target = await TeamMember.findOne({
-            team_type: member.team_type,
-            display_order: direction === 'up' ? { $lt: currentOrder } : { $gt: currentOrder }
-        }).sort(direction === 'up' ? { display_order: -1, created_at: -1 } : { display_order: 1, created_at: 1 });
+        // Legacy/seeded records may share display_order 0. Repair to a dense,
+        // deterministic sequence, then swap with the nearest member of the same section.
+        const members = await normalizeTeamDisplayOrder();
+        const sameSection = members.filter((item) => item.team_type === member.team_type);
+        const currentIndex = sameSection.findIndex((item) => String(item._id) === String(member._id));
+        const target = sameSection[direction === 'up' ? currentIndex - 1 : currentIndex + 1];
 
         if (!target) {
-            return res.json({ success: true, message: 'Team member already at boundary', data: mapTeamMember(member) });
+            return res.json({ success: true, moved: false, message: 'Team member already at boundary', data: mapTeamMember(member) });
         }
 
-        member.display_order = target.display_order ?? 0;
-        target.display_order = currentOrder;
-        await Promise.all([member.save(), target.save()]);
+        const currentOrder = members.findIndex((item) => String(item._id) === String(member._id)) + 1;
+        const targetOrder = members.findIndex((item) => String(item._id) === String(target._id)) + 1;
+        await TeamMember.bulkWrite([
+            { updateOne: { filter: { _id: member._id }, update: { $set: { display_order: targetOrder } } } },
+            { updateOne: { filter: { _id: target._id }, update: { $set: { display_order: currentOrder } } } }
+        ]);
+
+        member.display_order = targetOrder;
         await member.populate('created_by', 'username legacyId');
 
-        res.json({ success: true, message: 'Team member reordered successfully', data: mapTeamMember(member) });
+        res.json({ success: true, moved: true, message: 'Team member reordered successfully', data: mapTeamMember(member) });
     } catch (error) {
         console.error('Reorder team member error:', error);
         res.status(500).json({ error: 'Failed to reorder team member' });

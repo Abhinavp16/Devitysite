@@ -41,7 +41,7 @@ router.get('/', authenticateToken, async (req, res) => {
         if (is_active !== 'all') filter.is_active = is_active === 'true';
 
         const [reviews, total] = await Promise.all([
-            SpeakerReview.find(filter).sort({ created_at: -1 }).skip(skip).limit(Number(limit)),
+            SpeakerReview.find(filter).sort({ display_order: 1, created_at: 1, _id: 1 }).skip(skip).limit(Number(limit)),
             SpeakerReview.countDocuments(filter)
         ]);
 
@@ -74,7 +74,12 @@ router.post('/', authenticateToken, logActivity('CREATE', 'speaker_reviews'), as
         const { error, value } = reviewSchema.validate(req.body, { stripUnknown: true });
         if (error) return res.status(400).json({ error: 'Invalid input', details: error.details[0].message });
 
-        const review = await SpeakerReview.create(normalizeReviewPayload(value));
+        // New reviews go to the end of the list (same order as the public site)
+        const last = await SpeakerReview.findOne().sort({ display_order: -1, created_at: -1 });
+        const review = await SpeakerReview.create({
+            ...normalizeReviewPayload(value),
+            display_order: last ? (last.display_order || 0) + 1 : 1
+        });
         res.status(201).json({ success: true, message: 'Review created successfully', data: mapSpeakerReview(review) });
     } catch (error) {
         console.error('Create review error:', error);
@@ -112,6 +117,44 @@ router.delete('/:id', authenticateToken, logActivity('DELETE', 'speaker_reviews'
     } catch (error) {
         console.error('Delete review error:', error);
         res.status(500).json({ error: 'Failed to delete review' });
+    }
+});
+
+// Dense, deterministic order (legacy reviews may all share display_order 0)
+const normalizeReviewOrder = async () => {
+    const reviews = await SpeakerReview.find().sort({ display_order: 1, created_at: 1, _id: 1 });
+    const updates = reviews.flatMap((review, index) => (
+        review.display_order === index + 1
+            ? []
+            : [{ updateOne: { filter: { _id: review._id }, update: { $set: { display_order: index + 1 } } } }]
+    ));
+    if (updates.length > 0) await SpeakerReview.bulkWrite(updates);
+    return reviews;
+};
+
+// PATCH /api/reviews/:id/reorder — move up/down one place
+router.patch('/:id/reorder', authenticateToken, logActivity('UPDATE', 'speaker_reviews'), async (req, res) => {
+    try {
+        const { direction } = req.body;
+        if (!['up', 'down'].includes(direction)) return res.status(400).json({ error: 'direction must be "up" or "down"' });
+
+        const review = await SpeakerReview.findOne(legacyOrObjectIdQuery(req.params.id));
+        if (!review) return res.status(404).json({ error: 'Review not found' });
+
+        const reviews = await normalizeReviewOrder();
+        const currentIndex = reviews.findIndex((item) => String(item._id) === String(review._id));
+        const target = reviews[direction === 'up' ? currentIndex - 1 : currentIndex + 1];
+        if (!target) return res.json({ success: true, moved: false, message: 'Already at the ' + (direction === 'up' ? 'top' : 'bottom') });
+
+        const targetIndex = reviews.indexOf(target);
+        await SpeakerReview.bulkWrite([
+            { updateOne: { filter: { _id: review._id }, update: { $set: { display_order: targetIndex + 1 } } } },
+            { updateOne: { filter: { _id: target._id }, update: { $set: { display_order: currentIndex + 1 } } } }
+        ]);
+        res.json({ success: true, moved: true, message: 'Review moved' });
+    } catch (error) {
+        console.error('Reorder review error:', error);
+        res.status(500).json({ error: 'Failed to reorder review' });
     }
 });
 

@@ -107,7 +107,8 @@ const speakerReviewSchema = new Schema({
     review: { type: String, required: true },
     highlight: String,
     image_url: String,
-    is_active: { type: Boolean, default: true }
+    is_active: { type: Boolean, default: true },
+    display_order: { type: Number, default: 0 }
 }, baseOptions);
 
 const activityLogSchema = new Schema({
@@ -123,6 +124,39 @@ const activityLogSchema = new Schema({
     user_agent: String
 }, { timestamps: { createdAt: 'created_at', updatedAt: false } });
 
+// Uploaded binary file (served from /api/public/media/:id). Kept in its own collection so
+// content documents stay small; replacing a file always creates a new id (safe to cache forever).
+const mediaAssetSchema = new Schema({
+    data: { type: Buffer, required: true },
+    content_type: { type: String, required: true },
+    size: { type: Number, required: true },
+    filename: String,
+    created_by: { type: Schema.Types.ObjectId, ref: 'AdminUser' }
+}, { timestamps: { createdAt: 'created_at', updatedAt: false } });
+
+const HOME_PHOTO_SLOTS = 4;
+
+const homePhotoSchema = new Schema({
+    media: { type: Schema.Types.ObjectId, ref: 'MediaAsset', default: null },
+    alt: { type: String, default: '' }
+}, { _id: false });
+
+// Editable site sections, one document per `key` (currently only 'home').
+// Unset fields mean "use the built-in default" on the public site.
+const siteContentSchema = new Schema({
+    key: { type: String, required: true, unique: true },
+    headline: { type: String, default: null },
+    headline_highlight: { type: String, default: null },
+    subtitle: { type: String, default: null },
+    photos: {
+        type: [homePhotoSchema],
+        default: () => Array.from({ length: HOME_PHOTO_SLOTS }, () => ({ media: null, alt: '' }))
+    },
+    video: { type: Schema.Types.ObjectId, ref: 'MediaAsset', default: null },
+    speaker_companies: { type: [String], default: undefined },
+    updated_by: { type: Schema.Types.ObjectId, ref: 'AdminUser' }
+}, baseOptions);
+
 const AdminUser = mongoose.model('AdminUser', adminUserSchema);
 const ClubMemory = mongoose.model('ClubMemory', clubMemorySchema);
 const Event = mongoose.model('Event', eventSchema);
@@ -130,6 +164,8 @@ const TeamMember = mongoose.model('TeamMember', teamMemberSchema);
 const GuestSpeaker = mongoose.model('GuestSpeaker', guestSpeakerSchema);
 const SpeakerReview = mongoose.model('SpeakerReview', speakerReviewSchema);
 const ActivityLog = mongoose.model('ActivityLog', activityLogSchema);
+const MediaAsset = mongoose.model('MediaAsset', mediaAssetSchema);
+const SiteContent = mongoose.model('SiteContent', siteContentSchema);
 
 const isObjectId = (id) => mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === String(id);
 
@@ -142,6 +178,14 @@ const legacyOrObjectIdQuery = (id) => {
 const publicId = (doc) => String(doc.legacyId || doc._id);
 
 const formatDate = (date) => date ? new Date(date).toISOString().slice(0, 10) : null;
+
+// Event dates are stored as UTC midnight, so "today" is compared at UTC midnight too
+const startOfTodayUTC = () => new Date(new Date().toISOString().slice(0, 10));
+
+// Admins set the status by hand; an "upcoming" event whose date has passed is shown as completed
+const effectiveEventStatus = (doc) => (
+    doc.status === 'upcoming' && doc.event_date && new Date(doc.event_date) < startOfTodayUTC() ? 'completed' : doc.status
+);
 
 const createdByUsername = (doc) => doc.created_by && doc.created_by.username ? doc.created_by.username : undefined;
 
@@ -167,7 +211,7 @@ const mapEvent = (doc, speakerDocs = []) => ({
     event_time: doc.event_time,
     location: doc.location,
     event_type: doc.event_type,
-    status: doc.status,
+    status: effectiveEventStatus(doc),
     max_participants: doc.max_participants || null,
     registration_link: doc.registration_link || null,
     display_order: doc.display_order || 0,
@@ -235,8 +279,24 @@ const mapSpeakerReview = (doc) => ({
     highlight: doc.highlight || null,
     image_url: doc.image_url || null,
     is_active: Boolean(doc.is_active),
+    display_order: doc.display_order || 0,
     created_at: doc.created_at,
     updated_at: doc.updated_at
+});
+
+// null / empty values mean "use the site's built-in default" — the frontend owns the defaults.
+// Media are returned as ids; clients build the URL as `${API_BASE}/public/media/${id}`.
+const mapHomeContent = (doc) => ({
+    headline: doc.headline || null,
+    headline_highlight: doc.headline_highlight || null,
+    subtitle: doc.subtitle || null,
+    speaker_companies: doc.speaker_companies && doc.speaker_companies.length ? doc.speaker_companies : null,
+    photos: Array.from({ length: HOME_PHOTO_SLOTS }, (_, index) => {
+        const photo = (doc.photos || [])[index] || {};
+        return { media_id: photo.media ? String(photo.media) : null, alt: photo.alt || '' };
+    }),
+    video_id: doc.video ? String(doc.video) : null,
+    updated_at: doc.updated_at || null
 });
 
 module.exports = {
@@ -247,6 +307,9 @@ module.exports = {
     GuestSpeaker,
     SpeakerReview,
     ActivityLog,
+    MediaAsset,
+    SiteContent,
+    HOME_PHOTO_SLOTS,
     legacyOrObjectIdQuery,
     publicId,
     mapMemory,
@@ -254,5 +317,7 @@ module.exports = {
     mapTeamMember,
     mapSpeaker,
     mapSpeakerReview,
-    formatDate
+    mapHomeContent,
+    formatDate,
+    startOfTodayUTC
 };

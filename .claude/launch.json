@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ui-mockups",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8765", "--bind", "127.0.0.1", "--directory", "/Users/abhinavpandey/Projects/Devitysite"],
+      "port": 8765
+    },
+    {
+      "name": "backend-preview",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd /Users/abhinavpandey/Projects/Devitysite/backend && MONGODB_URI=mongodb://127.0.0.1:27099/devity_preview JWT_SECRET=local-preview-secret PORT=5001 NODE_ENV=production FRONTEND_URL=http://localhost:3001 node server.js"],
+      "port": 5001
+    },
+    {
+      "name": "frontend",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd /Users/abhinavpandey/Projects/Devitysite/frontend && BROWSER=none PORT=3001 REACT_APP_API_URL=http://localhost:5001/api npm start"],
+      "port": 3001
+    }
+  ]
+}

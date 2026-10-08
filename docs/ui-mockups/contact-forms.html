@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DevityClub — Student & mentor form options</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" rel="stylesheet" />
+<style>
+  :root { --navy: #0b2a5b; --ink: #0b1d3a; --slate: #0f172a; --gold: #c9a227; --gold-dark: #8a6d12; --gold-soft: #f3ead2; --cream: #f6f3ec; --line: #e4e0d6; --muted: #55607a; --ease: cubic-bezier(.22,1,.36,1); }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; color: var(--ink); background: #e9e6df; }
+  p, h2, h3, h4 { margin: 0; }
+  .serif { font-family: 'Playfair Display', Georgia, serif; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 40px; }
+
+  /* Mockup chrome (not part of the site) */
+  .jump { position: sticky; top: 0; z-index: 100; background: #111; color: #fff; font: 500 13px 'Inter', sans-serif; }
+  .jump .inner { max-width: 1280px; margin: 0 auto; display: flex; gap: 8px; align-items: center; padding: 10px 24px; flex-wrap: wrap; }
+  .jump a { border: 1px solid #444; padding: 6px 12px; border-radius: 8px; color: #ddd; text-decoration: none; }
+  .jump a:hover { background: #fff; color: #111; }
+  .label { max-width: 1280px; margin: 64px auto 12px; padding: 0 24px; font: 600 14px 'Inter', sans-serif; color: #333; display: flex; gap: 10px; align-items: baseline; }
+  .label b { background: #111; color: #fff; padding: 3px 9px; border-radius: 6px; }
+  .label span { color: #666; font-weight: 400; }
+  .frame { max-width: 1280px; margin: 0 auto; border-radius: 14px; overflow: clip; box-shadow: 0 20px 50px rgba(0,0,0,.18); }
+  .frame > section { padding: 88px 0; }
+
+  /* Shared */
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-dark); }
+  .eyebrow.light { color: var(--gold); }
+  .rule { display: block; width: 44px; height: 2px; background: var(--gold); margin: 10px 0 22px; }
+  .rule.center { margin-left: auto; margin-right: auto; }
+  h2 { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 44px; line-height: 1.1; letter-spacing: -.015em; }
+  .muted { color: var(--muted); }
+  .note { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); margin-top: 12px; }
+
+  /* Floating-label fields */
+  .field { position: relative; margin-top: 14px; }
+  .field input, .field textarea { width: 100%; font: 15px 'Inter', sans-serif; color: var(--ink); background: #fff; border: 1.5px solid var(--line); border-radius: 10px; padding: 22px 14px 8px; outline: none; transition: border-color .25s, box-shadow .25s; resize: vertical; }
+  .field textarea { min-height: 112px; }
+  .field label { position: absolute; left: 15px; top: 15px; font-size: 15px; color: #8a93a6; pointer-events: none; transition: all .2s var(--ease); }
+  .field input:focus, .field textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(201,162,39,.15); }
+  .field input:focus + label, .field input:not(:placeholder-shown) + label,
+  .field textarea:focus + label, .field textarea:not(:placeholder-shown) + label { top: 7px; font-size: 11.5px; font-weight: 600; color: var(--gold-dark); letter-spacing: .02em; }
+  .dark-fields .field input, .dark-fields .field textarea { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.14); color: #fff; }
+  .dark-fields .field label { color: #8c9bb5; }
+  .dark-fields .field input:focus + label, .dark-fields .field input:not(:placeholder-shown) + label,
+  .dark-fields .field textarea:focus + label, .dark-fields .field textarea:not(:placeholder-shown) + label { color: var(--gold); }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 18px; padding: 14px 20px; border: 0; border-radius: 10px; font: 600 15px 'Inter', sans-serif; cursor: pointer; transition: transform .2s var(--ease), box-shadow .25s, background .25s; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn i { transition: transform .3s var(--ease); }
+  .btn:hover i { transform: translateX(4px); }
+  .btn.navy { background: var(--navy); color: #fff; box-shadow: 0 10px 24px rgba(11,42,91,.25); }
+  .btn.gold { background: var(--gold); color: var(--ink); box-shadow: 0 10px 24px rgba(201,162,39,.3); }
+
+  .perks { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 10px; }
+  .perks li { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; line-height: 1.5; }
+  .perks i { color: var(--gold-dark); font-size: 18px; margin-top: 1px; }
+
+  /* Segmented toggle */
+  .seg { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; background: var(--cream); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+  .seg button { position: relative; z-index: 1; border: 0; background: none; font: 600 14px 'Inter'; padding: 10px 22px; border-radius: 999px; cursor: pointer; color: var(--muted); display: flex; gap: 8px; align-items: center; justify-content: center; transition: color .3s; }
+  .seg button.on { color: #fff; }
+  .seg .thumb { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); background: var(--navy); border-radius: 999px; transition: transform .45s var(--ease); }
+  .seg[data-mode="mentor"] .thumb { transform: translateX(100%); }
+  .swap { animation: swapIn .45s var(--ease); }
+  @keyframes swapIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  /* Role cards (wizard) */
+  .role { border: 1.5px solid var(--line); border-radius: 14px; padding: 26px; background: #fff; cursor: pointer; text-align: left; font: inherit; color: inherit; transition: border-color .25s, transform .3s var(--ease), box-shadow .3s; }
+  .role:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(11,29,58,.1); }
+  .role.on { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(201,162,39,.15); }
+  .steps { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .steps .s { display: flex; align-items: center; gap: 8px; }
+  .steps .s span { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--line); background: #fff; transition: all .3s; }
+  .steps .s.on { color: var(--ink); }
+  .steps .s.on span { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .steps .bar { width: 48px; height: 2px; background: var(--line); }
+
+  /* Mad-libs sentence form */
+  .madlib { font-family: 'Playfair Display', serif; font-size: 34px; line-height: 1.7; font-weight: 700; color: var(--ink); }
+  .madlib input, .madlib select { font: inherit; font-style: italic; color: var(--navy); border: 0; border-bottom: 2px dashed var(--gold); background: transparent; padding: 0 4px; outline: none; min-width: 140px; transition: border-color .2s, background .2s; }
+  .madlib input:focus, .madlib select:focus { border-bottom-style: solid; background: rgba(201,162,39,.08); }
+  .madlib select { cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="jump"><div class="inner">
+  <strong>Student &amp; mentor form options:</strong>
+  <a href="#c1">1 · Switcher card</a><a href="#c2">2 · Paired cards</a><a href="#c3">3 · Guided steps</a><a href="#c4">4 · Sentence form</a>
+</div></div>
+
+<!-- ============ 1. Switcher card ============ -->
+<div class="label" id="c1"><b>1</b> Switcher card <span>— one card, a "Student / Mentor" toggle swaps the form. Navy info panel explains what happens next. Floating labels, gold focus.</span></div>
+<div class="frame"><section style="background:var(--cream)">
+  <div class="wrap">
+    <div style="text-align:center;margin-bottom:40px"><p class="eyebrow">Get involved</p><span class="rule center"></span><h2>Join us <em style="color:var(--navy)">or help us grow</em></h2></div>
+    <div style="display:grid;grid-template-columns:.9fr 1.1fr;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 30px 60px rgba(11,29,58,.12)">
+      <div style="background:var(--slate);color:#fff;padding:44px;position:relative;overflow:hidden">
+        <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:var(--gold);filter:blur(110px);opacity:.18;top:-80px;left:-80px"></div>
+        <div style="position:relative" id="c1-info">
+          <p class="eyebrow light">For students</p>
+          <h3 class="serif" style="font-size:30px;font-weight:800;margin-top:12px">Learn by building, alongside 200+ members.</h3>
+          <ul class="perks" style="color:#c7d2e8">
+            <li><i class="ti ti-check" style="color:var(--gold)"></i>Hands-on workshops, hackathons and bootcamps</li>
+            <li><i class="ti ti-check" style="color:var(--gold)"></i>Mentorship from industry engineers</li>
+            <li><i class="ti ti-check" style="color:var(--gold)"></i>Real projects for your portfolio</li>
+          </ul>
+        </div>
+        <div style="position:relative;margin-top:36px;padding-top:24px;border-top:1px solid rgba(255,255,255,.12)">
+          <p style="font-size:13px;color:#8c9bb5">Prefer email?</p>
+          <p style="font-weight:600;margin-top:4px">club.devity@gmail.com</p>
+        </div>
+      </div>
+      <div style="padding:44px">
+        <div class="seg" id="c1-seg" data-mode="student"><div class="thumb"></div>
+          <button class="on" data-mode="student"><i class="ti ti-school"></i>I'm a student</button>
+          <button data-mode="mentor"><i class="ti ti-briefcase"></i>I'm a mentor</button>
+        </div>
+        <form id="c1-form" style="margin-top:12px" onsubmit="return false">
+          <div class="field"><input placeholder=" " id="c1n" /><label for="c1n">Full name</label></div>
+          <div class="field"><input placeholder=" " id="c1e" type="email" /><label for="c1e" id="c1-email-label">Email address</label></div>
+          <div class="field"><textarea placeholder=" " id="c1m"></textarea><label for="c1m" id="c1-msg-label">Your interests and why you want to join</label></div>
+          <button class="btn navy" id="c1-btn">Send inquiry <i class="ti ti-arrow-right"></i></button>
+          <p class="note"><i class="ti ti-mail"></i>Opens your email app with your message ready to send.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section></div>
+
+<!-- ============ 2. Paired cards ============ -->
+<div class="label" id="c2"><b>2</b> Paired cards <span>— keeps today's two side-by-side forms, but contrasting: student card light, mentor card deep slate. Perks above each form.</span></div>
+<div class="frame"><section style="background:#fff">
+  <div class="wrap">
+    <div style="text-align:center;margin-bottom:44px"><p class="eyebrow">Get involved</p><span class="rule center"></span><h2>Two ways <em style="color:var(--navy)">to be part of Devity</em></h2></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+      <div style="background:var(--cream);border:1px solid var(--line);border-radius:18px;padding:36px">
+        <div style="display:flex;align-items:center;gap:14px"><span style="width:48px;height:48px;border-radius:12px;background:var(--navy);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:24px"><i class="ti ti-school"></i></span>
+          <div><p class="eyebrow">For students</p><h3 class="serif" style="font-size:26px;font-weight:800;margin-top:4px">Student inquiries</h3></div></div>
+        <ul class="perks muted"><li><i class="ti ti-check"></i>Workshops, hackathons and bootcamps</li><li><i class="ti ti-check"></i>Mentors from top tech companies</li></ul>
+        <form onsubmit="return false" style="margin-top:8px">
+          <div class="field"><input placeholder=" " id="c2n" /><label for="c2n">Full name</label></div>
+          <div class="field"><input placeholder=" " id="c2e" /><label for="c2e">Email address</label></div>
+          <div class="field"><textarea placeholder=" " id="c2m"></textarea><label for="c2m">Your interests and why you want to join</label></div>
+          <button class="btn navy">Submit inquiry <i class="ti ti-arrow-right"></i></button>
+          <p class="note"><i class="ti ti-mail"></i>Opens your email app with your message ready.</p>
+        </form>
+      </div>
+      <div class="dark-fields" style="background:var(--slate);color:#fff;border-radius:18px;padding:36px;position:relative;overflow:hidden">
+        <div style="position:absolute;width:280px;height:280px;border-radius:50%;background:var(--gold);filter:blur(110px);opacity:.16;top:-90px;right:-60px"></div>
+        <div style="position:relative">
+          <div style="display:flex;align-items:center;gap:14px"><span style="width:48px;height:48px;border-radius:12px;background:var(--gold);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:24px"><i class="ti ti-briefcase"></i></span>
+            <div><p class="eyebrow light">For industry professionals</p><h3 class="serif" style="font-size:26px;font-weight:800;margin-top:4px">Mentorship opportunities</h3></div></div>
+          <ul class="perks" style="color:#c7d2e8"><li><i class="ti ti-check" style="color:var(--gold)"></i>Speak at events or run a workshop</li><li><i class="ti ti-check" style="color:var(--gold)"></i>Mentor students on real projects</li></ul>
+          <form onsubmit="return false" style="margin-top:8px">
+            <div class="field"><input placeholder=" " id="c2bn" /><label for="c2bn">Full name</label></div>
+            <div class="field"><input placeholder=" " id="c2be" /><label for="c2be">Work email</label></div>
+            <div class="field"><textarea placeholder=" " id="c2bm"></textarea><label for="c2bm">Your expertise and how you'd like to contribute</label></div>
+            <button class="btn gold">Offer mentorship <i class="ti ti-arrow-right"></i></button>
+            <p class="note" style="color:#8c9bb5"><i class="ti ti-mail"></i>Opens your email app with your message ready.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section></div>
+
+<!-- ============ 3. Guided steps ============ -->
+<div class="label" id="c3"><b>3</b> Guided steps <span>— step 1: pick "Student" or "Mentor" as big cards; step 2: details. Feels like a short onboarding, less intimidating than a form.</span></div>
+<div class="frame"><section style="background:var(--cream)">
+  <div class="wrap" style="max-width:860px">
+    <div style="text-align:center;margin-bottom:28px"><p class="eyebrow">Get involved</p><span class="rule center"></span><h2>How would you like <em style="color:var(--navy)">to join us?</em></h2></div>
+    <div class="steps" style="justify-content:center;margin-bottom:28px"><div class="s on" id="c3-s1"><span>1</span>Choose</div><div class="bar"></div><div class="s" id="c3-s2"><span>2</span>Your details</div></div>
+    <div id="c3-step1" style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+      <button class="role" data-role="student"><span style="font-size:30px;color:var(--gold-dark)"><i class="ti ti-school"></i></span><h3 class="serif" style="font-size:24px;font-weight:800;margin-top:12px">I'm a student</h3><p class="muted" style="margin-top:6px;font-size:14.5px;line-height:1.6">Join workshops, hackathons and projects with 200+ members.</p></button>
+      <button class="role" data-role="mentor"><span style="font-size:30px;color:var(--gold-dark)"><i class="ti ti-briefcase"></i></span><h3 class="serif" style="font-size:24px;font-weight:800;margin-top:12px">I'm a professional</h3><p class="muted" style="margin-top:6px;font-size:14.5px;line-height:1.6">Mentor students, speak at an event or run a workshop.</p></button>
+    </div>
+    <div id="c3-step2" style="display:none;background:#fff;border-radius:16px;padding:36px;box-shadow:0 24px 50px rgba(11,29,58,.1)">
+      <button id="c3-back" style="border:0;background:none;color:var(--muted);font:600 13px Inter;cursor:pointer;padding:0"><i class="ti ti-arrow-left"></i> Change</button>
+      <h3 class="serif" id="c3-title" style="font-size:28px;font-weight:800;margin-top:10px">Tell us about you</h3>
+      <form onsubmit="return false">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 14px">
+          <div class="field"><input placeholder=" " id="c3n" /><label for="c3n">Full name</label></div>
+          <div class="field"><input placeholder=" " id="c3e" /><label for="c3e">Email address</label></div>
+        </div>
+        <div class="field"><textarea placeholder=" " id="c3m"></textarea><label for="c3m" id="c3-msg-label">Your interests and why you want to join</label></div>
+        <button class="btn navy" id="c3-btn">Send inquiry <i class="ti ti-arrow-right"></i></button>
+        <p class="note"><i class="ti ti-mail"></i>Opens your email app with your message ready to send.</p>
+      </form>
+    </div>
+  </div>
+</section></div>
+
+<!-- ============ 4. Sentence form ============ -->
+<div class="label" id="c4"><b>4</b> Sentence form <span>— playful and memorable: fill in the blanks of a sentence. The role dropdown changes the button and email subject.</span></div>
+<div class="frame"><section style="background:var(--slate);color:#fff;position:relative;overflow:hidden">
+  <div style="position:absolute;width:420px;height:420px;border-radius:50%;background:var(--gold);filter:blur(120px);opacity:.15;top:-140px;left:-100px"></div>
+  <div class="wrap" style="position:relative;max-width:900px">
+    <p class="eyebrow light">Say hello</p><span class="rule"></span>
+    <form onsubmit="return false" class="madlib" style="color:#fff">
+      Hi Devity Club, I'm <input placeholder="your name" style="color:var(--gold);width:230px" />
+      and I'm <select id="c4-role" style="color:var(--gold)"><option style="color:#111" value="student">a student</option><option style="color:#111" value="mentor">an industry professional</option></select>.
+      <br />I'd love to <input id="c4-goal" placeholder="join your next hackathon" style="color:var(--gold);width:420px" />.
+      <br />You can reach me at <input placeholder="you@email.com" style="color:var(--gold);width:300px" />.
+    </form>
+    <div style="display:flex;align-items:center;gap:20px;margin-top:36px">
+      <button class="btn gold" id="c4-btn" style="width:auto;margin:0;padding:15px 28px">Send to the club <i class="ti ti-arrow-right"></i></button>
+      <p class="note" style="margin:0;color:#8c9bb5"><i class="ti ti-mail"></i>Opens your email app with this message ready.</p>
+    </div>
+  </div>
+</section></div>
+
+<div style="height:120px"></div>
+
+<script>
+  // 1 · Switcher card
+  const copy = {
+    student: { eyebrow: 'For students', title: 'Learn by building, alongside 200+ members.', perks: ['Hands-on workshops, hackathons and bootcamps', 'Mentorship from industry engineers', 'Real projects for your portfolio'], email: 'Email address', msg: 'Your interests and why you want to join', btn: 'Send inquiry' },
+    mentor: { eyebrow: 'For industry professionals', title: 'Share what you know with the next generation.', perks: ['Speak at a summit or run a workshop', 'Mentor students on real projects', 'Judge or sponsor a hackathon'], email: 'Work email', msg: 'Your expertise and how you would like to contribute', btn: 'Offer mentorship' }
+  };
+  const seg = document.getElementById('c1-seg');
+  seg.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+    const mode = b.dataset.mode; const c = copy[mode];
+    seg.dataset.mode = mode;
+    seg.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+    const info = document.getElementById('c1-info');
+    info.innerHTML = `<p class="eyebrow light">${c.eyebrow}</p><h3 class="serif" style="font-size:30px;font-weight:800;margin-top:12px">${c.title}</h3><ul class="perks" style="color:#c7d2e8">${c.perks.map((p) => `<li><i class="ti ti-check" style="color:var(--gold)"></i>${p}</li>`).join('')}</ul>`;
+    info.classList.remove('swap'); void info.offsetWidth; info.classList.add('swap');
+    document.getElementById('c1-email-label').textContent = c.email;
+    document.getElementById('c1-msg-label').textContent = c.msg;
+    const btn = document.getElementById('c1-btn');
+    btn.innerHTML = `${c.btn} <i class="ti ti-arrow-right"></i>`;
+    btn.className = 'btn ' + (mode === 'mentor' ? 'gold' : 'navy');
+    const form = document.getElementById('c1-form');
+    form.classList.remove('swap'); void form.offsetWidth; form.classList.add('swap');
+  }));
+
+  // 3 · Guided steps
+  const step1 = document.getElementById('c3-step1');
+  const step2 = document.getElementById('c3-step2');
+  document.querySelectorAll('#c3-step1 .role').forEach((card) => card.addEventListener('click', () => {
+    const mentor = card.dataset.role === 'mentor';
+    document.querySelectorAll('#c3-step1 .role').forEach((c) => c.classList.toggle('on', c === card));
+    setTimeout(() => {
+      step1.style.display = 'none'; step2.style.display = 'block';
+      step2.classList.remove('swap'); void step2.offsetWidth; step2.classList.add('swap');
+      document.getElementById('c3-s2').classList.add('on');
+      document.getElementById('c3-title').textContent = mentor ? 'Tell us how you would like to help' : 'Tell us about you';
+      document.getElementById('c3-msg-label').textContent = mentor ? 'Your expertise and how you would like to contribute' : 'Your interests and why you want to join';
+      const btn = document.getElementById('c3-btn');
+      btn.innerHTML = `${mentor ? 'Offer mentorship' : 'Send inquiry'} <i class="ti ti-arrow-right"></i>`;
+      btn.className = 'btn ' + (mentor ? 'gold' : 'navy');
+    }, 250);
+  }));
+  document.getElementById('c3-back').addEventListener('click', () => {
+    step2.style.display = 'none'; step1.style.display = 'grid';
+    step1.classList.remove('swap'); void step1.offsetWidth; step1.classList.add('swap');
+    document.getElementById('c3-s2').classList.remove('on');
+  });
+
+  // 4 · Sentence form
+  document.getElementById('c4-role').addEventListener('change', (e) => {
+    const mentor = e.target.value === 'mentor';
+    document.getElementById('c4-goal').placeholder = mentor ? 'mentor students or speak at an event' : 'join your next hackathon';
+    document.getElementById('c4-btn').innerHTML = `${mentor ? 'Offer to mentor' : 'Send to the club'} <i class="ti ti-arrow-right"></i>`;
+  });
+</script>
+</body>
+</html>

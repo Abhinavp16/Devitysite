@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DevityClub — home section options</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet" />
+<style>
+  :root { --navy: #0b2a5b; --ink: #0b1d3a; --gold: #c9a227; --gold-dark: #8a6d12; --gold-soft: #f3ead2; --cream: #f6f3ec; --line: #e4e0d6; --muted: #55607a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; color: var(--ink); background: #e9e6df; }
+  a { color: inherit; text-decoration: none; }
+  img, video { display: block; max-width: 100%; }
+  .serif { font-family: 'Playfair Display', Georgia, serif; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+
+  /* Mockup chrome (not part of the site) */
+  .jump { position: sticky; top: 0; z-index: 100; background: #111; color: #fff; font: 500 13px 'Inter', sans-serif; }
+  .jump .wrap { display: flex; gap: 8px; align-items: center; padding-top: 10px; padding-bottom: 10px; flex-wrap: wrap; }
+  .jump a { border: 1px solid #444; padding: 6px 12px; border-radius: 8px; color: #ddd; }
+  .jump a:hover { background: #fff; color: #111; }
+  .label { max-width: 1200px; margin: 56px auto 12px; padding: 0 32px; font: 600 14px 'Inter', sans-serif; color: #333; display: flex; gap: 10px; align-items: baseline; }
+  .label b { background: #111; color: #fff; padding: 3px 9px; border-radius: 6px; }
+  .label span { color: #666; font-weight: 400; }
+  .frame { max-width: 1280px; margin: 0 auto; border-radius: 14px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,.18); background: #fff; }
+
+  /* Shared site pieces */
+  .nav { display: flex; align-items: center; gap: 28px; height: 72px; padding: 0 32px; font-size: 14px; font-weight: 500; }
+  .nav .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; }
+  .nav .brand img { height: 32px; }
+  .nav .links { display: flex; gap: 24px; margin-left: auto; opacity: .85; }
+  .nav.navy { background: var(--navy); color: #fff; }
+  .nav.clear { position: absolute; inset: 0 0 auto 0; color: #fff; z-index: 5; }
+  .nav.light { color: var(--ink); border-bottom: 1px solid var(--line); background: #fff; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 22px; border-radius: 6px; font-weight: 600; font-size: 15px; border: 1px solid transparent; }
+  .btn.sm { padding: 9px 16px; font-size: 13px; }
+  .btn.gold { background: var(--gold); color: var(--ink); }
+  .btn.navy { background: var(--navy); color: #fff; }
+  .btn.outline { border-color: var(--line); background: #fff; color: var(--ink); }
+  .btn.outline-light { border-color: rgba(255,255,255,.45); color: #fff; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-dark); margin: 0; }
+  .eyebrow.light { color: var(--gold); }
+  .rule { display: block; width: 44px; height: 2px; background: var(--gold); margin: 10px 0 22px; }
+  .sub { font-size: 18px; line-height: 1.65; color: var(--muted); margin: 18px 0 0; max-width: 560px; }
+  .cta { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; }
+  h1 { margin: 0; line-height: 1.08; letter-spacing: -.015em; }
+  .hl-gold { border-bottom: 5px solid var(--gold); white-space: nowrap; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .stat { border-top: 3px solid var(--gold); background: #fff; padding: 18px 20px; border-radius: 6px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stat b { display: block; font-family: 'Playfair Display', serif; font-size: 32px; color: var(--navy); line-height: 1.1; }
+  .stat span { font-size: 14px; color: var(--muted); }
+  .logos { display: flex; gap: 34px; flex-wrap: wrap; align-items: center; color: #8a93a6; font-weight: 700; font-size: 18px; letter-spacing: -.01em; }
+</style>
+</head>
+<body>
+
+<div class="jump"><div class="wrap">
+  <strong>Home section options:</strong>
+  <a href="#h1">1 · Split + collage</a><a href="#h2">2 · Full-photo</a><a href="#h3">3 · Navy panel</a>
+  <a href="#h4">4 · Editorial</a><a href="#h5">5 · Event spotlight</a><a href="#h6">6 · Logo spotlight</a>
+</div></div>
+
+<!-- ============ 1. Split + collage ============ -->
+<div class="label" id="h1"><b>1</b> Split + photo collage <span>— classic and balanced. Text left, three real photos right, stats underneath.</span></div>
+<div class="frame">
+  <nav class="nav navy"><a class="brand"><img src="../../frontend/src/img/devity%20logo.png" alt="" />DevityClub</a>
+    <div class="links"><a>Home</a><a>Events</a><a>Memories</a><a>Team</a><a>Speakers</a><a>Contact</a></div><a class="btn gold sm">Join the club</a></nav>
+  <section style="padding: 72px 0 56px;">
+    <div class="wrap" style="display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center">
+      <div>
+        <p class="eyebrow">Amity University Chhattisgarh · Tech club</p><span class="rule"></span>
+        <h1 class="serif" style="font-size:58px;font-weight:800">Learn, build and ship with <span class="hl-gold">Devity Club</span></h1>
+        <p class="sub">A student-led community bridging classroom and industry — workshops, hackathons and sessions with engineers from Microsoft, Adobe and MongoDB.</p>
+        <div class="cta"><a class="btn navy">Join the club →</a><a class="btn outline">See upcoming events</a></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.3fr 1fr;grid-template-rows:190px 190px;gap:12px">
+        <img style="grid-row:span 2;width:100%;height:100%;object-fit:cover;border-radius:6px" src="../../frontend/src/img/club%20memoriess/DevitySummit25/DS2.jpeg" alt="" />
+        <img style="width:100%;height:100%;object-fit:cover;border-radius:6px" src="../../frontend/src/img/club%20memoriess/DevitySummit25/DS6.jpeg" alt="" />
+        <img style="width:100%;height:100%;object-fit:cover;border-radius:6px" src="../../frontend/src/img/club%20memoriess/DevitySummit25/DS3.jpeg" alt="" />
+      </div>
+    </div>
+    <div class="wrap" style="margin-top:56px"><div class="stats">
+      <div class="stat"><b>200+</b><span>Community members</span></div><div class="stat"><b>10+</b><span>Events hosted</span></div>
+      <div class="stat"><b>19</b><span>Industry speakers</span></div><div class="stat"><b>25+</b><span>Team members</span></div>
+    </div></div>
+  </section>
+</div>
+
+<!-- ============ 2. Full-photo ============ -->
+<div class="label" id="h2"><b>2</b> Full-bleed photo <span>— most emotional. Your team photo fills the screen, centered headline, stats card overlaps the edge.</span></div>
+<div class="frame" style="background:var(--cream)">
+  <section style="position:relative;min-height:600px;background:linear-gradient(180deg,rgba(11,29,58,.55),rgba(11,29,58,.88)),url('../../frontend/src/img/club%20memoriess/DevitySummit25/DS6.jpeg') center 30%/cover;color:#fff;display:flex;align-items:center;text-align:center">
+    <nav class="nav clear"><a class="brand"><img src="../../frontend/src/img/devity%20logo.png" alt="" />DevityClub</a>
+      <div class="links"><a>Home</a><a>Events</a><a>Memories</a><a>Team</a><a>Speakers</a><a>Contact</a></div><a class="btn gold sm">Join the club</a></nav>
+    <div class="wrap" style="padding-top:60px;padding-bottom:110px">
+      <p class="eyebrow light">Amity University Chhattisgarh · Tech club</p>
+      <span class="rule" style="margin-left:auto;margin-right:auto"></span>
+      <h1 class="serif" style="font-size:66px;font-weight:800;max-width:900px;margin:0 auto">Where students learn from<br />the people who <em style="color:var(--gold)">build</em> tech</h1>
+      <p class="sub" style="color:#d5dcea;margin:20px auto 0">Workshops, hackathons and industry sessions — run by students, for students.</p>
+      <div class="cta" style="justify-content:center"><a class="btn gold">Join the club →</a><a class="btn outline-light">Explore events</a></div>
+    </div>
+  </section>
+  <div class="wrap" style="margin-top:-60px;position:relative;padding-bottom:48px">
+    <div class="stats" style="background:#fff;padding:12px;border-radius:10px;box-shadow:0 18px 40px rgba(11,29,58,.18)">
+      <div class="stat" style="border-top:0;border:0"><b>200+</b><span>Community members</span></div><div class="stat" style="border:0"><b>10+</b><span>Events hosted</span></div>
+      <div class="stat" style="border:0"><b>19</b><span>Industry speakers</span></div><div class="stat" style="border:0"><b>25+</b><span>Team members</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 3. Navy panel ============ -->
+<div class="label" id="h3"><b>3</b> Navy panel + photo <span>— bold and official. Solid navy half with the message, photo edge-to-edge, "next event" ribbon.</span></div>
+<div class="frame">
+  <section style="display:grid;grid-template-columns:1fr 1fr;min-height:620px">
+    <div style="background:var(--navy);color:#fff;padding:0 56px 56px;display:flex;flex-direction:column">
+      <nav class="nav" style="padding:0;color:#fff"><a class="brand"><img src="../../frontend/src/img/devity%20logo.png" alt="" />DevityClub</a></nav>
+      <div style="margin:auto 0">
+        <p class="eyebrow light">The tech club of Amity University Chhattisgarh</p><span class="rule"></span>
+        <h1 class="serif" style="font-size:56px;font-weight:800">Think it.<br />Build it.<br /><span style="color:var(--gold)">Ship it.</span></h1>
+        <p class="sub" style="color:#c7d2e8">Hands-on workshops, hackathons and mentorship from engineers at Microsoft, Adobe, MongoDB and more.</p>
+        <div class="cta"><a class="btn gold">Join the club →</a><a class="btn outline-light">See events</a></div>
+      </div>
+      <a style="display:flex;align-items:center;gap:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:14px 18px;margin-top:28px">
+        <span style="background:var(--gold);color:var(--ink);border-radius:6px;padding:6px 10px;text-align:center;line-height:1.1;font-weight:800">14<br /><small style="font-size:10px">NOV</small></span>
+        <span><small style="color:var(--gold);font-weight:700;letter-spacing:.1em;font-size:11px">NEXT EVENT</small><br /><b>Devity Summit 2026</b> · Auditorium, AUC</span>
+        <span style="margin-left:auto;color:var(--gold);font-weight:600">Register →</span>
+      </a>
+    </div>
+    <div style="position:relative;background:url('../../frontend/src/img/club%20memoriess/DevitySummit25/DS3.jpeg') center/cover">
+      <div class="nav" style="position:absolute;top:0;right:0;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)"><div class="links" style="opacity:1"><a>Home</a><a>Events</a><a>Memories</a><a>Team</a><a>Speakers</a></div><a class="btn gold sm">Join</a></div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 4. Editorial ============ -->
+<div class="label" id="h4"><b>4</b> Centered editorial <span>— premium and calm. Big serif headline, a strip of event photos, "speakers from" logo row as proof.</span></div>
+<div class="frame" style="background:var(--cream)">
+  <nav class="nav light" style="background:var(--cream)"><a class="brand"><img src="../../frontend/src/img/devity%20logo.png" alt="" />DevityClub</a>
+    <div class="links"><a>Home</a><a>Events</a><a>Memories</a><a>Team</a><a>Speakers</a><a>Contact</a></div><a class="btn navy sm">Join the club</a></nav>
+  <section style="padding:80px 0 56px;text-align:center">
+    <div class="wrap">
+      <p class="eyebrow">Devity Club · Amity University Chhattisgarh</p><span class="rule" style="margin-left:auto;margin-right:auto"></span>
+      <h1 class="serif" style="font-size:68px;font-weight:800;max-width:940px;margin:0 auto">Where Amity's builders learn <em style="font-style:italic;color:var(--navy)">from the industry.</em></h1>
+      <p class="sub" style="margin:22px auto 0">Workshops, hackathons and sessions with engineers who ship real products.</p>
+      <div class="cta" style="justify-content:center"><a class="btn navy">Join the club →</a><a class="btn outline">Upcoming events</a></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1.15fr 1.3fr 1.15fr 1fr;gap:14px;margin:56px 32px 0;align-items:center">
+      <img style="height:200px;width:100%;object-fit:cover;border-radius:6px" src="../../frontend/src/img/club%20memoriess/Tech%20Elevate/2.JPG" alt="" />
+      <img style="height:250px;width:100%;object-fit:cover;border-radius:6px" src="../../frontend/src/img/club%20memoriess/DevitySummit25/DS4.jpeg" alt="" />
+      <img style="height:300px;width:100%;object-fit:cover;border-radius:6px" src="../../frontend/src/img/club%20memoriess/DevitySummit25/DS6.jpeg" alt="" />
+      <img style="height:250px;width:100%;object-fit:cover;border-radius:6px" src="../../frontend/src/img/club%20memoriess/Envision%20X/IMG20250325112216.jpg" alt="" />
+      <img style="height:200px;width:100%;object-fit:cover;border-radius:6px" src="../../frontend/src/img/club%20memoriess/Code%20Fusion/IMG_2628.JPG" alt="" />
+    </div>
+    <div class="wrap" style="margin-top:48px">
+      <p style="font-size:13px;color:var(--muted);margin:0 0 16px">Our speakers come from</p>
+      <div class="logos" style="justify-content:center"><span>Microsoft</span><span>Adobe</span><span>MongoDB</span><span>DELL</span><span>Salesforce</span><span>Optum</span><span>McAfee</span></div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 5. Event spotlight ============ -->
+<div class="label" id="h5"><b>5</b> Event spotlight <span>— best when a big event is coming. Countdown + poster drive registrations; switches back to a normal hero when nothing is upcoming. (Sample event.)</span></div>
+<div class="frame">
+  <nav class="nav light"><a class="brand"><img src="../../frontend/src/img/devity%20logo.png" alt="" />DevityClub</a>
+    <div class="links"><a>Home</a><a>Events</a><a>Memories</a><a>Team</a><a>Speakers</a><a>Contact</a></div><a class="btn navy sm">Join the club</a></nav>
+  <section style="padding:64px 0;background:linear-gradient(180deg,#fff,var(--cream))">
+    <div class="wrap" style="display:grid;grid-template-columns:1.1fr 1fr;gap:56px;align-items:center">
+      <div>
+        <p class="eyebrow">Devity Club presents</p><span class="rule"></span>
+        <h1 class="serif" style="font-size:60px;font-weight:800">Devity Summit <span style="color:var(--gold-dark)">2026</span></h1>
+        <p class="sub">Two days of talks and hands-on sessions with engineers from Microsoft, Adobe and MongoDB. Learn from leaders, build for the industry.</p>
+        <div style="display:flex;gap:24px;margin-top:22px;color:var(--muted);font-size:15px"><span>📅 14–15 Nov 2026</span><span>📍 Auditorium, AUC</span><span>🎟 Free for students</span></div>
+        <div style="display:flex;gap:12px;margin-top:28px" id="countdown">
+          <div class="stat" style="text-align:center;min-width:92px"><b data-u="d">--</b><span>days</span></div>
+          <div class="stat" style="text-align:center;min-width:92px"><b data-u="h">--</b><span>hours</span></div>
+          <div class="stat" style="text-align:center;min-width:92px"><b data-u="m">--</b><span>minutes</span></div>
+        </div>
+        <div class="cta"><a class="btn navy">Register now →</a><a class="btn outline">About the club</a></div>
+      </div>
+      <div style="position:relative">
+        <img style="width:100%;border-radius:8px;box-shadow:0 24px 50px rgba(11,29,58,.25)" src="../../frontend/src/img/club%20memoriess/DevitySummit25/DS1.jpg" alt="" />
+        <span style="position:absolute;top:-14px;right:-14px;background:var(--gold);color:var(--ink);font-weight:800;padding:10px 14px;border-radius:999px;transform:rotate(6deg);box-shadow:0 8px 20px rgba(0,0,0,.15)">Registrations open</span>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 6. Logo spotlight ============ -->
+<div class="label" id="h6"><b>6</b> Logo spotlight <span>— keeps your animated logo video, but clean: dark navy, thin gold ring, no emoji bubbles.</span></div>
+<div class="frame">
+  <section style="background:radial-gradient(ellipse at 70% 40%,#163a75 0%,var(--ink) 60%);color:#fff;padding-bottom:64px;background-image:radial-gradient(rgba(201,162,39,.18) 1px,transparent 1px),radial-gradient(ellipse at 70% 40%,#163a75 0%,var(--ink) 60%);background-size:26px 26px,auto">
+    <nav class="nav" style="color:#fff"><a class="brand"><img src="../../frontend/src/img/devity%20logo.png" alt="" />DevityClub</a>
+      <div class="links"><a>Home</a><a>Events</a><a>Memories</a><a>Team</a><a>Speakers</a><a>Contact</a></div><a class="btn gold sm">Join the club</a></nav>
+    <div class="wrap" style="display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center;padding-top:48px">
+      <div>
+        <p class="eyebrow light">Amity University Chhattisgarh · Tech club</p><span class="rule"></span>
+        <h1 class="serif" style="font-size:58px;font-weight:800">Empowering the next generation of <span style="color:var(--gold)">tech builders</span></h1>
+        <p class="sub" style="color:#c7d2e8">Community, learning and collaboration — workshops, hackathons and industry mentors.</p>
+        <div class="cta"><a class="btn gold">Join the club →</a><a class="btn outline-light">See events</a></div>
+        <div style="display:flex;gap:36px;margin-top:40px">
+          <div><b class="serif" style="font-size:30px;color:var(--gold)">200+</b><br /><span style="color:#9fb0cc;font-size:14px">Members</span></div>
+          <div><b class="serif" style="font-size:30px;color:var(--gold)">10+</b><br /><span style="color:#9fb0cc;font-size:14px">Events</span></div>
+          <div><b class="serif" style="font-size:30px;color:var(--gold)">19</b><br /><span style="color:#9fb0cc;font-size:14px">Speakers</span></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center">
+        <div style="width:380px;height:380px;border-radius:50%;border:2px solid var(--gold);padding:14px;box-shadow:0 0 0 14px rgba(201,162,39,.08)">
+          <div style="width:100%;height:100%;border-radius:50%;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center">
+            <video src="../../frontend/public/assets/videos/devity_logo.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:contain"></video>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div style="height:80px"></div>
+
+<script>
+  // Sample countdown for option 5
+  const target = new Date('2026-11-14T09:00:00+05:30');
+  const tick = () => {
+    const ms = Math.max(0, target - new Date());
+    const set = (u, v) => { document.querySelector(`[data-u="${u}"]`).textContent = String(v).padStart(2, '0'); };
+    set('d', Math.floor(ms / 864e5)); set('h', Math.floor(ms / 36e5) % 24); set('m', Math.floor(ms / 6e4) % 60);
+  };
+  tick(); setInterval(tick, 30000);
+</script>
+</body>
+</html>

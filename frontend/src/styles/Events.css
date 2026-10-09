@@ -1,523 +1,138 @@
-/* Events Component Styles */
+/* Events section — "Royal" ticket carousel (see docs/ui-mockups/events-final.html) */
 
-/* Keyframe animations for upcoming events */
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), 0 0 40px rgba(147, 51, 234, 0.3);
-  }
+.event-rail {
+  scrollbar-width: none;
 }
 
-@keyframes gradient-x {
-  0%, 100% {
-    transform: translateX(-100%);
-  }
-  50% {
-    transform: translateX(100%);
-  }
-}
-
-@keyframes bounce-subtle {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-2px);
-  }
-}
-
-@keyframes pulse-bright {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
-}
-
-/* Animation classes */
-.animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
-}
-
-.animate-gradient-x {
-  animation: gradient-x 3s ease-in-out infinite;
-}
-
-.animate-bounce-subtle {
-  animation: bounce-subtle 2s ease-in-out infinite;
-}
-
-.animate-pulse-bright {
-  animation: pulse-bright 2s ease-in-out infinite;
-}
-
-/* Hover effects for upcoming events */
-.group:hover .animate-pulse-glow {
-  animation-duration: 1.5s;
-}
-
-/* Mobile optimizations */
-@media (max-width: 768px) {
-  .animate-pulse-glow {
-    animation-duration: 4s;
-  }
-  
-  .animate-gradient-x {
-    animation-duration: 4s;
-  }
-}
-
-/* Reduce motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-  .animate-pulse-glow,
-  .animate-gradient-x,
-  .animate-bounce-subtle,
-  .animate-pulse-bright {
-    animation: none;
-  }
-}
-
-/* Events section specific styles */
-.events-section {
-  padding: 5rem 0;
-  background: #0f172a; /* slate-900, same as the About section */
-  position: relative;
-  overflow: hidden;
-  transition: colors 0.3s;
-}
-
-.dark .events-section {
-  background: #0f172a;
-}
-
-/* Event card styles */
-.event-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: 0.6rem;
-  box-shadow: none;
-  transition: border-color 0.3s, background 0.3s;
-  padding: 1.5rem;
-  transform: scale(1);
-  color: #d1d5db;
-}
-
-.event-card:hover {
-  box-shadow: none;
-  transform: none;
-}
-
-/* Upcoming event card */
-.event-card-upcoming {
-  min-height: auto;
-  background: #ffffff;
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  animation: none;
-  backdrop-filter: none;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
-}
-
-.event-card-upcoming::after {
+.event-rail::-webkit-scrollbar {
   display: none;
 }
 
-.dark .event-card-upcoming {
-  background: #ffffff;
-  border-color: rgba(226, 232, 240, 0.95);
-}
-
-.event-card-upcoming:hover {
-  border-color: rgba(191, 219, 254, 0.95);
-}
-
-.dark .event-card-upcoming:hover {
-  border-color: rgba(191, 219, 254, 0.95);
-}
-
-/* Ongoing event card */
-.event-card-ongoing {
-  background: linear-gradient(135deg, rgb(240, 253, 244) 0%, rgb(255, 255, 255) 50%, rgb(236, 253, 245) 100%);
-  border: 2px solid rgb(187, 247, 208);
-}
-
-.dark .event-card-ongoing {
-  background: linear-gradient(135deg, rgba(20, 83, 45, 0.2) 0%, rgba(31, 41, 55, 0.8) 50%, rgba(6, 78, 59, 0.2) 100%);
-  border-color: rgba(34, 197, 94, 0.3);
-}
-
-/* Completed event card */
-.event-card-completed {
-  background: rgba(17, 28, 43, 0.88);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(148, 163, 184, 0.26);
-}
-
-.dark .event-card-completed {
-  background: rgba(17, 28, 43, 0.88);
-  border-color: rgba(148, 163, 184, 0.26);
-}
-
-/* Event type badge */
-.event-type-badge {
-  padding: 0.35rem 0.85rem;
-  border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  background: linear-gradient(90deg, rgba(59, 130, 246, 0.82), rgba(124, 58, 237, 0.82)) !important;
-  color: #dbeafe !important;
-}
-
-/* Event status badge */
-.event-status-badge {
-  padding: 0.35rem 0.85rem;
-  border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  position: relative;
-}
-
-.event-status-upcoming {
-  background: rgba(34, 197, 94, 0.62);
-  color: #bbf7d0;
-  box-shadow: none;
-  animation: none;
-}
-
-.event-status-ongoing {
-  background: linear-gradient(to right, rgb(251, 191, 36), rgb(245, 158, 11));
-  color: white;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-.event-status-completed {
-  background: rgba(75, 85, 99, 0.8);
-  color: rgb(209, 213, 219);
-}
-
-.dark .event-status-completed {
-  background: rgb(55, 65, 81);
-  color: rgb(156, 163, 175);
-}
-
-/* Event title */
-.event-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 0.75rem;
-  transition: colors 0.3s;
-  position: relative;
-  z-index: 10;
-}
-
-.event-title-upcoming {
-  background: none;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: #111827;
-}
-
-.dark .event-title-upcoming {
-  background: none;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: #111827;
-}
-
-.event-title-regular {
-  color: rgb(243, 244, 246);
-}
-
-.dark .event-title-regular {
-  color: white;
-}
-
-/* Event description */
-.event-description {
-  margin-bottom: 1rem;
-  transition: colors 0.3s;
-  position: relative;
-  z-index: 10;
-}
-
-.event-description-upcoming {
-  color: #4b5563;
-  font-weight: 500;
-}
-
-.dark .event-description-upcoming {
-  color: #4b5563;
-}
-
-.event-description-regular {
-  color: rgb(156, 163, 175);
-}
-
-.dark .event-description-regular {
-  color: rgb(156, 163, 175);
-}
-
-/* Event details */
-.event-details {
-  margin-bottom: 1.5rem;
-  position: relative;
-  z-index: 10;
-}
-
-.event-detail-item {
+/* Wrapper carries the shadow so it follows the notched ticket shape */
+.event-ticket-wrap {
+  --stub-w: 92px;
+  --notch: 10px;
+  flex: 0 0 min(340px, 84vw);
   display: flex;
-  align-items: center;
-  margin-bottom: 0.5rem;
-  transition: colors 0.3s;
+  scroll-snap-align: start;
+  filter: drop-shadow(0 12px 22px rgba(11, 29, 58, 0.1)) drop-shadow(0 0 0.6px rgba(11, 29, 58, 0.35));
 }
 
-.event-detail-upcoming {
-  color: #374151;
+.event-ticket-wrap.is-upcoming {
+  flex-basis: min(360px, 88vw);
+  filter: drop-shadow(0 10px 18px rgba(201, 162, 39, 0.2)) drop-shadow(0 0 0.8px rgba(201, 162, 39, 0.9));
 }
 
-.dark .event-detail-upcoming {
-  color: #374151;
+@media (min-width: 640px) {
+  .event-ticket-wrap { --stub-w: 104px; --notch: 11px; flex-basis: 380px; }
+  .event-ticket-wrap.is-upcoming { flex-basis: 400px; }
 }
 
-.event-detail-regular {
-  color: rgb(156, 163, 175);
-}
-
-.dark .event-detail-regular {
-  color: rgb(156, 163, 175);
-}
-
-.event-detail-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-right: 0.75rem;
-}
-
-.event-detail-icon-upcoming {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Event buttons */
-.event-button {
-  width: 100%;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  transition: all 0.3s;
-  font-weight: 600;
-  position: relative;
+/* The notches are real cut-outs, so they work on any section background */
+.event-ticket {
+  flex: 1;
+  display: grid;
+  grid-template-columns: var(--stub-w) 1fr;
+  min-height: 228px;
+  border-radius: 18px;
+  background: #fff;
   overflow: hidden;
+  -webkit-mask:
+    radial-gradient(circle var(--notch) at var(--stub-w) 0, transparent 98%, #000) top / 100% 51% no-repeat,
+    radial-gradient(circle var(--notch) at var(--stub-w) 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+  mask:
+    radial-gradient(circle var(--notch) at var(--stub-w) 0, transparent 98%, #000) top / 100% 51% no-repeat,
+    radial-gradient(circle var(--notch) at var(--stub-w) 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
 }
 
-.event-button-upcoming {
-  background: linear-gradient(to right, rgb(37, 99, 235), rgb(147, 51, 234), rgb(219, 39, 119));
-  color: rgb(229, 231, 235);
-  font-size: 1.125rem;
-  font-weight: 700;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  transform: scale(1);
+.event-stub {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #fff;
+  background: linear-gradient(160deg, #0b2a5b, #1e3a8a 60%, #312e81);
 }
 
-.event-button-upcoming:hover {
-  background: linear-gradient(to right, rgb(29, 78, 216), rgb(126, 34, 206), rgb(190, 24, 93));
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  transform: none;
+.is-upcoming .event-stub {
+  background: linear-gradient(160deg, #e5c04a, #c9a227 55%, #a8861c);
+  text-shadow: 0 1px 2px rgba(90, 66, 0, 0.35);
 }
 
-.event-button-ongoing {
-  background: linear-gradient(to right, rgb(234, 179, 8), rgb(245, 158, 11));
-  color: white;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+.event-stub-day { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+.event-stub-month { margin-top: 8px; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.16em; color: #c9a227; }
+.event-stub-year { margin-top: 2px; font-size: 0.75rem; font-weight: 500; color: #c7d2fe; }
+.event-stub-no {
+  position: absolute;
+  bottom: 16px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: rgba(199, 210, 254, 0.75);
+  white-space: nowrap;
 }
 
-.event-button-ongoing:hover {
-  background: linear-gradient(to right, rgb(202, 138, 4), rgb(217, 119, 6));
-}
+.is-upcoming .event-stub-month { color: #fff; }
+.is-upcoming .event-stub-year,
+.is-upcoming .event-stub-no { color: rgba(255, 255, 255, 0.9); }
 
-.event-button-completed {
-  background: rgb(243, 244, 246);
-  color: rgb(75, 85, 99);
-  cursor: not-allowed;
-}
-
-.dark .event-button-completed {
-  background: rgb(55, 65, 81);
-  color: rgb(156, 163, 175);
-}
-
-/* Special effects for upcoming events */
-.upcoming-glow::before {
+/* Tear line from notch to notch */
+.event-stub::after {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(to right, rgb(96, 165, 250), rgb(147, 51, 234), rgb(244, 114, 182));
-  border-radius: 0.75rem;
-  opacity: 0;
-  animation: none;
+  right: -1px;
+  top: calc(var(--notch) + 4px);
+  bottom: calc(var(--notch) + 4px);
+  border-right: 2px dashed rgba(11, 29, 58, 0.18);
 }
 
-.upcoming-particles {
-  position: absolute;
-}
+.is-upcoming .event-stub::after { border-right-color: rgba(201, 162, 39, 0.45); }
 
-.upcoming-particle-1 {
-  top: 0.5rem;
-  right: 0.5rem;
-  width: 0.5rem;
-  height: 0.5rem;
-  background: rgb(96, 165, 250);
-  border-radius: 50%;
-  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
+/* Type colours */
+.event-type-Workshop    { --tint: #dbeafe; --strong: #1d4ed8; }
+.event-type-Seminar     { --tint: #fef3c7; --strong: #a16207; }
+.event-type-Competition { --tint: #fce7f3; --strong: #be185d; }
+.event-type-Bootcamp    { --tint: #dcfce7; --strong: #15803d; }
+.event-type-Hackathon   { --tint: #ede9fe; --strong: #6d28d9; }
 
-.upcoming-particle-2 {
-  top: 1rem;
-  right: 1.5rem;
-  width: 0.25rem;
-  height: 0.25rem;
-  background: rgb(196, 181, 253);
-  border-radius: 50%;
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  animation-delay: 0.5s;
-}
-
-.upcoming-particle-3 {
-  top: 1.5rem;
-  right: 0.75rem;
-  width: 0.375rem;
-  height: 0.375rem;
-  background: rgb(251, 207, 232);
-  border-radius: 50%;
-  animation: bounce 1s infinite;
-  animation-delay: 1s;
-}
-
-.upcoming-shimmer {
-  display: none;
-}
-
-.group:hover .upcoming-shimmer {
-  transform: translateX(-100%);
-}
-
-/* Button hover effects */
-.button-shimmer {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.event-button-upcoming:hover .button-shimmer {
-  opacity: 1;
-}
-
-/* Icon animations */
-.bounce-icon {
-  animation: bounce 2s infinite;
-}
-
-@keyframes ping {
-  75%, 100% {
-    transform: scale(2);
-    opacity: 0;
-  }
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(-25%);
-    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-  }
-  50% {
-    transform: none;
-    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-  }
-}
-
-/* Small completed event cards */
-.event-card-small {
-  padding: 1.25rem;
-  min-height: auto;
-  background: #ffffff;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  border-radius: 0.85rem;
-  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.16);
-  color: #111827;
-}
-
-.event-card-small:hover {
-  transform: none;
-  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.16);
-}
-
-.event-type-badge-small {
-  padding: 0.28rem 0.62rem;
-  border-radius: 0.35rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  background: #f0522f !important;
-  color: white !important;
-}
-
-.event-title-small {
-  font-size: 1.1rem;
+.event-tag {
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 11px;
   font-weight: 800;
-  margin-bottom: 0.75rem;
-  line-height: 1.3;
-  color: #111827;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--tint, #e2e8f0);
+  color: var(--strong, #334155);
 }
 
-.dark .event-title-small {
-  color: #111827;
+.event-tag-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #0b2a5b;
+  color: #fff;
 }
 
-.event-description-small {
-  font-size: 0.85rem;
-  color: #4b5563;
-  margin-bottom: 1rem;
-  line-height: 1.55;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.event-tag-next::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25);
 }
 
-.dark .event-description-small {
-  color: #4b5563;
-}
+/* Keeps one- and two-line titles the same height */
+.event-ticket-title { min-height: 2.64em; line-height: 1.32; }
 
-.event-details-small {
-  margin-bottom: 0.75rem;
-  color: #374151;
-}
-
-.event-card-small .event-detail-item {
-  color: #374151;
-  font-size: 0.82rem;
-  margin-bottom: 0.45rem;
-}
-
-.event-card-small .event-status-badge {
-  border-radius: 0.45rem;
-  background: #f3f4f6;
-  color: #6b7280;
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.3rem 0.65rem;
-}
-
-.event-detail-icon-small {
-  width: 0.875rem;
-  height: 0.875rem;
-  margin-right: 0.5rem;
+.event-barcode {
+  height: 22px;
+  width: 84px;
   flex-shrink: 0;
+  opacity: 0.75;
+  background: repeating-linear-gradient(90deg, #0b1d3a 0 2px, transparent 2px 4px, #0b1d3a 4px 5px, transparent 5px 8px, #0b1d3a 8px 11px, transparent 11px 12px);
 }

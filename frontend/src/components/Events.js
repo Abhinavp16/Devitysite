@@ -1,43 +1,113 @@
-import { useEffect, useState } from 'react';
-import { EventsAnimatedBackground } from './AnimatedBackground';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import publicApiService from '../services/publicApiService';
+import Icon from './admin/icons';
+import SkeletonBone from './SkeletonBone';
 import '../styles/Events.css';
 
-const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+// Event dates are stored as UTC midnight ("YYYY-MM-DD"), so format them in UTC
+const formatPart = (date, options) => new Date(date).toLocaleDateString('en-US', { ...options, timeZone: 'UTC' });
 
-const formatDay = (date) => date ? new Date(date).toLocaleDateString('en-US', { day: '2-digit' }) : '';
-
-const formatMonth = (date) => date ? new Date(date).toLocaleDateString('en-US', { month: 'short' }).toUpperCase() : '';
-
-const pastEventVisuals = [
-  'from-fuchsia-600 via-purple-700 to-slate-950',
-  'from-slate-950 via-gray-800 to-zinc-700',
-  'from-cyan-500 via-blue-700 to-slate-950',
-  'from-orange-500 via-rose-700 to-slate-950'
-];
-
-const eventColor = (status) => {
-  if (status === 'upcoming') return 'bg-gradient-to-r from-blue-500 to-purple-600 text-white';
-  if (status === 'cancelled') return 'bg-red-100 text-red-600';
-  return 'bg-blue-100 text-blue-600';
+const daysUntil = (date) => {
+  const now = new Date();
+  const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((new Date(date).getTime() - todayUTC) / 86400000);
 };
 
-const SectionNotice = ({ tone = 'neutral', children }) => {
-  const toneClass = tone === 'error'
-    ? 'border-red-200/70 bg-red-50/80 text-red-700 dark:border-red-400/30 dark:bg-red-950/30 dark:text-red-200'
-    : 'border-blue-200/70 bg-white/70 text-gray-700 dark:border-white/10 dark:bg-slate-800/60 dark:text-gray-200';
+const countdownLabel = (date) => {
+  const days = daysUntil(date);
+  if (days <= 0) return 'Today';
+  if (days === 1) return 'Tomorrow';
+  return `In ${days} days`;
+};
+
+const isUpcoming = (event) => event.status === 'upcoming' || event.status === 'ongoing';
+const byDate = (a, b) => new Date(a.event_date) - new Date(b.event_date);
+
+const Ticket = ({ event, number }) => {
+  const upcoming = isUpcoming(event);
 
   return (
-    <div className={`mx-auto max-w-2xl rounded-2xl border px-5 py-4 text-center shadow-lg backdrop-blur-xl ${toneClass}`}>
-      {children}
+    <div className={`event-ticket-wrap ${upcoming ? 'is-upcoming' : ''}`}>
+      <article className={`event-ticket event-type-${event.event_type}`}>
+        <div className="event-stub" aria-hidden="true">
+          <b className="event-stub-day">{formatPart(event.event_date, { day: '2-digit' })}</b>
+          <small className="event-stub-month">{formatPart(event.event_date, { month: 'short' }).toUpperCase()}</small>
+          <span className="event-stub-year">{formatPart(event.event_date, { year: 'numeric' })}</span>
+          <em className="event-stub-no not-italic">{upcoming ? 'NEXT UP' : `No. ${String(number).padStart(3, '0')}`}</em>
+        </div>
+
+        <div className="flex min-w-0 flex-col gap-2.5 py-5 pl-5 pr-4 sm:pl-6 sm:pr-5">
+          <div className="flex flex-wrap gap-1.5">
+            {upcoming && <span className="event-tag event-tag-next">Upcoming</span>}
+            <span className="event-tag">{event.event_type}</span>
+          </div>
+
+          <h3 className="event-ticket-title line-clamp-2 text-[17px] font-extrabold tracking-tight text-navy-ink">{event.title}</h3>
+          <p className="sr-only">{formatPart(event.event_date, { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+
+          <div className="flex flex-col gap-1.5 text-[13.5px] font-medium text-slate-500">
+            <span className="flex min-w-0 items-center gap-2.5">
+              <Icon name="clock" className="h-5 w-5 shrink-0 text-navy" strokeWidth={1.8} />
+              <span className="truncate">{event.event_time}</span>
+            </span>
+            <span className="flex min-w-0 items-center gap-2.5">
+              <Icon name="mapPin" className="h-5 w-5 shrink-0 text-navy" strokeWidth={1.8} />
+              <span className="truncate">{event.location}</span>
+            </span>
+          </div>
+
+          <div className="mt-auto flex min-h-[46px] items-center justify-between gap-2.5 border-t border-dashed border-navy-ink/10 pt-3">
+            {upcoming ? (
+              <>
+                <span className="whitespace-nowrap text-[12.5px] font-bold text-gold-dark">{countdownLabel(event.event_date)}</span>
+                {event.registration_link ? (
+                  <a
+                    href={event.registration_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-navy px-4 py-2.5 text-[13.5px] font-bold text-white"
+                  >
+                    Register now <Icon name="arrowRight" className="h-4 w-4" strokeWidth={2.2} />
+                  </a>
+                ) : (
+                  <span className="whitespace-nowrap rounded-full bg-cream px-4 py-2.5 text-[12.5px] font-bold text-slate-500">Registration opens soon</span>
+                )}
+              </>
+            ) : (
+              <>
+                <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-[12.5px] font-bold text-green-700">
+                  <Icon name="check" className="h-[18px] w-[18px]" strokeWidth={2} /> Completed
+                </span>
+                <span className="event-barcode" aria-hidden="true" />
+              </>
+            )}
+          </div>
+        </div>
+      </article>
     </div>
   );
 };
+
+const TicketSkeleton = ({ index }) => (
+  <div className="event-ticket-wrap">
+    <div className="event-ticket">
+      <SkeletonBone className="h-full w-full rounded-none" delay={index * 0.1} />
+      <div className="flex flex-col gap-3 p-6">
+        <SkeletonBone className="h-5 w-24 rounded-md" delay={index * 0.1} />
+        <SkeletonBone className="h-5 w-full rounded-md" delay={index * 0.1 + 0.05} />
+        <SkeletonBone className="h-4 w-2/3 rounded-md" delay={index * 0.1 + 0.1} />
+        <SkeletonBone className="h-4 w-1/2 rounded-md" delay={index * 0.1 + 0.15} />
+      </div>
+    </div>
+  </div>
+);
 
 const Events = () => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [scroll, setScroll] = useState({ pages: 1, current: 0, atStart: true, atEnd: true });
+  const railRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -58,101 +128,104 @@ const Events = () => {
     };
   }, []);
 
-  const featuredEvents = events.filter((event) => event.status === 'upcoming' || event.status === 'ongoing');
-  const pastEvents = events.filter((event) => event.status !== 'upcoming' && event.status !== 'ongoing');
+  // Soonest upcoming first, then past events newest first
+  const upcomingEvents = events.filter(isUpcoming).sort(byDate);
+  const pastEvents = events.filter((event) => !isUpcoming(event)).sort((a, b) => byDate(b, a));
+  const tickets = [...upcomingEvents, ...pastEvents];
 
-  const renderEventCard = (event, index, small = false) => {
-    const isUpcoming = event.status === 'upcoming';
-    const isCancelled = event.status === 'cancelled';
-    const isOngoing = event.status === 'ongoing';
+  const syncScroll = useCallback(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const maxScroll = rail.scrollWidth - rail.clientWidth;
+    const pages = Math.max(1, Math.ceil(rail.scrollWidth / rail.clientWidth));
+    setScroll({
+      pages,
+      current: maxScroll > 0 ? Math.round((rail.scrollLeft / maxScroll) * (pages - 1)) : 0,
+      atStart: rail.scrollLeft < 4,
+      atEnd: rail.scrollLeft > maxScroll - 4
+    });
+  }, []);
 
-    if (small) {
-      const buttonLabel = event.status === 'completed' ? 'Completed' : isCancelled ? 'Cancelled' : 'Register Now';
+  useEffect(() => {
+    syncScroll();
+    window.addEventListener('resize', syncScroll);
+    return () => window.removeEventListener('resize', syncScroll);
+  }, [syncScroll, tickets.length]);
 
-      return (
-        <div key={event.id || index} className="overflow-hidden rounded-xl bg-white text-slate-950 shadow-[0_16px_40px_rgba(15,23,42,0.18)]">
-          <div className={`relative h-16 sm:h-20 bg-gradient-to-br ${pastEventVisuals[index % pastEventVisuals.length]}`}>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.35),transparent_26%),radial-gradient(circle_at_70%_65%,rgba(255,255,255,0.2),transparent_28%)]" />
-            <div className="absolute left-3 top-3 rounded bg-orange-600 px-2 py-1 text-[10px] font-bold text-white">{event.event_type}</div>
-            <div className="absolute right-3 top-3 rounded bg-white px-2 py-1 text-center text-slate-950 shadow-sm">
-              <div className="text-sm font-black leading-none">{formatDay(event.event_date)}</div>
-              <div className="mt-0.5 text-[10px] font-black leading-none text-orange-600">{formatMonth(event.event_date)}</div>
-            </div>
-          </div>
-
-          <div className="p-3 sm:p-4">
-            <h3 className="line-clamp-2 text-sm font-black leading-tight text-slate-950 sm:text-base">{event.title}</h3>
-            <div className="mt-2 flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-medium text-slate-600 sm:mt-3 sm:gap-x-4 sm:text-xs">
-              <span>{event.event_time}</span>
-              <span>{event.location}</span>
-            </div>
-            <p className="mt-2 line-clamp-3 text-[10px] leading-relaxed text-slate-600 sm:mt-3 sm:text-xs">{event.description}</p>
-            {event.registration_link && (isUpcoming || isOngoing) ? (
-              <a
-                href={event.registration_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`mt-3 w-fit rounded px-2.5 py-1.5 text-[10px] font-semibold text-white sm:mt-4 sm:px-3 sm:py-2 sm:text-xs bg-blue-600 hover:bg-blue-700 transition-colors`}
-              >
-                Register Now
-              </a>
-            ) : (
-              <span className={`mt-3 w-fit rounded px-2.5 py-1.5 text-[10px] font-semibold text-white sm:mt-4 sm:px-3 sm:py-2 sm:text-xs ${isCancelled ? 'bg-red-500' : 'bg-slate-500'}`}>
-                {isCancelled ? 'Cancelled' : 'Completed'}
-              </span>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div key={event.id || index} className={`event-card group ${isUpcoming ? 'event-card-upcoming' : 'event-card-completed'} ${small ? 'event-card-small' : ''}`}>
-        {isUpcoming && <><div className="upcoming-glow"></div><div className="upcoming-shimmer"></div></>}
-        <div className="flex items-start justify-between mb-4 relative z-10">
-          <div className={`${small ? 'event-type-badge-small' : 'event-type-badge'} ${eventColor(event.status)}`}>{event.event_type}</div>
-          <div className={`event-status-badge ${isUpcoming ? 'event-status-upcoming' : isOngoing ? 'event-status-ongoing' : 'event-status-completed'}`}>
-            <span>{isUpcoming ? 'Upcoming' : isOngoing ? 'Ongoing' : isCancelled ? 'Cancelled' : 'Completed'}</span>
-          </div>
-        </div>
-        <h3 className={small ? 'event-title event-title-small' : `event-title ${isUpcoming ? 'event-title-upcoming' : 'event-title-regular'}`}>{event.title}</h3>
-        <p className={small ? 'event-description event-description-small' : `event-description ${isUpcoming ? 'event-description-upcoming' : 'event-description-regular'}`}>{event.description}</p>
-        <div className={`${small ? 'event-details-small' : 'event-details'} space-y-2`}>
-          <div className={`event-detail-item ${isUpcoming ? 'event-detail-upcoming' : 'event-detail-regular'} ${small ? 'text-xs' : ''}`}>
-            <span>{formatDate(event.event_date)} | {event.event_time}</span>
-          </div>
-          <div className={`event-detail-item ${isUpcoming ? 'event-detail-upcoming' : 'event-detail-regular'} ${small ? 'text-xs' : ''}`}>
-            <span>{event.location}</span>
-          </div>
-        </div>
-        {!small && event.registration_link && (isUpcoming || isOngoing) && (
-          <a href={event.registration_link} target="_blank" rel="noopener noreferrer" className="event-button event-button-upcoming group/btn block text-center no-underline mt-4">Register Now</a>
-        )}
-      </div>
-    );
+  const scrollBy = (direction) => {
+    const rail = railRef.current;
+    if (rail) rail.scrollBy({ left: direction * (rail.clientWidth - 60), behavior: 'smooth' });
   };
 
+  const arrowClass = 'flex h-12 w-12 items-center justify-center rounded-full border-[1.5px] border-navy-ink/10 bg-white text-navy disabled:cursor-default disabled:opacity-35';
+
   return (
-    <section id="events" className="events-section">
-      <EventsAnimatedBackground />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-16">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gold">Events</p>
-          <span className="mx-auto mt-2 block h-0.5 w-11 bg-gold" aria-hidden="true" />
-          <h2 className="mt-6 mb-5 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">Upcoming <span className="text-gold">events</span></h2>
-          <p className="text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed sm:text-xl">Join our exciting events and workshops to enhance your skills and connect with fellow tech enthusiasts.</p>
+    <section id="events" className="bg-white py-20 font-jakarta text-navy-ink transition-colors duration-300 dark:bg-slate-900 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-wrap items-end justify-between gap-5">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-gold-dark dark:text-gold">Events</p>
+            <span className="mb-4 mt-2.5 block h-0.5 w-11 bg-gold" aria-hidden="true" />
+            <h2 className="text-4xl font-extrabold leading-tight tracking-[-0.03em] dark:text-white sm:text-[2.9rem]">
+              Events we've <span className="text-navy dark:text-gold">hosted</span>
+            </h2>
+            <p className="mt-3 text-base text-slate-500 dark:text-slate-300 sm:text-[16.5px]">Workshops, bootcamps, seminars and competitions run by the club.</p>
+          </div>
+
+          {tickets.length > 1 && (
+            <div className="flex gap-2.5">
+              <button type="button" className={arrowClass} onClick={() => scrollBy(-1)} disabled={scroll.atStart} aria-label="Previous events">
+                <Icon name="arrowLeft" className="h-5 w-5" strokeWidth={2} />
+              </button>
+              <button type="button" className={arrowClass} onClick={() => scrollBy(1)} disabled={scroll.atEnd} aria-label="Next events">
+                <Icon name="arrowRight" className="h-5 w-5" strokeWidth={2} />
+              </button>
+            </div>
+          )}
         </div>
 
-        {isLoading && <SectionNotice>Loading events from database...</SectionNotice>}
-        {error && <SectionNotice tone="error">Unable to load events: {error}</SectionNotice>}
-        {!isLoading && !error && events.length === 0 && <SectionNotice>No events available yet.</SectionNotice>}
-
-        {featuredEvents.length > 0 && <div className="grid md:grid-cols-2 gap-8 mb-12">{featuredEvents.map((event, index) => renderEventCard(event, index))}</div>}
-        {pastEvents.length > 0 && (
-          <div className="mt-16">
-            <h3 className="mb-6 text-center font-display text-3xl font-extrabold tracking-tight text-white">Past <span className="text-gold">events</span></h3>
-            <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">{pastEvents.map((event, index) => renderEventCard(event, index, true))}</div>
+        {!isLoading && !error && upcomingEvents.length === 0 && (
+          <div className="mt-7 inline-flex items-center gap-3 rounded-2xl border border-cream-line bg-cream py-3 pl-3 pr-5 text-[14.5px] font-medium text-navy-ink">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-gold-dark">
+              <Icon name="calendar" className="h-6 w-6" strokeWidth={1.8} />
+            </span>
+            {events.length > 0
+              ? 'No upcoming events right now — the next one will appear here first.'
+              : 'No events yet — the first one will appear here.'}
           </div>
+        )}
+
+        {error && (
+          <div className="mt-7 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-medium text-red-700">
+            Unable to load events: {error}
+          </div>
+        )}
+
+        {(isLoading || tickets.length > 0) && (
+          <>
+            <div
+              ref={railRef}
+              onScroll={() => requestAnimationFrame(syncScroll)}
+              className="event-rail -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-5 overflow-x-auto px-4 pb-11 pt-9 sm:-mx-6 sm:scroll-px-6 sm:gap-6 sm:px-6 lg:-mx-8 lg:scroll-px-8 lg:px-8"
+            >
+              {isLoading
+                ? [0, 1, 2].map((index) => <TicketSkeleton key={index} index={index} />)
+                : tickets.map((event, index) => (
+                  <Ticket key={event.id || index} event={event} number={pastEvents.length - (index - upcomingEvents.length)} />
+                ))}
+            </div>
+
+            {!isLoading && scroll.pages > 1 && (
+              <div className="flex justify-center gap-1.5" aria-hidden="true">
+                {Array.from({ length: scroll.pages }, (_, index) => (
+                  <span
+                    key={index}
+                    className={`h-[7px] rounded transition-all duration-300 ${index === scroll.current ? 'w-6 bg-navy dark:bg-gold' : 'w-[7px] bg-slate-300 dark:bg-slate-600'}`}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </section>

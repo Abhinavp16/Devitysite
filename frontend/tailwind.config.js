@@ -16,6 +16,7 @@ module.exports = {
       },
       fontFamily: {
         display: ['"Playfair Display"', 'Georgia', 'serif'],
+        jakarta: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',

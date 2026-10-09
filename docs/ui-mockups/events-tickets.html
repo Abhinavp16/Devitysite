@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="classic">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DevityClub — Event ticket styles</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" rel="stylesheet" />
+<style>
+  :root { --slate: #0f172a; --gold: #c9a227; --navy: #0b2a5b; --ink: #0b1d3a; --cream: #f6f3ec; --muted-light: #55607a; }
+
+  /* ---------- Ticket colour schemes (same layout, different palette) ---------- */
+  [data-theme="classic"]   { --body: #f6f3ec; --text: #0b1d3a; --muted: #55607a; --stub: #0b2a5b; --stub-text: #fff; --stub-accent: #c9a227; --stub-sub: #9fb0cc; --line: rgba(11,29,58,.14); --perf: rgba(255,255,255,.35); --outline: none; --stamp: #0b2a5b; }
+  [data-theme="midnight"]  { --body: #16213a; --text: #f1f5f9; --muted: #94a3b8; --stub: #c9a227; --stub-text: #0b1d3a; --stub-accent: #0b1d3a; --stub-sub: rgba(11,29,58,.7); --line: rgba(255,255,255,.1); --perf: rgba(11,29,58,.35); --outline: 1px solid rgba(201,162,39,.35); --stamp: #c9a227; }
+  [data-theme="champagne"] { --body: #f3ead2; --text: #0b1d3a; --muted: #6b5d3a; --stub: #8a6d12; --stub-text: #fff; --stub-accent: #f3ead2; --stub-sub: rgba(255,255,255,.75); --line: rgba(107,93,58,.2); --perf: rgba(255,255,255,.3); --outline: none; --stamp: #8a6d12; }
+  [data-theme="typed"]     { --body: #ffffff; --text: #0b1d3a; --muted: #55607a; --stub: var(--tc); --stub-text: #0b1d3a; --stub-accent: #0b1d3a; --stub-sub: rgba(11,29,58,.65); --line: rgba(11,29,58,.12); --perf: rgba(11,29,58,.3); --outline: none; --stamp: #0b1d3a; }
+  [data-theme="outline"]   { --body: rgba(255,255,255,.02); --text: #f1f5f9; --muted: #94a3b8; --stub: rgba(201,162,39,.12); --stub-text: #c9a227; --stub-accent: #f1f5f9; --stub-sub: #94a3b8; --line: rgba(201,162,39,.25); --perf: rgba(201,162,39,.5); --outline: 1.5px solid rgba(201,162,39,.55); --stamp: #c9a227; }
+  [data-theme="royal"]     { --body: #ffffff; --text: #0b1d3a; --muted: #55607a; --stub: linear-gradient(160deg, #0b2a5b, #1e3a8a 60%, #312e81); --stub-text: #fff; --stub-accent: #c9a227; --stub-sub: #c7d2fe; --line: rgba(11,29,58,.12); --perf: rgba(255,255,255,.4); --outline: none; --stamp: #312e81; }
+
+  /* Event type colours — tags (and the stub in the "typed" scheme) */
+  .t-Workshop { --tc: #93c5fd; } .t-Seminar { --tc: #f3d77a; } .t-Competition { --tc: #f9a8d4; } .t-Bootcamp { --tc: #86efac; } .t-Hackathon { --tc: #c4b5fd; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: #e9e6df; }
+  p, h2, h3 { margin: 0; }
+
+  /* Mockup chrome (not part of the site) */
+  .switcher { position: sticky; top: 0; z-index: 100; background: #111; color: #fff; font-size: 13px; }
+  .switcher .inner { max-width: 1280px; margin: 0 auto; display: flex; gap: 8px; align-items: center; padding: 10px 24px; flex-wrap: wrap; }
+  .switcher button { border: 1px solid #444; background: transparent; color: #ddd; padding: 6px 12px; border-radius: 8px; cursor: pointer; font: inherit; display: inline-flex; align-items: center; gap: 7px; }
+  .switcher button.on { background: #fff; color: #111; }
+  .swatch { display: inline-flex; }
+  .swatch i { width: 11px; height: 11px; border-radius: 50%; display: block; margin-left: -3px; border: 1px solid rgba(255,255,255,.6); }
+  .note { max-width: 1280px; margin: 18px auto 0; padding: 0 24px; color: #555; font-size: 13.5px; }
+  .frame { max-width: 1280px; margin: 14px auto 60px; border-radius: 14px; overflow: clip; box-shadow: 0 20px 50px rgba(0,0,0,.18); background: var(--slate); }
+
+  /* ---------- Section ---------- */
+  section { padding: 88px 0 80px; position: relative; overflow: hidden; }
+  .glow { position: absolute; width: 440px; height: 440px; border-radius: 50%; background: var(--gold); filter: blur(120px); opacity: .14; top: -160px; left: -120px; pointer-events: none; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; position: relative; }
+  .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+  .rule { display: block; width: 44px; height: 2px; background: var(--gold); margin: 10px 0 20px; }
+  h2 { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 44px; line-height: 1.1; color: #fff; }
+  h2 span { color: var(--gold); }
+  .sub { color: #c7d2e8; font-size: 16px; margin-top: 12px; }
+  .arrows { display: flex; gap: 8px; }
+  .arrows button { width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,.22); background: transparent; color: #fff; font-size: 18px; cursor: pointer; }
+  .arrows button:disabled { opacity: .35; cursor: default; }
+  .notice { display: inline-flex; align-items: center; gap: 10px; margin-top: 26px; padding: 10px 16px; border-radius: 999px; border: 1px dashed rgba(201,162,39,.45); color: #e6edf7; font-size: 14px; background: rgba(201,162,39,.08); }
+  .notice i { color: var(--gold); font-size: 18px; }
+
+  .rail { display: flex; gap: 22px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 30px 32px 18px; scroll-padding: 0 32px; scrollbar-width: none; }
+  .rail::-webkit-scrollbar { display: none; }
+  .dots { display: flex; justify-content: center; gap: 6px; margin-top: 14px; }
+  .dots span { width: 6px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.25); transition: width .3s, background .3s; }
+  .dots span.on { width: 22px; background: var(--gold); }
+
+  /* ---------- Ticket ---------- */
+  .ticket { scroll-snap-align: start; flex: 0 0 360px; display: grid; grid-template-columns: 96px 1fr; min-height: 214px; position: relative; border-radius: 16px; background: var(--body); color: var(--text); outline: var(--outline); outline-offset: -1px; overflow: hidden; }
+  .stub { background: var(--stub); color: var(--stub-text); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 18px 0; }
+  .stub b { font-family: 'Playfair Display', serif; font-size: 38px; line-height: 1; }
+  .stub small { font-size: 12px; font-weight: 800; letter-spacing: .14em; color: var(--stub-accent); margin-top: 7px; }
+  .stub span { font-size: 11px; color: var(--stub-sub); margin-top: 4px; }
+  .stub em { position: absolute; bottom: 14px; font-style: normal; font: 500 9.5px 'JetBrains Mono', monospace; letter-spacing: .12em; color: var(--stub-sub); }
+  .stub::after { content: ''; position: absolute; right: 0; top: 14px; bottom: 14px; border-right: 2px dashed var(--perf); }
+  /* Punched notches on the tear line */
+  .ticket::before, .ticket::after { content: ''; position: absolute; left: 86px; width: 20px; height: 20px; border-radius: 50%; background: var(--slate); z-index: 2; }
+  .ticket::before { top: -10px; } .ticket::after { bottom: -10px; }
+  [data-theme="outline"] .ticket::before, [data-theme="outline"] .ticket::after { box-shadow: inset 0 0 0 1.5px rgba(201,162,39,.55); }
+
+  .body { padding: 18px 20px 16px 22px; display: flex; flex-direction: column; gap: 9px; position: relative; min-width: 0; }
+  /* align-self: the tag hugs its text instead of stretching across the ticket */
+  .tag { align-self: flex-start; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 4px 9px; border-radius: 6px; background: var(--tc); color: #0b1d3a; }
+  [data-theme="midnight"] .tag, [data-theme="outline"] .tag { background: color-mix(in srgb, var(--tc) 18%, transparent); color: var(--tc); }
+  [data-theme="typed"] .tag { background: transparent; color: var(--muted); padding: 0; letter-spacing: .1em; }
+  /* Per-ticket type colour has to be applied on the stub itself (it's set on .ticket, not the page) */
+  [data-theme="typed"] .stub { background: var(--tc); }
+  h3 { font-size: 16.5px; font-weight: 800; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--muted); }
+  .meta i { margin-right: 4px; color: var(--stub-accent); }
+  [data-theme="classic"] .meta i, [data-theme="typed"] .meta i, [data-theme="royal"] .meta i { color: #8a6d12; }
+  [data-theme="champagne"] .meta i { color: #0b2a5b; }
+  .desc { font-size: 13px; line-height: 1.5; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .foot { margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--line); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .foot .no { font: 500 11px 'JetBrains Mono', monospace; color: var(--muted); letter-spacing: .08em; }
+  .barcode { height: 22px; width: 92px; opacity: .75; background: repeating-linear-gradient(90deg, var(--text) 0 2px, transparent 2px 4px, var(--text) 4px 5px, transparent 5px 8px, var(--text) 8px 11px, transparent 11px 12px); }
+  /* Faint "completed" stamp for past events */
+  .stamp { position: absolute; top: 12px; right: 12px; transform: rotate(-10deg); border: 1.5px solid var(--stamp); color: var(--stamp); opacity: .2; font: 800 9.5px "Inter"; letter-spacing: .16em; padding: 3px 6px; border-radius: 5px; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<div class="switcher"><div class="inner">
+  <strong>Ticket style:</strong>
+  <button data-pick="classic" class="on"><span class="swatch"><i style="background:#f6f3ec"></i><i style="background:#0b2a5b"></i><i style="background:#c9a227"></i></span>Classic</button>
+  <button data-pick="midnight"><span class="swatch"><i style="background:#16213a"></i><i style="background:#c9a227"></i></span>Midnight gold</button>
+  <button data-pick="champagne"><span class="swatch"><i style="background:#f3ead2"></i><i style="background:#8a6d12"></i></span>Champagne</button>
+  <button data-pick="typed"><span class="swatch"><i style="background:#fff"></i><i style="background:#93c5fd"></i><i style="background:#f9a8d4"></i><i style="background:#86efac"></i></span>Colour-coded</button>
+  <button data-pick="outline"><span class="swatch"><i style="background:#0f172a"></i><i style="background:#c9a227"></i></span>Gold outline</button>
+  <button data-pick="royal"><span class="swatch"><i style="background:#fff"></i><i style="background:#1e3a8a"></i><i style="background:#312e81"></i></span>Royal</button>
+</div></div>
+<p class="note" id="note"></p>
+
+<div class="frame"><section>
+  <div class="glow"></div>
+  <div class="wrap">
+    <div class="head">
+      <div><p class="eyebrow">Events</p><span class="rule"></span><h2>Events we've <span>hosted</span></h2><p class="sub">Workshops, bootcamps, seminars and competitions run by the club.</p></div>
+      <div class="arrows"><button data-scroll="-1" aria-label="Previous">←</button><button data-scroll="1" aria-label="Next">→</button></div>
+    </div>
+    <div class="notice"><i class="ti ti-calendar-time"></i>No upcoming events right now — the next one will appear here first.</div>
+  </div>
+  <div class="wrap" style="padding:0">
+    <div class="rail" id="rail"></div>
+    <div class="dots" id="dots"></div>
+  </div>
+</section></div>
+
+<script>
+  const EVENTS = [
+    { title: 'From Fresher to First Offer Letter: Navigating Internships and Placements', date: '2026-04-18', time: '22:00', place: 'Google Meet', type: 'Workshop', desc: 'Learn from real experience, not just advice.' },
+    { title: 'ENVISION-X 2.0: Inter University Coding Challenge', date: '2026-02-09', time: '09:00', place: 'Auditorium (AUC) & Virtual', type: 'Competition', desc: 'The biggest tech innovation challenge is back — a 45-day online project-based challenge.' },
+    { title: 'AI Launchpad', date: '2026-01-09', time: '10:00', place: 'Auditorium', type: 'Workshop', desc: 'Empowering future innovators with hands-on AI.' },
+    { title: 'NetRise — Rise in Networking', date: '2025-12-16', time: '10:00', place: 'Seminar Hall (B Block)', type: 'Workshop', desc: 'Introduces first-year students to networking and industry-ready skills.' },
+    { title: 'Prompt to Product: AI Full-Stack Workshop', date: '2025-11-27', time: '21:00', place: 'Hybrid', type: 'Workshop', desc: 'Turn your ideas into a real app or website, hands-on with AI.' },
+    { title: 'Legacy Connect 1.0', date: '2025-09-12', time: '08:45 PM', place: 'Virtual Session', type: 'Seminar', desc: 'From footsteps to milestones — learn from those who walked before you.' },
+    { title: "Devity Summit '2025", date: '2025-09-02', time: '09:00', place: 'Auditorium', type: 'Bootcamp', desc: 'Learn from the leaders. Build for the industry.' },
+    { title: 'NetCamp', date: '2025-08-04', time: '10:00', place: 'Auditorium AUC', type: 'Bootcamp', desc: 'Summer internship with industrial training 2025.' },
+    { title: 'Jumpstart Your Tech Career', date: '2025-05-06', time: '11:00', place: 'Auditorium', type: 'Seminar', desc: 'Master networking fundamentals and learn CCNA & CCNP for job readiness.' },
+    { title: 'CodeFusion: The DevOps Synergy', date: '2025-02-04', time: '11:00 AM – 01:00 PM', place: 'Auditorium', type: 'Seminar', desc: 'Unifying development and operations for automation and continuous delivery.' },
+    { title: 'Net Secure 2025', date: '2025-01-20', time: '10:30', place: 'Auditorium', type: 'Seminar', desc: 'Building careers in network security.' },
+    { title: 'Tech Elevate 2024', date: '2024-11-22', time: '10:00', place: 'Auditorium', type: 'Seminar', desc: 'DevOps and cloud computing.' }
+  ];
+  const d = (iso) => new Date(iso + 'T00:00:00Z');
+  const fmt = (iso, opts) => d(iso).toLocaleDateString('en-US', { ...opts, timeZone: 'UTC' });
+  const total = EVENTS.length;
+
+  document.getElementById('rail').innerHTML = EVENTS.map((e, i) => `
+    <article class="ticket t-${e.type}">
+      <div class="stub"><b>${fmt(e.date, { day: '2-digit' })}</b><small>${fmt(e.date, { month: 'short' }).toUpperCase()}</small><span>${d(e.date).getUTCFullYear()}</span><em>ADMIT ONE</em></div>
+      <div class="body">
+        <span class="stamp">COMPLETED</span>
+        <span class="tag">${e.type}</span>
+        <h3>${e.title}</h3>
+        <div class="meta"><span><i class="ti ti-clock"></i>${e.time}</span><span><i class="ti ti-map-pin"></i>${e.place}</span></div>
+        <p class="desc">${e.desc}</p>
+        <div class="foot"><span class="no">No. ${String(total - i).padStart(3, '0')}</span><span class="barcode" aria-hidden="true"></span></div>
+      </div>
+    </article>`).join('');
+
+  // Arrows + progress dots
+  const rail = document.getElementById('rail');
+  const dots = document.getElementById('dots');
+  const pages = () => Math.max(1, Math.ceil(rail.scrollWidth / rail.clientWidth));
+  const syncDots = () => {
+    const n = pages(); const current = Math.round(rail.scrollLeft / Math.max(1, rail.scrollWidth - rail.clientWidth) * (n - 1));
+    dots.innerHTML = Array.from({ length: n }, (_, i) => `<span class="${i === current ? 'on' : ''}"></span>`).join('');
+    document.querySelector('[data-scroll="-1"]').disabled = rail.scrollLeft < 4;
+    document.querySelector('[data-scroll="1"]').disabled = rail.scrollLeft > rail.scrollWidth - rail.clientWidth - 4;
+  };
+  document.querySelectorAll('[data-scroll]').forEach((b) => b.addEventListener('click', () => rail.scrollBy({ left: Number(b.dataset.scroll) * (rail.clientWidth - 60), behavior: 'smooth' })));
+  rail.addEventListener('scroll', () => requestAnimationFrame(syncDots));
+  addEventListener('resize', syncDots);
+  syncDots();
+
+  // Scheme switcher
+  const notes = {
+    classic: 'Classic — cream ticket, navy stub, gold accents. Closest to the rest of the site.',
+    midnight: 'Midnight gold — dark navy ticket with a gold stub and a thin gold edge. Most premium on the slate background.',
+    champagne: 'Champagne — warm gold-cream ticket with a deep bronze stub. Soft and elegant.',
+    typed: 'Colour-coded — white ticket; the stub colour shows the event type (blue workshop, gold seminar, pink competition, green bootcamp).',
+    outline: 'Gold outline — see-through ticket drawn with a gold line. Minimal and modern.',
+    royal: 'Royal — white ticket with a deep navy→indigo gradient stub. Bold, high contrast.'
+  };
+  const pick = (t) => {
+    document.documentElement.dataset.theme = t;
+    document.querySelectorAll('[data-pick]').forEach((b) => b.classList.toggle('on', b.dataset.pick === t));
+    document.getElementById('note').textContent = notes[t];
+  };
+  document.querySelectorAll('[data-pick]').forEach((b) => b.addEventListener('click', () => pick(b.dataset.pick)));
+  pick('classic');
+</script>
+</body>
+</html>

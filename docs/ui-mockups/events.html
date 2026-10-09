@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DevityClub — Events section options</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" rel="stylesheet" />
+<style>
+  :root { --slate: #0f172a; --slate2: #111a2e; --card: #16213a; --line: rgba(255,255,255,.09); --text: #e6edf7; --muted: #94a3b8; --gold: #c9a227; --gold-soft: rgba(201,162,39,.12); --navy: #0b2a5b; --cream: #f6f3ec; --ease: cubic-bezier(.22,1,.36,1); }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: #e9e6df; color: var(--text); }
+  p, h2, h3, h4 { margin: 0; }
+  .serif { font-family: 'Playfair Display', Georgia, serif; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+
+  /* Mockup chrome (not part of the site) */
+  .jump { position: sticky; top: 0; z-index: 100; background: #111; color: #fff; font-size: 13px; }
+  .jump .inner { max-width: 1280px; margin: 0 auto; display: flex; gap: 8px; align-items: center; padding: 10px 24px; flex-wrap: wrap; }
+  .jump a { border: 1px solid #444; padding: 6px 12px; border-radius: 8px; color: #ddd; text-decoration: none; }
+  .jump a:hover { background: #fff; color: #111; }
+  .label { max-width: 1280px; margin: 64px auto 12px; padding: 0 24px; font-size: 14px; font-weight: 600; color: #333; display: flex; gap: 10px; align-items: baseline; }
+  .label b { background: #111; color: #fff; padding: 3px 9px; border-radius: 6px; }
+  .label span { color: #666; font-weight: 400; }
+  .frame { max-width: 1280px; margin: 0 auto; border-radius: 14px; overflow: clip; box-shadow: 0 20px 50px rgba(0,0,0,.18); background: var(--slate); position: relative; }
+  .frame > section { padding: 88px 0; position: relative; }
+
+  /* Shared site pieces */
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+  .rule { display: block; width: 44px; height: 2px; background: var(--gold); margin: 10px 0 20px; }
+  .center { text-align: center; }
+  .center .rule { margin-left: auto; margin-right: auto; }
+  h2 { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 44px; line-height: 1.1; color: #fff; }
+  h2 .gold { color: var(--gold); }
+  .sub { color: #c7d2e8; font-size: 16.5px; line-height: 1.7; margin-top: 14px; max-width: 620px; }
+  .center .sub { margin-left: auto; margin-right: auto; }
+  .glow { position: absolute; border-radius: 50%; filter: blur(110px); opacity: .16; pointer-events: none; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: var(--muted); font: 600 13.5px 'Inter'; padding: 8px 14px; border-radius: 999px; cursor: pointer; transition: all .25s; }
+  .chip:hover { color: #fff; border-color: rgba(255,255,255,.25); }
+  .chip.on { background: var(--gold); border-color: var(--gold); color: #0b1d3a; }
+  .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 4px 9px; border-radius: 6px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
+  .meta i { color: var(--gold); margin-right: 4px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; font: 600 14px 'Inter'; padding: 11px 18px; border-radius: 9px; border: 0; cursor: pointer; text-decoration: none; transition: transform .2s var(--ease); }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.gold { background: var(--gold); color: #0b1d3a; }
+  .btn.ghost { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.25); }
+  .more { display: flex; justify-content: center; margin-top: 36px; }
+  .empty-upcoming { display: flex; align-items: center; gap: 18px; border: 1px dashed rgba(201,162,39,.4); background: var(--gold-soft); border-radius: 14px; padding: 20px 24px; }
+  .empty-upcoming i { font-size: 28px; color: var(--gold); }
+  .clamp2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .clamp3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Type colours (one accent per event type) */
+  .t-Workshop { --tc: #60a5fa; } .t-Seminar { --tc: #c9a227; } .t-Competition { --tc: #f472b6; } .t-Bootcamp { --tc: #34d399; } .t-Hackathon { --tc: #a78bfa; }
+  .tag.typed { background: color-mix(in srgb, var(--tc) 16%, transparent); color: var(--tc); }
+
+  /* ===== 1. Date-block cards (grid + filters) ===== */
+  .g1 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 28px; }
+  .c1 { display: flex; gap: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; transition: transform .35s var(--ease), border-color .3s, box-shadow .35s; }
+  .c1:hover { transform: translateY(-4px); border-color: rgba(201,162,39,.45); box-shadow: 0 20px 40px rgba(0,0,0,.3); }
+  .c1 .date { flex-shrink: 0; width: 64px; height: 72px; border-radius: 12px; background: var(--gold-soft); border: 1px solid rgba(201,162,39,.35); display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
+  .c1 .date b { font-family: 'Playfair Display', serif; font-size: 28px; color: #fff; }
+  .c1 .date small { font-size: 11px; font-weight: 800; letter-spacing: .1em; color: var(--gold); margin-top: 4px; }
+  .c1 .date span { font-size: 10px; color: var(--muted); margin-top: 3px; }
+  .c1 h3 { font-size: 16.5px; font-weight: 700; color: #fff; line-height: 1.35; margin: 8px 0 8px; }
+  .c1 p { font-size: 13.5px; line-height: 1.55; color: var(--muted); margin-top: 10px; }
+
+  /* ===== 2. Timeline by year ===== */
+  .year { display: flex; align-items: center; gap: 16px; margin: 44px 0 22px; }
+  .year b { font-family: 'Playfair Display', serif; font-size: 30px; color: #fff; }
+  .year span { height: 1px; flex: 1; background: linear-gradient(90deg, rgba(201,162,39,.5), transparent); }
+  .year small { color: var(--muted); font-size: 13px; }
+  .tl { position: relative; padding-left: 32px; }
+  .tl::before { content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: rgba(201,162,39,.25); }
+  .c2 { position: relative; display: grid; grid-template-columns: 120px 1fr auto; gap: 22px; align-items: start; padding: 18px 22px; border-radius: 14px; border: 1px solid transparent; transition: background .25s, border-color .25s; margin-bottom: 6px; }
+  .c2:hover { background: var(--card); border-color: var(--line); }
+  .c2::before { content: ''; position: absolute; left: -31px; top: 24px; width: 14px; height: 14px; border-radius: 50%; background: var(--slate); border: 2px solid var(--gold); transition: background .25s; }
+  .c2:hover::before { background: var(--gold); }
+  .c2 .when { color: var(--gold); font-weight: 700; font-size: 14px; }
+  .c2 .when small { display: block; color: var(--muted); font-weight: 500; font-size: 12.5px; margin-top: 3px; }
+  .c2 h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .c2 p { font-size: 14px; color: var(--muted); line-height: 1.55; margin-top: 8px; }
+
+  /* ===== 3. Ticket cards (carousel) ===== */
+  .rail-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .arrows { display: flex; gap: 8px; }
+  .arrows button { width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,.2); background: transparent; color: #fff; font-size: 18px; cursor: pointer; transition: background .2s; }
+  .arrows button:hover { background: var(--gold); color: #0b1d3a; border-color: var(--gold); }
+  .rail { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 28px 32px 12px; margin: 0 -32px; scrollbar-width: none; }
+  .rail::-webkit-scrollbar { display: none; }
+  .c3 { scroll-snap-align: start; flex: 0 0 340px; display: grid; grid-template-columns: 92px 1fr; background: var(--cream); color: #0b1d3a; border-radius: 16px; overflow: hidden; position: relative; transition: transform .35s var(--ease); }
+  .c3:hover { transform: translateY(-6px) rotate(-.6deg); }
+  .c3 .stub { background: var(--navy); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 16px 0; }
+  .c3 .stub b { font-family: 'Playfair Display', serif; font-size: 34px; line-height: 1; }
+  .c3 .stub small { font-size: 12px; font-weight: 800; letter-spacing: .12em; color: var(--gold); margin-top: 6px; }
+  .c3 .stub span { font-size: 11px; color: #9fb0cc; margin-top: 4px; }
+  .c3 .stub::after { content: ''; position: absolute; right: -1px; top: 10px; bottom: 10px; border-right: 2px dashed rgba(255,255,255,.35); }
+  .c3::before, .c3::after { content: ''; position: absolute; left: 82px; width: 20px; height: 20px; border-radius: 50%; background: var(--slate); z-index: 2; }
+  .c3::before { top: -10px; } .c3::after { bottom: -10px; }
+  .c3 .body { padding: 18px 18px 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .c3 h3 { font-size: 16px; font-weight: 800; line-height: 1.3; }
+  .c3 p { font-size: 13px; color: #55607a; line-height: 1.5; }
+  .c3 .meta { color: #55607a; font-size: 12.5px; }
+  .c3 .tag.typed { background: color-mix(in srgb, var(--tc) 22%, white); color: #0b1d3a; }
+
+  /* ===== 4. Agenda list ===== */
+  .agenda { margin-top: 30px; border-top: 1px solid var(--line); }
+  .c4 { display: grid; grid-template-columns: 110px 1fr 170px 40px; gap: 24px; align-items: center; padding: 22px 8px; border-bottom: 1px solid var(--line); cursor: pointer; transition: background .25s, padding .3s var(--ease); }
+  .c4:hover { background: linear-gradient(90deg, var(--gold-soft), transparent 70%); padding-left: 18px; }
+  .c4 .d { font-family: 'Playfair Display', serif; color: #fff; font-size: 22px; font-weight: 800; line-height: 1.1; }
+  .c4 .d small { display: block; font-family: 'Inter'; font-size: 12px; font-weight: 600; color: var(--muted); margin-top: 4px; letter-spacing: .04em; }
+  .c4 h3 { font-size: 18px; color: #fff; font-weight: 700; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .c4 p { font-size: 14px; color: var(--muted); margin-top: 5px; }
+  .c4 .where { font-size: 13px; color: var(--muted); }
+  .c4 .arrow { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all .3s; }
+  .c4:hover .arrow { background: var(--gold); color: #0b1d3a; border-color: var(--gold); transform: rotate(-45deg); }
+  .c4 .detail { grid-column: 2 / 4; max-height: 0; overflow: hidden; transition: max-height .4s var(--ease); font-size: 14px; color: #c7d2e8; line-height: 1.6; }
+  .c4.open .detail { max-height: 120px; }
+
+  /* ===== 5. Bento highlights ===== */
+  .stats5 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 32px; }
+  .stats5 div { border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; background: rgba(255,255,255,.02); }
+  .stats5 b { font-family: 'Playfair Display', serif; font-size: 34px; color: var(--gold); display: block; line-height: 1; }
+  .stats5 span { font-size: 13px; color: var(--muted); margin-top: 6px; display: block; }
+  .bento { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 200px; gap: 14px; margin-top: 14px; }
+  .c5 { position: relative; border-radius: 16px; overflow: hidden; padding: 20px; display: flex; flex-direction: column; justify-content: flex-end; border: 1px solid var(--line); background: radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--tc) 30%, transparent), transparent 55%), var(--card); transition: transform .35s var(--ease), border-color .3s; }
+  .c5:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--tc) 60%, transparent); }
+  .c5.big { grid-column: span 2; grid-row: span 2; }
+  .c5.wide { grid-column: span 2; }
+  .c5 .num { position: absolute; top: 16px; right: 18px; font-family: 'Playfair Display', serif; font-size: 13px; color: var(--muted); }
+  .c5 .big-date { position: absolute; top: 18px; left: 20px; font-family: 'Playfair Display', serif; font-size: 44px; color: rgba(255,255,255,.12); font-weight: 800; line-height: 1; }
+  .c5 h3 { color: #fff; font-size: 17px; font-weight: 700; line-height: 1.3; margin-top: 8px; }
+  .c5.big h3 { font-size: 28px; font-family: 'Playfair Display', serif; font-weight: 800; }
+  .c5 p { color: var(--muted); font-size: 13.5px; line-height: 1.55; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div class="jump"><div class="inner">
+  <strong>Events section options:</strong>
+  <a href="#e1">1 · Date-block grid</a><a href="#e2">2 · Timeline by year</a><a href="#e3">3 · Ticket carousel</a><a href="#e4">4 · Agenda list</a><a href="#e5">5 · Highlights bento</a>
+</div></div>
+
+<!-- 1 -->
+<div class="label" id="e1"><b>1</b> Date-block grid <span>— big gold date on each card, type filters, "Show more". Clean and scannable; works with any number of events.</span></div>
+<div class="frame"><section>
+  <div class="glow" style="width:420px;height:420px;background:var(--gold);top:-140px;left:-100px"></div>
+  <div class="wrap">
+    <div class="center"><p class="eyebrow">Events</p><span class="rule"></span><h2>Our <span class="gold">events</span></h2><p class="sub">Workshops, bootcamps, seminars and competitions run by the club.</p></div>
+    <div class="empty-upcoming" style="margin-top:36px"><i class="ti ti-calendar-time"></i><div><b style="color:#fff">No upcoming events right now</b><p style="color:var(--muted);font-size:14px;margin-top:3px">The next one will show up here first. Follow us on Instagram to hear about it.</p></div><a class="btn ghost" style="margin-left:auto" href="#">Follow us</a></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:40px">
+      <h3 class="serif" style="font-size:24px;color:#fff;font-weight:800">Past events</h3>
+      <div class="chips" data-filter="g1"></div>
+    </div>
+    <div class="g1" id="g1"></div>
+    <div class="more"><button class="btn ghost" data-more="g1">Show all events</button></div>
+  </div>
+</section></div>
+
+<!-- 2 -->
+<div class="label" id="e2"><b>2</b> Timeline by year <span>— events grouped under 2026 / 2025 / 2024 on a gold line. Tells the club's story; nodes fill gold on hover.</span></div>
+<div class="frame"><section>
+  <div class="glow" style="width:460px;height:460px;background:#1d4ed8;bottom:-160px;right:-120px"></div>
+  <div class="wrap" style="max-width:980px">
+    <div><p class="eyebrow">Events</p><span class="rule"></span><h2>A year of <span class="gold">learning by doing</span></h2><p class="sub">Every workshop, bootcamp and summit we've run — newest first.</p></div>
+    <div id="tl"></div>
+  </div>
+</section></div>
+
+<!-- 3 -->
+<div class="label" id="e3"><b>3</b> Ticket carousel <span>— cream ticket-style cards with a navy date stub and punched notches; swipe or use the arrows. Fun and on-theme.</span></div>
+<div class="frame"><section>
+  <div class="wrap">
+    <div class="rail-head">
+      <div><p class="eyebrow">Events</p><span class="rule"></span><h2>Events we've <span class="gold">hosted</span></h2></div>
+      <div class="arrows"><button data-scroll="-1" aria-label="Previous">←</button><button data-scroll="1" aria-label="Next">→</button></div>
+    </div>
+    <div class="rail" id="rail"></div>
+  </div>
+</section></div>
+
+<!-- 4 -->
+<div class="label" id="e4"><b>4</b> Agenda list <span>— editorial rows like a conference agenda; hover slides the row and turns the arrow gold; click a row to expand the description.</span></div>
+<div class="frame"><section>
+  <div class="wrap" style="max-width:1040px">
+    <div style="display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap">
+      <div><p class="eyebrow">Events</p><span class="rule"></span><h2>The <span class="gold">agenda</span> so far</h2></div>
+      <div class="chips" data-filter="agenda"></div>
+    </div>
+    <div class="agenda" id="agenda"></div>
+    <div class="more"><button class="btn ghost" data-more="agenda">Show all events</button></div>
+  </div>
+</section></div>
+
+<!-- 5 -->
+<div class="label" id="e5"><b>5</b> Highlights bento <span>— stats row, then the biggest events large and the rest as tiles tinted by event type. Most visual without needing photos.</span></div>
+<div class="frame"><section>
+  <div class="glow" style="width:420px;height:420px;background:var(--gold);top:-140px;right:-80px"></div>
+  <div class="wrap">
+    <div class="center"><p class="eyebrow">Events</p><span class="rule"></span><h2>What we've <span class="gold">built together</span></h2></div>
+    <div class="stats5"><div><b id="s-total">0</b><span>events hosted</span></div><div><b id="s-work">0</b><span>workshops &amp; bootcamps</span></div><div><b id="s-seminar">0</b><span>seminars &amp; talks</span></div><div><b id="s-comp">0</b><span>competitions</span></div></div>
+    <div class="bento" id="bento"></div>
+  </div>
+</section></div>
+
+<div style="height:120px"></div>
+
+<script>
+  // Real event names from the live site (dates/times/places as shown there)
+  const EVENTS = [
+    { title: 'From Fresher to First Offer Letter: Navigating Internships and Placements', date: '2026-04-18', time: '22:00', place: 'Google Meet', type: 'Workshop', desc: 'Learn from real experience, not just advice.' },
+    { title: 'ENVISION-X 2.0: Inter University Coding Challenge', date: '2026-02-09', time: '09:00', place: 'Auditorium (AUC) & Virtual', type: 'Competition', desc: 'The biggest tech innovation challenge is back — a 45-day online project-based challenge where ideas turn into reality.' },
+    { title: 'AI Launchpad', date: '2026-01-09', time: '10:00', place: 'Auditorium', type: 'Workshop', desc: 'Empowering future innovators with hands-on AI.' },
+    { title: 'NetRise — Rise in Networking', date: '2025-12-16', time: '10:00', place: 'Seminar Hall (B Block)', type: 'Workshop', desc: 'A career-focused technical event that introduces first-year students to networking and industry-ready skills.' },
+    { title: 'Prompt to Product: AI Full-Stack Workshop', date: '2025-11-27', time: '21:00', place: 'Hybrid', type: 'Workshop', desc: 'Turn your ideas into a real app or website, hands-on with AI.' },
+    { title: 'Core Team Exclusive Program', date: '2025-11-15', time: '21:00', place: 'Google Meet', type: 'Workshop', desc: 'Boost your developer profile and gear up for future opportunities.' },
+    { title: 'Legacy Connect 1.0', date: '2025-09-12', time: '08:45 PM', place: 'Virtual Session', type: 'Seminar', desc: 'From footsteps to milestones — learn from those who walked before you.' },
+    { title: 'The Devity Spark', date: '2025-09-07', time: '10:30 AM', place: 'Auditorium', type: 'Seminar', desc: 'Spark your journey into tech with the club.' },
+    { title: "Devity Summit '2025", date: '2025-09-02', time: '09:00', place: 'Auditorium', type: 'Bootcamp', desc: 'Learn from the leaders. Build for the industry.' },
+    { title: 'NetCamp', date: '2025-08-04', time: '10:00', place: 'Auditorium AUC', type: 'Bootcamp', desc: 'Summer internship with industrial training 2025.' },
+    { title: 'Jumpstart Your Tech Career', date: '2025-05-06', time: '11:00', place: 'Auditorium', type: 'Seminar', desc: 'Master networking fundamentals and learn CCNA & CCNP for job readiness.' },
+    { title: 'ENVISION-X 2025: Transform Ideas into Reality', date: '2025-02-04', time: '10:00', place: 'Online · Virtual', type: 'Competition', desc: 'A 45-day online project-based innovation challenge.' },
+    { title: 'CodeFusion: The DevOps Synergy', date: '2025-02-04', time: '11:00 AM – 01:00 PM', place: 'Auditorium', type: 'Seminar', desc: 'Unifying development and operations for seamless integration, automation and continuous delivery.' },
+    { title: 'Net Secure 2025', date: '2025-01-20', time: '10:30', place: 'Auditorium', type: 'Seminar', desc: 'Building careers in network security.' },
+    { title: 'Tech Elevate 2024', date: '2024-11-22', time: '10:00', place: 'Auditorium', type: 'Seminar', desc: 'DevOps and cloud computing.' }
+  ];
+  const d = (iso) => new Date(iso + 'T00:00:00Z');
+  const day = (iso) => d(iso).toLocaleDateString('en-US', { day: '2-digit', timeZone: 'UTC' });
+  const mon = (iso) => d(iso).toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' }).toUpperCase();
+  const yr = (iso) => d(iso).getUTCFullYear();
+  const full = (iso) => d(iso).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  const types = ['All', ...new Set(EVENTS.map((e) => e.type))];
+  const tag = (e) => `<span class="tag typed t-${e.type}">${e.type}</span>`;
+  const state = { g1: { filter: 'All', all: false }, agenda: { filter: 'All', all: false } };
+
+  const card1 = (e) => `<article class="c1 t-${e.type}"><div class="date"><b>${day(e.date)}</b><small>${mon(e.date)}</small><span>${yr(e.date)}</span></div>
+    <div style="min-width:0">${tag(e)}<h3 class="clamp2">${e.title}</h3><div class="meta"><span><i class="ti ti-clock"></i>${e.time}</span><span><i class="ti ti-map-pin"></i>${e.place}</span></div><p class="clamp2">${e.desc}</p></div></article>`;
+  const card4 = (e) => `<article class="c4 t-${e.type}" onclick="this.classList.toggle('open')"><div class="d">${day(e.date)} ${mon(e.date)}<small>${yr(e.date)}</small></div>
+    <div><h3>${e.title} ${tag(e)}</h3><p>${e.time}</p></div><div class="where"><i class="ti ti-map-pin" style="color:var(--gold)"></i> ${e.place}</div><div class="arrow"><i class="ti ti-arrow-right"></i></div><div class="detail">${e.desc}</div></article>`;
+
+  const renderList = (id, cardFn, limit) => {
+    const s = state[id];
+    const list = EVENTS.filter((e) => s.filter === 'All' || e.type === s.filter);
+    document.getElementById(id).innerHTML = (s.all ? list : list.slice(0, limit)).map(cardFn).join('');
+    const btn = document.querySelector(`[data-more="${id}"]`);
+    btn.parentElement.style.display = list.length > limit ? 'flex' : 'none';
+    btn.textContent = s.all ? 'Show fewer' : `Show all ${list.length} events`;
+  };
+  const setup = (id, cardFn, limit) => {
+    const chips = document.querySelector(`[data-filter="${id}"]`);
+    chips.innerHTML = types.map((t) => `<button class="chip${t === 'All' ? ' on' : ''}" data-t="${t}">${t}</button>`).join('');
+    chips.addEventListener('click', (ev) => {
+      const t = ev.target.dataset.t; if (!t) return;
+      state[id].filter = t; state[id].all = false;
+      chips.querySelectorAll('.chip').forEach((c) => c.classList.toggle('on', c.dataset.t === t));
+      renderList(id, cardFn, limit);
+    });
+    document.querySelector(`[data-more="${id}"]`).addEventListener('click', () => { state[id].all = !state[id].all; renderList(id, cardFn, limit); });
+    renderList(id, cardFn, limit);
+  };
+  setup('g1', card1, 6);
+  setup('agenda', card4, 6);
+
+  // 2 · Timeline grouped by year
+  const byYear = EVENTS.reduce((acc, e) => { (acc[yr(e.date)] = acc[yr(e.date)] || []).push(e); return acc; }, {});
+  document.getElementById('tl').innerHTML = Object.keys(byYear).sort((a, b) => b - a).map((y) => `
+    <div class="year"><b>${y}</b><span></span><small>${byYear[y].length} events</small></div>
+    <div class="tl">${byYear[y].map((e) => `<article class="c2 t-${e.type}"><div class="when">${day(e.date)} ${mon(e.date)}<small>${e.time}</small></div>
+      <div><h3>${e.title}</h3><div class="meta"><span><i class="ti ti-map-pin"></i>${e.place}</span></div><p class="clamp2">${e.desc}</p></div><div>${tag(e)}</div></article>`).join('')}</div>`).join('');
+
+  // 3 · Ticket carousel
+  document.getElementById('rail').innerHTML = EVENTS.map((e) => `<article class="c3 t-${e.type}"><div class="stub"><b>${day(e.date)}</b><small>${mon(e.date)}</small><span>${yr(e.date)}</span></div>
+    <div class="body">${tag(e)}<h3 class="clamp2">${e.title}</h3><div class="meta"><span><i class="ti ti-clock"></i>${e.time}</span><span><i class="ti ti-map-pin"></i>${e.place}</span></div><p class="clamp2">${e.desc}</p></div></article>`).join('');
+  document.querySelectorAll('[data-scroll]').forEach((b) => b.addEventListener('click', () => document.getElementById('rail').scrollBy({ left: Number(b.dataset.scroll) * 360, behavior: 'smooth' })));
+
+  // 5 · Bento highlights
+  const count = (pred) => EVENTS.filter(pred).length;
+  document.getElementById('s-total').textContent = EVENTS.length;
+  document.getElementById('s-work').textContent = count((e) => ['Workshop', 'Bootcamp'].includes(e.type));
+  document.getElementById('s-seminar').textContent = count((e) => e.type === 'Seminar');
+  document.getElementById('s-comp').textContent = count((e) => e.type === 'Competition');
+  const sizes = ['big', '', '', 'wide', '', '', '', 'wide'];
+  document.getElementById('bento').innerHTML = EVENTS.slice(0, 10).map((e, i) => `<article class="c5 t-${e.type} ${sizes[i] || ''}"><span class="big-date">${day(e.date)} ${mon(e.date)}</span><span class="num">${yr(e.date)}</span>
+    <div>${tag(e)}<h3 class="${sizes[i] === 'big' ? '' : 'clamp2'}">${e.title}</h3>${sizes[i] === 'big' || sizes[i] === 'wide' ? `<p class="clamp2">${e.desc}</p>` : ''}<div class="meta" style="margin-top:8px"><span><i class="ti ti-map-pin"></i>${e.place}</span></div></div></article>`).join('');
+</script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DevityClub — Follow us + Footer options</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #0b1d3a; --navy: #0b2a5b; --gold: #c9a227; --gold-dark: #8a6d12;
+    --cream: #f6f3ec; --cream-line: #e4e0d6; --muted: #55607a; --line: rgba(11,29,58,.1);
+    --slate: #0f172a; --slate-2: #1e293b; --dim: #94a3b8; --soft: #cbd5e1; --hair: rgba(255,255,255,.08);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #e9e6df; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--ink); }
+  h2, h3, h4, p, ul { margin: 0; } ul { list-style: none; padding: 0; }
+  a { color: inherit; text-decoration: none; }
+  .group-title { max-width: 1280px; margin: 44px auto 0; padding: 0 24px; font-size: 22px; font-weight: 800; }
+  .label { max-width: 1280px; margin: 26px auto 0; padding: 0 24px; font-size: 14px; color: #444; }
+  .label b { font-size: 16px; color: var(--ink); margin-right: 6px; }
+  .frame { max-width: 1280px; margin: 12px auto 0; border-radius: 14px; overflow: clip; box-shadow: 0 20px 50px rgba(0,0,0,.12); }
+  body > .frame:last-of-type { margin-bottom: 60px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+  /* End of the white Contact section, for context */
+  .prev { background: #fff; height: 70px; display: flex; align-items: center; justify-content: center; color: #b6bcc8; font-size: 12.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand img { height: 40px; }
+  .brand b { font-size: 22px; font-weight: 800; letter-spacing: -.02em; color: #fff; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+  .f2-band p.eyebrow, .s6-banner p.eyebrow { color: var(--gold); }
+  .toggle { width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--hair); background: rgba(255,255,255,.05); color: #facc15; display: inline-flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .toggle.light { background: #fff; border-color: var(--line); color: var(--navy); }
+  .copy { font-size: 13.5px; color: var(--dim); }
+  .heart { color: #f43f5e; }
+
+  /* Social brand colours (icons only) */
+  .s-github i { color: #f1f5f9; } .s-linkedin i { color: #60a5fa; } .s-x i { color: #f1f5f9; }
+  .s-instagram i { color: #f472b6; } .s-discord i { color: #818cf8; }
+
+  /* ---------- 1: Four-column footer ---------- */
+  .f1 { background: var(--slate); color: #fff; padding: 72px 0 0; }
+  .f1-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.2fr; gap: 40px; }
+  .f1 .about { color: var(--dim); font-size: 14.5px; line-height: 1.65; margin: 18px 0 22px; max-width: 320px; }
+  .f1-social { display: flex; gap: 10px; }
+  .f1-social a { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,.06); border: 1px solid var(--hair); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .f1 h4 { font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+  .f1 li { margin-bottom: 12px; font-size: 14.5px; color: var(--soft); }
+  .f1 li i { color: var(--gold); font-size: 18px; vertical-align: -3px; margin-right: 8px; }
+  .f1-bottom { margin-top: 56px; border-top: 1px solid var(--hair); padding: 22px 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+
+  /* ---------- 2: Social band + slim footer ---------- */
+  .f2 { background: var(--slate); color: #fff; }
+  .f2-band { padding: 64px 0 52px; text-align: center; }
+  .f2-band h2 { font-size: 40px; font-weight: 800; letter-spacing: -.03em; margin-top: 10px; }
+  .f2-band h2 span { color: var(--gold); }
+  .f2-band p { color: var(--dim); font-size: 16px; margin-top: 10px; }
+  .f2-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 36px; }
+  .f2-row a { display: flex; align-items: center; gap: 14px; text-align: left; padding: 16px 18px; border-radius: 16px; background: rgba(255,255,255,.05); border: 1px solid var(--hair); }
+  .f2-row i { font-size: 30px; }
+  .f2-row b { display: block; font-size: 14.5px; font-weight: 700; }
+  .f2-row small { font-size: 12px; color: var(--dim); font-weight: 500; }
+  .f2-bar { border-top: 1px solid var(--hair); padding: 22px 0; }
+  .f2-bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+  .f2-links { display: flex; gap: 22px; font-size: 14px; font-weight: 600; color: var(--soft); }
+  .f2-bar .brand img { height: 32px; } .f2-bar .brand b { font-size: 18px; }
+
+  /* ---------- 3: Oversized wordmark ---------- */
+  .f3 { background: var(--slate); color: #fff; padding: 72px 0 0; overflow: hidden; }
+  .f3-top { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: start; }
+  .f3 h2 { font-size: 42px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin-top: 12px; }
+  .f3 h2 span { color: var(--gold); }
+  .f3 .lead { color: var(--dim); font-size: 15.5px; margin-top: 14px; line-height: 1.6; max-width: 420px; }
+  .f3 .mail { display: inline-flex; align-items: center; gap: 10px; margin-top: 24px; font-size: 17px; font-weight: 700; color: #fff; padding-bottom: 4px; border-bottom: 2px solid var(--gold); }
+  .f3-list a { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 14px; padding: 15px 0; border-bottom: 1px solid var(--hair); }
+  .f3-list a:first-child { border-top: 1px solid var(--hair); }
+  .f3-list i { font-size: 26px; }
+  .f3-list b { font-size: 16px; font-weight: 700; }
+  .f3-list small { display: block; font-size: 13px; color: var(--dim); font-weight: 500; }
+  .f3-list .ti-arrow-up-right { font-size: 20px; color: var(--dim) !important; }
+  .f3-meta { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 56px; flex-wrap: wrap; }
+  .f3-nav { display: flex; gap: 22px; font-size: 14px; font-weight: 600; color: var(--soft); flex-wrap: wrap; }
+  .f3-word { font-size: clamp(80px, 15.5vw, 205px); font-weight: 800; letter-spacing: -.06em; line-height: .78; text-align: center; margin-top: 36px; color: transparent; background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.02)); -webkit-background-clip: text; background-clip: text; user-select: none; white-space: nowrap; }
+
+  /* ---------- 4: Centered compact ---------- */
+  .f4 { background: var(--slate); color: #fff; padding: 64px 0 26px; text-align: center; }
+  .f4 .brand { justify-content: center; }
+  .f4 .tag { color: var(--dim); font-size: 15px; margin-top: 14px; }
+  .f4-social { display: flex; justify-content: center; gap: 12px; margin-top: 28px; }
+  .f4-social a { display: inline-flex; align-items: center; gap: 9px; padding: 11px 18px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid var(--hair); font-size: 14px; font-weight: 700; }
+  .f4-social i { font-size: 20px; }
+  .f4-nav { display: flex; justify-content: center; gap: 26px; margin-top: 34px; font-size: 14.5px; font-weight: 600; color: var(--soft); flex-wrap: wrap; }
+  .f4-bottom { margin-top: 38px; padding-top: 22px; border-top: 1px solid var(--hair); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+
+  /* ---------- 5: Separate — light Follow us strip + dark footer ---------- */
+  .s5-follow { background: var(--cream); padding: 64px 0; border-top: 1px solid var(--cream-line); }
+  .s5-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .s5-follow .eyebrow { color: var(--gold-dark); }
+  .s5-follow h2 { font-size: 38px; font-weight: 800; letter-spacing: -.03em; margin-top: 10px; }
+  .s5-follow h2 span { color: var(--navy); }
+  .s5-follow p.sub { color: var(--muted); font-size: 15.5px; margin-top: 8px; }
+  .s5-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 30px; }
+  .s5-grid a { background: #fff; border: 1px solid var(--cream-line); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .s5-grid .ic { width: 46px; height: 46px; border-radius: 13px; background: var(--cream); color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 26px; }
+  .s5-grid b { font-size: 15.5px; font-weight: 800; }
+  .s5-grid small { display: block; font-size: 12.5px; color: var(--muted); font-weight: 500; margin-top: 2px; }
+  .s5-grid .go { font-size: 13px; font-weight: 700; color: var(--navy); display: inline-flex; align-items: center; gap: 5px; margin-top: auto; }
+  .s5-foot { background: var(--slate); color: #fff; padding: 30px 0; }
+  .s5-foot .wrap { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+  .s5-foot .brand img { height: 32px; } .s5-foot .brand b { font-size: 18px; }
+
+  /* ---------- 6: Separate — navy banner + dark footer ---------- */
+  .s6-sec { background: #fff; padding: 0 0 72px; }
+  .s6-banner { background: linear-gradient(120deg, #0b2a5b, #1e3a8a 60%, #312e81); color: #fff; border-radius: 26px; padding: 40px 44px; display: grid; grid-template-columns: 1fr auto; gap: 30px; align-items: center; position: relative; overflow: hidden; }
+  .s6-banner::after { content: ''; position: absolute; width: 300px; height: 300px; right: -90px; top: -150px; border-radius: 50%; background: radial-gradient(circle, rgba(201,162,39,.28), transparent 70%); }
+  .s6-banner h2 { font-size: 34px; font-weight: 800; letter-spacing: -.03em; margin-top: 10px; }
+  .s6-banner h2 span { color: var(--gold); }
+  .s6-banner p { color: #c7d2fe; font-size: 15px; margin-top: 8px; max-width: 440px; }
+  .s6-icons { display: flex; gap: 12px; position: relative; z-index: 1; }
+  .s6-icons a { width: 62px; height: 62px; border-radius: 18px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.14); display: flex; align-items: center; justify-content: center; font-size: 30px; }
+  .s6-foot { background: var(--slate); color: #fff; padding: 48px 0 26px; }
+  .s6-top { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .s6-nav { display: flex; gap: 24px; font-size: 14.5px; font-weight: 600; color: var(--soft); flex-wrap: wrap; }
+  .s6-bottom { margin-top: 32px; padding-top: 22px; border-top: 1px solid var(--hair); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+
+  @media (max-width: 900px) {
+    .f1-grid { grid-template-columns: 1fr 1fr; }
+    .f2-row, .s5-grid { grid-template-columns: repeat(2, 1fr); }
+    .f3-top, .s6-banner { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 0 20px; }
+    .f1-grid, .f2-row { grid-template-columns: 1fr; }
+    .f4-social { flex-wrap: wrap; }
+    .f1-bottom, .f4-bottom, .s6-bottom { flex-direction: column-reverse; text-align: center; }
+    .s6-banner { padding: 30px 24px; } .s6-icons a { width: 52px; height: 52px; font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<p class="group-title">Combined — "Follow us" merged into the footer</p>
+
+<!-- 1 -->
+<p class="label"><b>1 — Four-column footer</b> Brand and social icons on the left, then Explore, Get involved and Contact columns. The most "complete website" look.</p>
+<div class="frame"><div class="prev">… end of Contact section</div>
+<footer class="f1"><div class="wrap">
+  <div class="f1-grid">
+    <div>
+      <div class="brand"><img src="../../frontend/src/img/devity%20logo.png" alt="" /><b>DevityClub</b></div>
+      <p class="about">The tech club of Amity University Chhattisgarh — workshops, hackathons and sessions with engineers who ship real products.</p>
+      <div class="f1-social" data-social="icons"></div>
+    </div>
+    <div><h4>Explore</h4><ul><li>Home</li><li>About</li><li>Events</li><li>Team</li><li>Speakers</li></ul></div>
+    <div><h4>Get involved</h4><ul><li>Join as a student</li><li>Become a mentor</li><li>Propose an event</li><li>Sponsor a hackathon</li></ul></div>
+    <div><h4>Contact</h4><ul><li><i class="ti ti-mail"></i>club.devity@gmail.com</li><li><i class="ti ti-map-pin"></i>Amity University Chhattisgarh, Raipur</li><li><i class="ti ti-brand-discord"></i>Join our Discord</li></ul></div>
+  </div>
+  <div class="f1-bottom"><p class="copy">© 2026 Devity Club. Made with <span class="heart">♥</span> by the Devity Tech Team.</p><span class="toggle"><i class="ti ti-sun"></i></span></div>
+</div></footer></div>
+
+<!-- 2 -->
+<p class="label"><b>2 — Social band + slim footer</b> Keeps a clear "Follow us" moment (with handles) at the top of the footer, then one slim bar with links, copyright and theme toggle.</p>
+<div class="frame"><div class="prev">… end of Contact section</div>
+<footer class="f2">
+  <div class="f2-band"><div class="wrap">
+    <p class="eyebrow">Stay connected</p>
+    <h2>Follow <span>Devity</span></h2>
+    <p>Updates, tech news and community highlights — wherever you hang out.</p>
+    <div class="f2-row" data-social="cards"></div>
+  </div></div>
+  <div class="f2-bar"><div class="wrap">
+    <div class="brand"><img src="../../frontend/src/img/devity%20logo.png" alt="" /><b>DevityClub</b></div>
+    <nav class="f2-links"><a>About</a><a>Events</a><a>Team</a><a>Speakers</a><a>Contact</a></nav>
+    <div style="display:flex;align-items:center;gap:16px"><p class="copy">© 2026 Devity Club</p><span class="toggle"><i class="ti ti-sun"></i></span></div>
+  </div></div>
+</footer></div>
+
+<!-- 3 -->
+<p class="label"><b>3 — Oversized wordmark</b> Big "Let's stay in touch" with the email, socials as a list with handles, and a huge faded DEVITY wordmark at the very bottom.</p>
+<div class="frame"><div class="prev">… end of Contact section</div>
+<footer class="f3"><div class="wrap">
+  <div class="f3-top">
+    <div>
+      <p class="eyebrow">Stay connected</p>
+      <h2>Let's stay <span>in touch</span></h2>
+      <p class="lead">Follow along for event announcements, tech news and community highlights from Devity Club, Amity University Chhattisgarh.</p>
+      <a class="mail" href="mailto:club.devity@gmail.com"><i class="ti ti-mail"></i>club.devity@gmail.com</a>
+    </div>
+    <div class="f3-list" data-social="list"></div>
+  </div>
+  <div class="f3-meta"><div style="display:flex;align-items:center;gap:16px"><p class="copy">© 2026 Devity Club · Made with <span class="heart">♥</span> by the Devity Tech Team</p><span class="toggle"><i class="ti ti-sun"></i></span></div></div>
+  <div class="f3-word" aria-hidden="true">DEVITY</div>
+</div></footer></div>
+
+<!-- 4 -->
+<p class="label"><b>4 — Centered compact</b> Logo, one line about the club, social pills, page links and a bottom bar. Short and tidy.</p>
+<div class="frame"><div class="prev">… end of Contact section</div>
+<footer class="f4"><div class="wrap">
+  <div class="brand"><img src="../../frontend/src/img/devity%20logo.png" alt="" /><b>DevityClub</b></div>
+  <p class="tag">Where Amity's builders learn from the industry.</p>
+  <div class="f4-social" data-social="pills"></div>
+  <nav class="f4-nav"><a>Home</a><a>About</a><a>Events</a><a>Team</a><a>Speakers</a><a>Contact</a></nav>
+  <div class="f4-bottom"><p class="copy">© 2026 Devity Club. All rights reserved.</p><p class="copy">Made with <span class="heart">♥</span> by the Devity Tech Team</p><span class="toggle"><i class="ti ti-sun"></i></span></div>
+</div></footer></div>
+
+<p class="group-title">Separate — "Follow us" stays its own section</p>
+
+<!-- 5 -->
+<p class="label"><b>5 — Light Follow us + slim footer</b> Follow us becomes a light cream section with cards (matches Contact), then a slim dark footer bar.</p>
+<div class="frame"><div class="prev">… end of Contact section</div>
+<section class="s5-follow"><div class="wrap">
+  <div class="s5-head"><div><p class="eyebrow">Stay connected</p><h2>Follow <span>us</span></h2><p class="sub">The latest updates, tech news and community highlights.</p></div></div>
+  <div class="s5-grid" data-social="light"></div>
+</div></section>
+<footer class="s5-foot"><div class="wrap">
+  <div class="brand"><img src="../../frontend/src/img/devity%20logo.png" alt="" /><b>DevityClub</b></div>
+  <p class="copy">© 2026 Devity Club · Made with <span class="heart">♥</span> by the Devity Tech Team</p>
+  <span class="toggle"><i class="ti ti-sun"></i></span>
+</div></footer></div>
+
+<!-- 6 -->
+<p class="label"><b>6 — Navy banner + footer</b> Follow us as a royal-blue banner (same gradient as the event tickets) at the end of Contact, then a two-row dark footer.</p>
+<div class="frame"><div class="prev">… end of Contact section</div>
+<section class="s6-sec"><div class="wrap">
+  <div class="s6-banner">
+    <div><p class="eyebrow">Stay connected</p><h2>Follow <span>us</span></h2><p>Updates, tech news and community highlights — follow Devity wherever you are.</p></div>
+    <div class="s6-icons" data-social="banner"></div>
+  </div>
+</div></section>
+<footer class="s6-foot"><div class="wrap">
+  <div class="s6-top"><div class="brand"><img src="../../frontend/src/img/devity%20logo.png" alt="" /><b>DevityClub</b></div><nav class="s6-nav"><a>Home</a><a>About</a><a>Events</a><a>Team</a><a>Speakers</a><a>Contact</a></nav></div>
+  <div class="s6-bottom"><p class="copy">© 2026 Devity Club · Made with <span class="heart">♥</span> by the Devity Tech Team</p><span class="toggle"><i class="ti ti-sun"></i></span></div>
+</div></footer></div>
+
+<script>
+  const SOCIAL = [
+    { key: 'github', name: 'GitHub', handle: 'devity-club', note: 'Code & projects', href: 'https://github.com/devity-club' },
+    { key: 'linkedin', name: 'LinkedIn', handle: 'devity-club-auc', note: 'Club news', href: 'https://www.linkedin.com/in/devity-club-auc' },
+    { key: 'x', name: 'X', handle: '@devity_club441', note: 'Quick updates', href: 'https://x.com/devity_club441' },
+    { key: 'instagram', name: 'Instagram', handle: '@devity_club_auc', note: 'Event moments', href: 'https://www.instagram.com/devity_club_auc' },
+    { key: 'discord', name: 'Discord', handle: 'Join the server', note: 'Chat with members', href: 'https://discord.gg/p4wPhaBn' }
+  ];
+  const icon = (s) => `<i class="ti ti-brand-${s.key}"></i>`;
+  const render = {
+    icons: (s) => `<a class="s-${s.key}" href="${s.href}" aria-label="${s.name}">${icon(s)}</a>`,
+    cards: (s) => `<a class="s-${s.key}" href="${s.href}">${icon(s)}<span><b>${s.name}</b><small>${s.handle}</small></span></a>`,
+    list: (s) => `<a class="s-${s.key}" href="${s.href}">${icon(s)}<span><b>${s.name}</b><small>${s.handle}</small></span><i class="ti ti-arrow-up-right"></i></a>`,
+    pills: (s) => `<a class="s-${s.key}" href="${s.href}">${icon(s)}${s.name}</a>`,
+    light: (s) => `<a href="${s.href}"><span class="ic">${icon(s)}</span><span><b>${s.name}</b><small>${s.note}</small></span><span class="go">${s.handle} <i class="ti ti-arrow-up-right"></i></span></a>`,
+    banner: (s) => `<a href="${s.href}" aria-label="${s.name}" style="color:#fff">${icon(s)}</a>`
+  };
+  document.querySelectorAll('[data-social]').forEach((el) => { el.innerHTML = SOCIAL.map(render[el.dataset.social]).join(''); });
+</script>
+</body>
+</html>
